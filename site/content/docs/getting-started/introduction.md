@@ -5,7 +5,7 @@ description: What is CONDUYT and why does it exist
 
 # Introduction
 
-CONDUYT (**G**eneric **R**emote **A**ctuator **F**irmware **T**ransport) is an open binary protocol and firmware library for extending hardware control from a host to a connected microcontroller device.
+Conduyt is an open binary protocol and firmware library for extending hardware control from a host to a connected microcontroller device.
 
 ## What It Replaces
 
