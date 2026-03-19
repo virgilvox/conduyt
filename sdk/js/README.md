@@ -1,20 +1,20 @@
-# graft-js
+# conduyt-js
 
-GRAFT protocol SDK for JavaScript and TypeScript. Host-side hardware control over Serial, BLE, MQTT, WebSocket, or TCP.
+CONDUYT protocol SDK for JavaScript and TypeScript. Host-side hardware control over Serial, BLE, MQTT, WebSocket, or TCP.
 
 ## Install
 
 ```bash
-npm install graft-js
+npm install conduyt-js
 ```
 
 ## Quick Start
 
 ```js
-import { GraftDevice } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+import { ConduytDevice } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
-const device = await GraftDevice.connect(
+const device = await ConduytDevice.connect(
   new SerialTransport({ path: '/dev/ttyUSB0' })
 )
 
@@ -34,9 +34,9 @@ await device.disconnect()
 ### Module Usage
 
 ```js
-import { GraftServo } from 'graft-js/modules/servo'
+import { ConduytServo } from 'conduyt-js/modules/servo'
 
-const servo = new GraftServo(device)
+const servo = new ConduytServo(device)
 await servo.attach(9)
 await servo.write(90)
 ```
@@ -51,11 +51,11 @@ const data = await i2c.readReg(0x68, 0x75, 1)
 
 ## API Reference
 
-### GraftDevice
+### ConduytDevice
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GraftDevice.connect(transport)` | `Promise<GraftDevice>` | Connect and run HELLO handshake |
+| `ConduytDevice.connect(transport)` | `Promise<ConduytDevice>` | Connect and run HELLO handshake |
 | `connect()` | `Promise<HelloResp>` | Manual connect, returns capabilities |
 | `disconnect()` | `Promise<void>` | Close connection |
 | `ping()` | `Promise<void>` | Ping/pong roundtrip |
@@ -79,46 +79,46 @@ const data = await i2c.readReg(0x68, 0x75, 1)
 
 | Class | When |
 |-------|------|
-| `GraftNAKError` | Device rejected a command |
-| `GraftTimeoutError` | No response within timeout |
-| `GraftDisconnectedError` | Transport disconnected mid-operation |
-| `GraftCapabilityError` | Pin or feature not supported by device |
+| `ConduytNAKError` | Device rejected a command |
+| `ConduytTimeoutError` | No response within timeout |
+| `ConduytDisconnectedError` | Transport disconnected mid-operation |
+| `ConduytCapabilityError` | Pin or feature not supported by device |
 
 ## Transports
 
 | Transport | Import | Use Case |
 |-----------|--------|----------|
-| `SerialTransport` | `graft-js/transports/serial` | Node.js USB/UART |
-| `WebSerialTransport` | `graft-js/transports/web-serial` | Browser Web Serial API |
-| `BLETransport` | `graft-js/transports/ble` | Bluetooth Low Energy |
-| `MQTTTransport` | `graft-js/transports/mqtt` | MQTT broker relay |
-| `WebSocketTransport` | `graft-js/transports/websocket` | WebSocket connection |
-| `CLASPTransport` | `graft-js/transports/clasp` | CLASP tunnel |
-| `MockTransport` | `graft-js/transports/mock` | Testing |
+| `SerialTransport` | `conduyt-js/transports/serial` | Node.js USB/UART |
+| `WebSerialTransport` | `conduyt-js/transports/web-serial` | Browser Web Serial API |
+| `BLETransport` | `conduyt-js/transports/ble` | Bluetooth Low Energy |
+| `MQTTTransport` | `conduyt-js/transports/mqtt` | MQTT broker relay |
+| `WebSocketTransport` | `conduyt-js/transports/websocket` | WebSocket connection |
+| `CLASPTransport` | `conduyt-js/transports/clasp` | CLASP tunnel |
+| `MockTransport` | `conduyt-js/transports/mock` | Testing |
 
 ## Modules
 
 | Module | Import | Hardware |
 |--------|--------|----------|
-| `GraftServo` | `graft-js/modules/servo` | Hobby servos |
-| `GraftNeoPixel` | `graft-js/modules/neopixel` | WS2812/SK6812 LEDs |
-| `GraftDHT` | `graft-js/modules/dht` | DHT11/DHT22 sensors |
-| `GraftOLED` | `graft-js/modules/oled` | SSD1306 OLED displays |
-| `GraftStepper` | `graft-js/modules/stepper` | Stepper motors |
-| `GraftEncoder` | `graft-js/modules/encoder` | Rotary encoders |
-| `GraftPID` | `graft-js/modules/pid` | PID controller |
+| `ConduytServo` | `conduyt-js/modules/servo` | Hobby servos |
+| `ConduytNeoPixel` | `conduyt-js/modules/neopixel` | WS2812/SK6812 LEDs |
+| `ConduytDHT` | `conduyt-js/modules/dht` | DHT11/DHT22 sensors |
+| `ConduytOLED` | `conduyt-js/modules/oled` | SSD1306 OLED displays |
+| `ConduytStepper` | `conduyt-js/modules/stepper` | Stepper motors |
+| `ConduytEncoder` | `conduyt-js/modules/encoder` | Rotary encoders |
+| `ConduytPID` | `conduyt-js/modules/pid` | PID controller |
 
 ## Reconnection
 
 ```js
-import { ReconnectTransport } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+import { ReconnectTransport } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
 const transport = new ReconnectTransport(
   new SerialTransport({ path: '/dev/ttyUSB0' }),
   { maxAttempts: 10, initialDelay: 500 }
 )
-const device = await GraftDevice.connect(transport)
+const device = await ConduytDevice.connect(transport)
 ```
 
 ## Requirements

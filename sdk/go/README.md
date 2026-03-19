@@ -1,11 +1,11 @@
-# graft-go
+# conduyt-go
 
-GRAFT protocol SDK for Go. Host-side hardware control with goroutine-based receive loop.
+CONDUYT protocol SDK for Go. Host-side hardware control with goroutine-based receive loop.
 
 ## Install
 
 ```bash
-go get github.com/graft-io/graft-go
+go get github.com/conduyt-io/conduyt-go
 ```
 
 ## Quick Start
@@ -17,14 +17,14 @@ import (
     "context"
     "fmt"
 
-    graft "github.com/graft-io/graft-go"
-    "github.com/graft-io/graft-go/transports"
+    conduyt "github.com/conduyt-io/conduyt-go"
+    "github.com/conduyt-io/conduyt-go/transports"
 )
 
 func main() {
     ctx := context.Background()
     transport := transports.NewMock()
-    device := graft.NewDevice(transport)
+    device := conduyt.NewDevice(transport)
 
     hello, err := device.Connect(ctx)
     if err != nil {
@@ -35,7 +35,7 @@ func main() {
 
     // Pin control
     pin := device.Pin(13)
-    pin.Mode(ctx, graft.PinModeOutput)
+    pin.Mode(ctx, conduyt.PinModeOutput)
     pin.Write(ctx, 1)
 
     value, _ := device.Pin(0).Read(ctx)
@@ -48,7 +48,7 @@ func main() {
 ### Module Usage
 
 ```go
-import "github.com/graft-io/graft-go/modules/servo"
+import "github.com/conduyt-io/conduyt-go/modules/servo"
 
 s := servo.New(device)
 s.Attach(ctx, 9)

@@ -1,7 +1,7 @@
-// Package transports defines the Transport interface for GRAFT connections.
+// Package transports defines the Transport interface for CONDUYT connections.
 package transports
 
-// Transport is the interface all GRAFT transports must implement.
+// Transport is the interface all CONDUYT transports must implement.
 type Transport interface {
 	// Connect establishes the connection.
 	Connect() error

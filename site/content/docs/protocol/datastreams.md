@@ -5,7 +5,7 @@ description: Named device values with type safety and push semantics
 
 # Datastreams
 
-Datastreams are named, typed values that flow between device and host. They're the GRAFT equivalent of Blynk virtual pins — but without the cloud dependency.
+Datastreams are named, typed values that flow between device and host. They're the CONDUYT equivalent of Blynk virtual pins — but without the cloud dependency.
 
 ## Type Codes
 
@@ -26,8 +26,8 @@ Datastreams are named, typed values that flow between device and host. They're t
 ### Declaring
 
 ```cpp
-device.addDatastream("temperature", GRAFT_TYPE_FLOAT32, "celsius", false);
-device.addDatastream("setpoint", GRAFT_TYPE_FLOAT32, "celsius", true);
+device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
+device.addDatastream("setpoint", CONDUYT_TYPE_FLOAT32, "celsius", true);
 ```
 
 ### Pushing Values
@@ -39,7 +39,7 @@ device.writeDatastream("temperature", 22.5f);
 ### Receiving Writes
 
 ```cpp
-device.onDatastreamWrite("setpoint", [](GraftPayloadReader &payload, GraftContext &ctx) {
+device.onDatastreamWrite("setpoint", [](ConduytPayloadReader &payload, ConduytContext &ctx) {
     float value = payload.readFloat32();
     // Apply the setpoint
     ctx.ack();

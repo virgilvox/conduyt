@@ -1,17 +1,17 @@
 [project]
-name = "graft-py"
+name = "conduyt-py"
 version = "0.1.0"
-description = "GRAFT protocol SDK for Python — host-side hardware control"
+description = "CONDUYT protocol SDK for Python — host-side hardware control"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 dependencies = []
-keywords = ["graft", "iot", "hardware", "serial", "mqtt", "microcontroller", "binary-protocol"]
+keywords = ["conduyt", "iot", "hardware", "serial", "mqtt", "microcontroller", "binary-protocol"]
 
 [project.urls]
-Homepage = "https://github.com/virgilvox/graft"
-Repository = "https://github.com/virgilvox/graft"
-Issues = "https://github.com/virgilvox/graft/issues"
+Homepage = "https://github.com/virgilvox/conduyt"
+Repository = "https://github.com/virgilvox/conduyt"
+Issues = "https://github.com/virgilvox/conduyt/issues"
 
 [project.optional-dependencies]
 serial = ["pyserial-asyncio>=0.6"]

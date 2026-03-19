@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in GRAFT firmware or an SDK
+description: Report a bug in Conduyt firmware or an SDK
 labels: ["bug"]
 body:
   - type: dropdown

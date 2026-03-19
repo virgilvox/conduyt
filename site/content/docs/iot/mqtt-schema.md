@@ -1,6 +1,6 @@
 ---
 title: MQTT Topic Schema
-description: GRAFT MQTT topic structure and QoS strategy
+description: CONDUYT MQTT topic structure and QoS strategy
 ---
 
 # MQTT Topic Schema
@@ -8,7 +8,7 @@ description: GRAFT MQTT topic structure and QoS strategy
 ## Topic Tree
 
 ```
-graft/
+conduyt/
   {deviceId}/
     cmd/{typeHex}    ← host publishes commands (e.g. cmd/11 = PIN_WRITE)
     evt/{typeHex}    ← device publishes events (e.g. evt/90 = PIN_EVENT)

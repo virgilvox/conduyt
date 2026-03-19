@@ -1,6 +1,6 @@
 ---
 title: 'Quick Start: JavaScript'
-description: Control a GRAFT device from Node.js or the browser
+description: Control a CONDUYT device from Node.js or the browser
 ---
 
 # Quick Start: JavaScript
@@ -8,17 +8,17 @@ description: Control a GRAFT device from Node.js or the browser
 ## Install
 
 ```bash
-npm install graft-js
+npm install conduyt-js
 ```
 
 ## Connect and Blink
 
 ```typescript
-import { GraftDevice } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+import { ConduytDevice } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
 const transport = new SerialTransport({ path: '/dev/ttyUSB0', baudRate: 115200 })
-const device = new GraftDevice(transport)
+const device = new ConduytDevice(transport)
 
 await device.connect()
 
@@ -41,9 +41,9 @@ console.log('Analog:', value) // 0–4095
 ## Use a Module
 
 ```typescript
-import { GraftServo } from 'graft-js/modules/servo'
+import { ConduytServo } from 'conduyt-js/modules/servo'
 
-const servo = new GraftServo(device)
+const servo = new ConduytServo(device)
 await servo.attach(9)
 await servo.write(90) // center position
 ```
@@ -52,22 +52,22 @@ await servo.write(90) // center position
 
 | Transport | Install | Use Case |
 |---|---|---|
-| Serial | `graft-js/transports/serial` | USB / UART (Node.js) |
-| WebSerial | `graft-js/transports/web-serial` | Browser USB |
-| BLE | `graft-js/transports/ble` | Browser Bluetooth |
-| MQTT | `graft-js/transports/mqtt` | IoT / remote |
-| WebSocket | `graft-js/transports/websocket` | Browser / bridge |
-| Mock | `graft-js/transports/mock` | Unit testing |
+| Serial | `conduyt-js/transports/serial` | USB / UART (Node.js) |
+| WebSerial | `conduyt-js/transports/web-serial` | Browser USB |
+| BLE | `conduyt-js/transports/ble` | Browser Bluetooth |
+| MQTT | `conduyt-js/transports/mqtt` | IoT / remote |
+| WebSocket | `conduyt-js/transports/websocket` | Browser / bridge |
+| Mock | `conduyt-js/transports/mock` | Unit testing |
 
 ## Error Handling
 
 ```typescript
-import { GraftNAKError, GraftTimeoutError } from 'graft-js'
+import { ConduytNAKError, ConduytTimeoutError } from 'conduyt-js'
 
 try {
   await device.pin(99).write(1)
 } catch (e) {
-  if (e instanceof GraftNAKError) {
+  if (e instanceof ConduytNAKError) {
     console.error('Device error:', e.errorName) // INVALID_PIN
   }
 }

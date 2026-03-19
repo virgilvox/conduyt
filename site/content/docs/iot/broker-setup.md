@@ -1,11 +1,11 @@
 ---
 title: Broker Setup
-description: Self-host an MQTT broker for GRAFT IoT deployments
+description: Self-host an MQTT broker for CONDUYT IoT deployments
 ---
 
 # Broker Setup
 
-GRAFT uses standard MQTT for IoT transport. Any MQTT 3.1.1+ broker works — Mosquitto, EMQX, HiveMQ, etc.
+CONDUYT uses standard MQTT for IoT transport. Any MQTT 3.1.1+ broker works — Mosquitto, EMQX, HiveMQ, etc.
 
 ## Docker Compose (Mosquitto)
 
@@ -42,29 +42,29 @@ persistence_location /mosquitto/data/
 ### Create Users
 
 ```bash
-docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/passwd graft-device
-docker exec -it mosquitto mosquitto_passwd /mosquitto/config/passwd graft-host
+docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/passwd conduyt-device
+docker exec -it mosquitto mosquitto_passwd /mosquitto/config/passwd conduyt-host
 ```
 
 ## Topic Structure
 
 ```
-graft/{deviceId}/cmd          — Host → Device commands
-graft/{deviceId}/evt/{type}   — Device → Host events
-graft/{deviceId}/ds/{name}    — Datastream values
-graft/{deviceId}/status       — LWT online/offline
+conduyt/{deviceId}/cmd          — Host → Device commands
+conduyt/{deviceId}/evt/{type}   — Device → Host events
+conduyt/{deviceId}/ds/{name}    — Datastream values
+conduyt/{deviceId}/status       — LWT online/offline
 ```
 
 ## Firmware Configuration
 
 ```cpp
-#define GRAFT_TRANSPORT_MQTT
-#include <Graft.h>
+#define CONDUYT_TRANSPORT_MQTT
+#include <Conduyt.h>
 
 WiFiClient wifiClient;
-GraftMQTT transport(wifiClient, "broker.local", 1883, "device-001");
-// transport.setAuth("graft-device", "password");
-GraftDevice device("MQTTSensor", "1.0.0", transport);
+ConduytMQTT transport(wifiClient, "broker.local", 1883, "device-001");
+// transport.setAuth("conduyt-device", "password");
+ConduytDevice device("MQTTSensor", "1.0.0", transport);
 ```
 
 ## QoS Strategy
@@ -82,6 +82,6 @@ GraftDevice device("MQTTSensor", "1.0.0", transport);
 - Enable TLS (port 8883) with Let's Encrypt certificates
 - Disable anonymous access
 - Use per-device credentials or client certificates
-- Set appropriate `max_packet_size` (default 512 bytes matches GRAFT)
+- Set appropriate `max_packet_size` (default 512 bytes matches CONDUYT)
 - Configure Last Will and Testament for device status
 - Monitor with Prometheus exporter (mosquitto-exporter)

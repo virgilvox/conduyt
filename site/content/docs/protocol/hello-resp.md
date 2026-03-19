@@ -1,6 +1,6 @@
 ---
 title: HELLO_RESP
-description: Binary layout of the GRAFT capability handshake
+description: Binary layout of the CONDUYT capability handshake
 ---
 
 # HELLO_RESP
@@ -57,7 +57,7 @@ The HELLO_RESP payload is the device's self-description. It's sent once on conne
 | Field | Size | Description |
 |---|---|---|
 | name | 16 | Null-padded name |
-| type | 1 | GRAFT_TYPE_* code |
+| type | 1 | CONDUYT_TYPE_* code |
 | unit | 8 | Null-padded unit string |
 | writable | 1 | 0x01 if host can write |
 | pin_ref | 1 | Associated pin (0xFF if none) |

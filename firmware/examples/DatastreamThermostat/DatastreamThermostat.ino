@@ -1,5 +1,5 @@
 /**
- * GRAFT — Datastream Thermostat Example
+ * CONDUYT — Datastream Thermostat Example
  *
  * Demonstrates named typed datastreams:
  * - "temperature" (FLOAT32, read-only) — pushed from device every 2 seconds
@@ -9,22 +9,22 @@
  * The host SDK subscribes to datastreams with `for await` syntax.
  */
 
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("Thermostat", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("Thermostat", "1.0.0", transport);
 
 float targetTemp = 22.0;
 
 unsigned long lastTempRead = 0;
 const unsigned long TEMP_INTERVAL = 2000;
 
-void onSetpoint(GraftPayloadReader &payload, GraftContext &ctx) {
+void onSetpoint(ConduytPayloadReader &payload, ConduytContext &ctx) {
   targetTemp = payload.readFloat32();
   ctx.ack();
 }
 
-void onRelay(GraftPayloadReader &payload, GraftContext &ctx) {
+void onRelay(ConduytPayloadReader &payload, ConduytContext &ctx) {
   bool on = payload.readBool();
   digitalWrite(8, on ? HIGH : LOW);
   ctx.ack();
@@ -33,9 +33,9 @@ void onRelay(GraftPayloadReader &payload, GraftContext &ctx) {
 void setup() {
   pinMode(8, OUTPUT); // relay pin
 
-  device.addDatastream("temperature", GRAFT_FLOAT32, "celsius", false);
-  device.addDatastream("setpoint",    GRAFT_FLOAT32, "celsius", true);
-  device.addDatastream("relay",       GRAFT_BOOL,    "",        true);
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);
+  device.addDatastream("setpoint",    CONDUYT_FLOAT32, "celsius", true);
+  device.addDatastream("relay",       CONDUYT_BOOL,    "",        true);
 
   device.onDatastreamWrite("setpoint", onSetpoint);
   device.onDatastreamWrite("relay", onRelay);

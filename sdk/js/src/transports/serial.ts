@@ -1,11 +1,11 @@
 /**
- * GRAFT Serial Transport — Node.js
+ * CONDUYT Serial Transport — Node.js
  *
  * Uses the `serialport` npm package. COBS-framed with 0x00 delimiter.
  * Install: npm install serialport
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
 export interface SerialTransportOptions {
   /** Serial port path (e.g., '/dev/ttyUSB0', 'COM3') */
@@ -14,7 +14,7 @@ export interface SerialTransportOptions {
   baudRate?: number
 }
 
-export class SerialTransport implements GraftTransport {
+export class SerialTransport implements ConduytTransport {
   private _options: Required<SerialTransportOptions>
   private _port: any = null
   private _handler: ((packet: Uint8Array) => void) | null = null

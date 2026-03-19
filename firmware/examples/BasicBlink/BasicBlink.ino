@@ -1,15 +1,15 @@
 /**
- * GRAFT — Basic Blink Example
+ * CONDUYT — Basic Blink Example
  *
- * The simplest GRAFT sketch. Connects over serial at 115200 baud.
+ * The simplest CONDUYT sketch. Connects over serial at 115200 baud.
  * The host can toggle pin 13 (built-in LED) and read pin states.
  * No modules, no datastreams — just raw pin control.
  */
 
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("BasicBlink", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("BasicBlink", "1.0.0", transport);
 
 void setup() {
   device.begin();

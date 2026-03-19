@@ -1,6 +1,6 @@
-# GRAFT Firmware
+# CONDUYT Firmware
 
-Arduino/PlatformIO library that turns any microcontroller into a GRAFT device. Handles packet framing, command dispatch, capability reporting, and module loading. The host controls everything; the firmware runs the protocol.
+Arduino/PlatformIO library that turns any microcontroller into a CONDUYT device. Handles packet framing, command dispatch, capability reporting, and module loading. The host controls everything; the firmware runs the protocol.
 
 ## Install
 
@@ -10,20 +10,20 @@ Arduino/PlatformIO library that turns any microcontroller into a GRAFT device. H
 [env:esp32dev]
 platform = espressif32
 board = esp32dev
-lib_deps = lumencanvas/Graft
+lib_deps = lumencanvas/Conduyt
 ```
 
 ### Arduino IDE
 
-Install "Graft" from the Library Manager.
+Install "Conduyt" from the Library Manager.
 
 ## Minimal Sketch
 
 ```cpp
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("MyDevice", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("MyDevice", "1.0.0", transport);
 
 void setup() { device.begin(); }
 void loop()  { device.poll(); }
@@ -33,19 +33,19 @@ This gives the host full pin control, I2C/SPI passthrough, and capability report
 
 ## Adding Modules
 
-Modules are compile-time opt-in. Define the feature flag before including `Graft.h`.
+Modules are compile-time opt-in. Define the feature flag before including `Conduyt.h`.
 
 ```cpp
-#define GRAFT_MODULE_SERVO
-#define GRAFT_MODULE_NEOPIXEL
-#include <Graft.h>
+#define CONDUYT_MODULE_SERVO
+#define CONDUYT_MODULE_NEOPIXEL
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("ModuleDemo", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("ModuleDemo", "1.0.0", transport);
 
 void setup() {
-  device.addModule(new GraftModuleServo());
-  device.addModule(new GraftModuleNeoPixel(6, 30)); // pin 6, 30 LEDs
+  device.addModule(new ConduytModuleServo());
+  device.addModule(new ConduytModuleNeoPixel(6, 30)); // pin 6, 30 LEDs
   device.begin();
 }
 
@@ -57,13 +57,13 @@ void loop() { device.poll(); }
 Datastreams are named, typed values that the device pushes to the host.
 
 ```cpp
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("Thermostat", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("Thermostat", "1.0.0", transport);
 
 void setup() {
-  device.addDatastream("temperature", GRAFT_FLOAT32, "C", false);
-  device.addDatastream("setpoint", GRAFT_FLOAT32, "C", true);
-  device.onDatastreamWrite("setpoint", [](GraftPayloadReader &r, GraftContext &ctx) {
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "C", false);
+  device.addDatastream("setpoint", CONDUYT_FLOAT32, "C", true);
+  device.onDatastreamWrite("setpoint", [](ConduytPayloadReader &r, ConduytContext &ctx) {
     float sp = r.readFloat32();
     // handle new setpoint
     ctx.ack();
@@ -95,36 +95,36 @@ void loop() {
 
 | Transport | Class | Use Case |
 |-----------|-------|----------|
-| Serial (UART/USB) | `GraftSerial` | Wired connection, most common |
-| USB Serial | `GraftUSBSerial` | Native USB CDC |
-| BLE | `GraftBLE` | Bluetooth Low Energy (ESP32, nRF52) |
-| MQTT | `GraftMQTT` | WiFi via MQTT broker |
-| TCP | `GraftTCP` | Direct WiFi socket |
-| CLASP | `GraftCLASP` | CLASP tunnel protocol |
+| Serial (UART/USB) | `ConduytSerial` | Wired connection, most common |
+| USB Serial | `ConduytUSBSerial` | Native USB CDC |
+| BLE | `ConduytBLE` | Bluetooth Low Energy (ESP32, nRF52) |
+| MQTT | `ConduytMQTT` | WiFi via MQTT broker |
+| TCP | `ConduytTCP` | Direct WiFi socket |
+| CLASP | `ConduytCLASP` | CLASP tunnel protocol |
 
 ## Modules
 
 | Module | Flag | Class | Hardware |
 |--------|------|-------|----------|
-| Servo | `GRAFT_MODULE_SERVO` | `GraftModuleServo` | Hobby servos |
-| NeoPixel | `GRAFT_MODULE_NEOPIXEL` | `GraftModuleNeoPixel` | WS2812/SK6812 LEDs |
-| DHT | `GRAFT_MODULE_DHT` | `GraftModuleDHT` | DHT11/DHT22 sensors |
-| OLED | `GRAFT_MODULE_OLED` | `GraftModuleOLED` | SSD1306 displays |
-| Stepper | `GRAFT_MODULE_STEPPER` | `GraftModuleStepper` | Stepper motors |
-| Encoder | `GRAFT_MODULE_ENCODER` | `GraftModuleEncoder` | Rotary encoders |
-| PID | `GRAFT_MODULE_PID` | `GraftModulePID` | PID controller |
-| I2C Passthrough | `GRAFT_MODULE_I2C_PASSTHROUGH` | `GraftModuleI2CPassthrough` | Raw I2C forwarding |
+| Servo | `CONDUYT_MODULE_SERVO` | `ConduytModuleServo` | Hobby servos |
+| NeoPixel | `CONDUYT_MODULE_NEOPIXEL` | `ConduytModuleNeoPixel` | WS2812/SK6812 LEDs |
+| DHT | `CONDUYT_MODULE_DHT` | `ConduytModuleDHT` | DHT11/DHT22 sensors |
+| OLED | `CONDUYT_MODULE_OLED` | `ConduytModuleOLED` | SSD1306 displays |
+| Stepper | `CONDUYT_MODULE_STEPPER` | `ConduytModuleStepper` | Stepper motors |
+| Encoder | `CONDUYT_MODULE_ENCODER` | `ConduytModuleEncoder` | Rotary encoders |
+| PID | `CONDUYT_MODULE_PID` | `ConduytModulePID` | PID controller |
+| I2C Passthrough | `CONDUYT_MODULE_I2C_PASSTHROUGH` | `ConduytModuleI2CPassthrough` | Raw I2C forwarding |
 
 ## Configuration
 
-These constants are set per-platform in `GraftBoard.h`. Override them before including `Graft.h` if needed.
+These constants are set per-platform in `ConduytBoard.h`. Override them before including `Conduyt.h` if needed.
 
 | Constant | Default | Description |
 |----------|---------|-------------|
-| `GRAFT_PACKET_BUF_SIZE` | 128-512 | Max payload size in bytes |
-| `GRAFT_MAX_MODULES` | 4-8 | Module slot count |
-| `GRAFT_MAX_SUBSCRIPTIONS` | 8-16 | Active pin subscription limit |
-| `GRAFT_MAX_DATASTREAMS` | 4-16 | Datastream slot count |
+| `CONDUYT_PACKET_BUF_SIZE` | 128-512 | Max payload size in bytes |
+| `CONDUYT_MAX_MODULES` | 4-8 | Module slot count |
+| `CONDUYT_MAX_SUBSCRIPTIONS` | 8-16 | Active pin subscription limit |
+| `CONDUYT_MAX_DATASTREAMS` | 4-16 | Datastream slot count |
 
 ## Running Tests
 

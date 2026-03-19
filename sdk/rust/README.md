@@ -1,27 +1,27 @@
-# graft
+# conduyt
 
-GRAFT protocol SDK for Rust. `no_std` core with optional `std` device client.
+CONDUYT protocol SDK for Rust. `no_std` core with optional `std` device client.
 
 ## Install
 
 ```toml
 [dependencies]
-graft = "0.1"
+conduyt = "0.1"
 ```
 
 For `no_std` (core wire/cobs/crc only):
 
 ```toml
 [dependencies]
-graft = { version = "0.1", default-features = false }
+conduyt = { version = "0.1", default-features = false }
 ```
 
 ## Quick Start
 
 ```rust
-use graft::device::Device;
-use graft::transports::MockTransport;
-use graft::constants::*;
+use conduyt::device::Device;
+use conduyt::transports::MockTransport;
+use conduyt::constants::*;
 
 let transport = MockTransport::new();
 let mut device = Device::new(transport);
@@ -38,9 +38,9 @@ device.close()?;
 ### Core Only (no_std)
 
 ```rust
-use graft::wire::{wire_encode, wire_decode};
-use graft::crc8::crc8;
-use graft::cobs::{cobs_encode, cobs_decode};
+use conduyt::wire::{wire_encode, wire_decode};
+use conduyt::crc8::crc8;
+use conduyt::cobs::{cobs_encode, cobs_decode};
 
 let encoded = wire_encode(CMD_PING, 0, &[]);
 let packet = wire_decode(&encoded)?;
@@ -76,11 +76,11 @@ let packet = wire_decode(&encoded)?;
 
 | Function | Module | Description |
 |----------|--------|-------------|
-| `wire_encode` | `graft::wire` | Encode packet to bytes |
-| `wire_decode` | `graft::wire` | Decode bytes to packet |
-| `crc8` | `graft::crc8` | CRC8 checksum |
-| `cobs_encode` | `graft::cobs` | COBS encode |
-| `cobs_decode` | `graft::cobs` | COBS decode |
+| `wire_encode` | `conduyt::wire` | Encode packet to bytes |
+| `wire_decode` | `conduyt::wire` | Decode bytes to packet |
+| `crc8` | `conduyt::crc8` | CRC8 checksum |
+| `cobs_encode` | `conduyt::cobs` | COBS encode |
+| `cobs_decode` | `conduyt::cobs` | COBS decode |
 
 ## Features
 

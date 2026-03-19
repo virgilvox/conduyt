@@ -1,6 +1,6 @@
 """COBS tests — cross-validates with C and JS implementations."""
 
-from graft.core.cobs import cobs_encode, cobs_decode
+from conduyt.core.cobs import cobs_encode, cobs_decode
 
 
 def test_empty_roundtrip():

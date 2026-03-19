@@ -1,6 +1,6 @@
-# GRAFT Conformance Tests
+# CONDUYT Conformance Tests
 
-Cross-SDK test vectors that verify every GRAFT implementation produces identical wire output. If an SDK passes conformance, it can talk to any other SDK or firmware.
+Cross-SDK test vectors that verify every CONDUYT implementation produces identical wire output. If an SDK passes conformance, it can talk to any other SDK or firmware.
 
 ## Test Vectors
 

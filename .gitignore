@@ -14,3 +14,4 @@ build/
 .nuxt/
 .output/
 coverage/
+sdk/rust/target/

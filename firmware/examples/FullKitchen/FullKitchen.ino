@@ -1,29 +1,29 @@
 /**
- * GRAFT — Full Kitchen Sink Example (ESP32 + MQTT)
+ * CONDUYT — Full Kitchen Sink Example (ESP32 + MQTT)
  *
  * Demonstrates: modules, datastreams, MQTT transport, all in one sketch.
  */
 
 #include <WiFi.h>
 
-#define GRAFT_MODULE_SERVO
-#define GRAFT_MODULE_NEOPIXEL
-#define GRAFT_TRANSPORT_MQTT
-#include <Graft.h>
-#include <graft/transport/GraftMQTT.h>
+#define CONDUYT_MODULE_SERVO
+#define CONDUYT_MODULE_NEOPIXEL
+#define CONDUYT_TRANSPORT_MQTT
+#include <Conduyt.h>
+#include <conduyt/transport/ConduytMQTT.h>
 
 const char* WIFI_SSID   = "your-ssid";
 const char* WIFI_PASS   = "your-password";
 const char* MQTT_BROKER = "broker.local";
 
 WiFiClient wifiClient;
-GraftMQTT  transport(wifiClient, MQTT_BROKER, 1883, "kitchen-01");
-GraftDevice device("FullKitchen", "1.0.0", transport);
+ConduytMQTT  transport(wifiClient, MQTT_BROKER, 1883, "kitchen-01");
+ConduytDevice device("FullKitchen", "1.0.0", transport);
 
 float targetTemp = 22.0;
 unsigned long lastPush = 0;
 
-void onSetpoint(GraftPayloadReader &payload, GraftContext &ctx) {
+void onSetpoint(ConduytPayloadReader &payload, ConduytContext &ctx) {
   targetTemp = payload.readFloat32();
   ctx.ack();
 }
@@ -33,13 +33,13 @@ void setup() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) { delay(500); }
 
-  device.addModule(new GraftModuleServo());
-  device.addModule(new GraftModuleNeoPixel());
+  device.addModule(new ConduytModuleServo());
+  device.addModule(new ConduytModuleNeoPixel());
 
-  device.addDatastream("temperature", GRAFT_FLOAT32, "celsius",  false);
-  device.addDatastream("humidity",    GRAFT_FLOAT32, "percent",  false);
-  device.addDatastream("setpoint",    GRAFT_FLOAT32, "celsius",  true);
-  device.addDatastream("led_mode",    GRAFT_UINT8,   "",         true);
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius",  false);
+  device.addDatastream("humidity",    CONDUYT_FLOAT32, "percent",  false);
+  device.addDatastream("setpoint",    CONDUYT_FLOAT32, "celsius",  true);
+  device.addDatastream("led_mode",    CONDUYT_UINT8,   "",         true);
 
   device.onDatastreamWrite("setpoint", onSetpoint);
 

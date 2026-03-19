@@ -1,18 +1,18 @@
 /**
- * GRAFT DHT Module — Typed JS wrapper
+ * CONDUYT DHT Module — Typed JS wrapper
  */
 
-import type { GraftDevice } from '../device.js'
+import type { ConduytDevice } from '../device.js'
 
 export interface DHTReading {
   temperature: number
   humidity: number
 }
 
-export class GraftDHT {
-  private _device: ReturnType<GraftDevice['module']>
+export class ConduytDHT {
+  private _device: ReturnType<ConduytDevice['module']>
 
-  constructor(device: GraftDevice) {
+  constructor(device: ConduytDevice) {
     this._device = device.module('dht')
   }
 

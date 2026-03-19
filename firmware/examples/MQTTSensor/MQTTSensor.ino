@@ -1,5 +1,5 @@
 /**
- * GRAFT — MQTT Sensor Example (ESP32)
+ * CONDUYT — MQTT Sensor Example (ESP32)
  *
  * Connects to WiFi and an MQTT broker.
  * Pushes temperature datastream every 5 seconds.
@@ -7,9 +7,9 @@
  */
 
 #include <WiFi.h>
-#define GRAFT_TRANSPORT_MQTT
-#include <Graft.h>
-#include <graft/transport/GraftMQTT.h>
+#define CONDUYT_TRANSPORT_MQTT
+#include <Conduyt.h>
+#include <conduyt/transport/ConduytMQTT.h>
 
 const char* WIFI_SSID   = "your-ssid";
 const char* WIFI_PASS   = "your-password";
@@ -17,8 +17,8 @@ const char* MQTT_BROKER = "broker.local";
 const uint16_t MQTT_PORT = 1883;
 
 WiFiClient wifiClient;
-GraftMQTT  transport(wifiClient, MQTT_BROKER, MQTT_PORT, "sensor-01");
-GraftDevice device("SensorNode", "1.0.0", transport);
+ConduytMQTT  transport(wifiClient, MQTT_BROKER, MQTT_PORT, "sensor-01");
+ConduytDevice device("SensorNode", "1.0.0", transport);
 
 unsigned long lastPush = 0;
 
@@ -34,8 +34,8 @@ void setup() {
   Serial.println("\nWiFi connected");
 
   // Declare datastreams
-  device.addDatastream("temperature", GRAFT_FLOAT32, "celsius", false);
-  device.addDatastream("humidity",    GRAFT_FLOAT32, "percent", false);
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);
+  device.addDatastream("humidity",    CONDUYT_FLOAT32, "percent", false);
 
   device.begin();
 }

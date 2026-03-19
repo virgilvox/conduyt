@@ -1,4 +1,4 @@
-//! GRAFT Protocol Constants
+//! CONDUYT Protocol Constants
 
 // Host → Device Commands
 pub const CMD_PING: u8 = 0x01;

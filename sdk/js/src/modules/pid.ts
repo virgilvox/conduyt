@@ -1,13 +1,13 @@
 /**
- * GRAFT PID Controller Module — Typed JS wrapper
+ * CONDUYT PID Controller Module — Typed JS wrapper
  */
 
-import type { GraftDevice } from '../device.js'
+import type { ConduytDevice } from '../device.js'
 
-export class GraftPID {
-  private _device: ReturnType<GraftDevice['module']>
+export class ConduytPID {
+  private _device: ReturnType<ConduytDevice['module']>
 
-  constructor(device: GraftDevice) {
+  constructor(device: ConduytDevice) {
     this._device = device.module('pid')
   }
 

@@ -1,11 +1,11 @@
 ---
 title: Introduction
-description: What is GRAFT and why does it exist
+description: What is CONDUYT and why does it exist
 ---
 
 # Introduction
 
-GRAFT (**G**eneric **R**emote **A**ctuator **F**irmware **T**ransport) is an open binary protocol and firmware library for extending hardware control from a host to a connected microcontroller device.
+CONDUYT (**G**eneric **R**emote **A**ctuator **F**irmware **T**ransport) is an open binary protocol and firmware library for extending hardware control from a host to a connected microcontroller device.
 
 ## What It Replaces
 
@@ -28,10 +28,10 @@ GRAFT (**G**eneric **R**emote **A**ctuator **F**irmware **T**ransport) is an ope
 ### Arduino Firmware
 
 ```cpp
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("MyBoard", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("MyBoard", "1.0.0", transport);
 
 void setup() { device.begin(); }
 void loop()  { device.poll();  }
@@ -40,10 +40,10 @@ void loop()  { device.poll();  }
 ### JavaScript Host
 
 ```js
-import { GraftDevice } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+import { ConduytDevice } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
-const device = await GraftDevice.connect(
+const device = await ConduytDevice.connect(
   new SerialTransport({ path: '/dev/ttyUSB0' })
 )
 
@@ -55,9 +55,9 @@ await device.pin(13).write(1)  // LED on
 
 | SDK | Language | Install |
 |---|---|---|
-| graft-firmware | Arduino / C++ | `#include <Graft.h>` |
-| graft-js | JavaScript / TypeScript | `npm install graft-js` |
-| graft-py | Python 3.10+ | `pip install graft-py` |
-| graft-go | Go | `go get github.com/graft-io/graft-go` |
-| graft-rs | Rust | `cargo add graft` |
-| GraftKit | Swift | `.package(url: "github.com/graft-io/GraftKit")` |
+| conduyt-firmware | Arduino / C++ | `#include <Conduyt.h>` |
+| conduyt-js | JavaScript / TypeScript | `npm install conduyt-js` |
+| conduyt-py | Python 3.10+ | `pip install conduyt-py` |
+| conduyt-go | Go | `go get github.com/conduyt-io/conduyt-go` |
+| conduyt-rs | Rust | `cargo add conduyt` |
+| ConduytKit | Swift | `.package(url: "github.com/conduyt-io/ConduytKit")` |

@@ -1,11 +1,11 @@
 /**
- * GRAFT WebSerial Transport — Browser
+ * CONDUYT WebSerial Transport — Browser
  *
  * Uses the Web Serial API (navigator.serial).
  * COBS-framed with 0x00 delimiter.
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
 export interface WebSerialTransportOptions {
   /** Baud rate (default: 115200) */
@@ -16,7 +16,7 @@ export interface WebSerialTransportOptions {
   filters?: SerialPortFilter[]
 }
 
-export class WebSerialTransport implements GraftTransport {
+export class WebSerialTransport implements ConduytTransport {
   private _options: WebSerialTransportOptions
   private _port: SerialPort | null = null
   private _reader: ReadableStreamDefaultReader<Uint8Array> | null = null

@@ -5,11 +5,11 @@
       <div class="hero-content">
         <div class="hero-text">
           <div class="hero-eyebrow">Open Hardware Protocol</div>
-          <h1 class="hero-title">GRAFT</h1>
+          <h1 class="hero-title">CONDUYT</h1>
           <p class="hero-sub">Control any microcontroller from any language. One protocol, every transport.</p>
           <div class="hero-cta">
             <a href="/docs/getting-started/introduction" class="btn-primary">Get Started</a>
-            <a href="https://github.com/virgilvox/graft" class="btn-secondary">GitHub</a>
+            <a href="https://github.com/virgilvox/conduyt" class="btn-secondary">GitHub</a>
           </div>
         </div>
         <div class="hero-demo">
@@ -77,7 +77,7 @@
         </div>
         <div class="wire-diagram">
           <div class="pkt-row">
-            <div class="pkt-cell pkt-magic"><div class="pkt-label">MAGIC</div><div class="pkt-val">47 46</div></div>
+            <div class="pkt-cell pkt-magic"><div class="pkt-label">MAGIC</div><div class="pkt-val">43 44</div></div>
             <div class="pkt-cell pkt-ver"><div class="pkt-label">VER</div><div class="pkt-val">01</div></div>
             <div class="pkt-cell pkt-type"><div class="pkt-label">TYPE</div><div class="pkt-val">11</div></div>
             <div class="pkt-cell pkt-seq"><div class="pkt-label">SEQ</div><div class="pkt-val">00</div></div>
@@ -94,7 +94,7 @@
     <!-- REPLACES -->
     <section class="section">
       <div class="section-header">
-        <h2>What GRAFT replaces</h2>
+        <h2>What Conduyt replaces</h2>
       </div>
 
       <div class="compare-grid">
@@ -104,7 +104,7 @@
             <span class="compare-year">{{ item.year }}</span>
           </div>
           <div class="compare-problem">{{ item.problem }}</div>
-          <div class="compare-fix">GRAFT: {{ item.fix }}</div>
+          <div class="compare-fix">Conduyt: {{ item.fix }}</div>
         </div>
       </div>
     </section>
@@ -129,14 +129,14 @@
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-col">
-          <div class="footer-logo">GRAFT</div>
+          <div class="footer-logo">CONDUYT</div>
           <div class="footer-meta">MIT License / LumenCanvas</div>
         </div>
         <div class="footer-links">
           <a href="/docs/getting-started/introduction">Docs</a>
           <a href="/docs/protocol/packet-structure">Protocol</a>
           <a href="/docs/firmware/module-system">Modules</a>
-          <a href="https://github.com/virgilvox/graft">GitHub</a>
+          <a href="https://github.com/virgilvox/conduyt">GitHub</a>
         </div>
       </div>
     </footer>
@@ -166,11 +166,11 @@ const codeExamples = [
   {
     name: 'JavaScript',
     langId: 'javascript',
-    pkg: 'npm install graft-js',
-    code: `import { GraftDevice } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+    pkg: 'npm install conduyt-js',
+    code: `import { ConduytDevice } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
-const device = await GraftDevice.connect(
+const device = await ConduytDevice.connect(
   new SerialTransport({ path: '/dev/ttyUSB0' })
 )
 
@@ -183,15 +183,15 @@ console.log('sensor:', value)`,
   {
     name: 'Arduino',
     langId: 'cpp',
-    pkg: '#include <Graft.h>',
-    code: `#define GRAFT_MODULE_SERVO
-#include <Graft.h>
+    pkg: '#include <Conduyt.h>',
+    code: `#define CONDUYT_MODULE_SERVO
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("MyBoard", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("MyBoard", "1.0.0", transport);
 
 void setup() {
-  device.addModule(new GraftModuleServo());
+  device.addModule(new ConduytModuleServo());
   device.begin();
 }
 
@@ -202,11 +202,11 @@ void loop() {
   {
     name: 'Python',
     langId: 'python',
-    pkg: 'pip install graft-py',
-    code: `from graft import GraftDevice
-from graft.transports.serial import SerialTransport
+    pkg: 'pip install conduyt-py',
+    code: `from conduyt import ConduytDevice
+from conduyt.transports.serial import SerialTransport
 
-device = GraftDevice(SerialTransport("/dev/ttyUSB0"))
+device = ConduytDevice(SerialTransport("/dev/ttyUSB0"))
 await device.connect()
 
 await device.pin(13).mode("output")
@@ -218,11 +218,11 @@ print(f"sensor: {value}")`,
   {
     name: 'Go',
     langId: 'go',
-    pkg: 'go get github.com/graft-io/graft-go',
-    code: `device := graft.NewDevice(transport)
+    pkg: 'go get github.com/conduyt-io/conduyt-go',
+    code: `device := conduyt.NewDevice(transport)
 hello, _ := device.Connect(ctx)
 
-device.Pin(13).Mode(ctx, graft.PinModeOutput)
+device.Pin(13).Mode(ctx, conduyt.PinModeOutput)
 device.Pin(13).Write(ctx, 1)
 
 value, _ := device.Pin(0).Read(ctx)
@@ -231,7 +231,7 @@ fmt.Println("sensor:", value)`,
   {
     name: 'Rust',
     langId: 'rust',
-    pkg: 'cargo add graft',
+    pkg: 'cargo add conduyt',
     code: `let mut device = Device::new(transport);
 device.connect()?;
 
@@ -244,12 +244,12 @@ println!("sensor: {}", value);`,
 ]
 
 const sdks = [
-  { name: 'graft-firmware', lang: 'Arduino / C++', install: '#include <Graft.h>', link: '/docs/getting-started/quick-start-arduino' },
-  { name: 'graft-js', lang: 'JavaScript / TypeScript', install: 'npm install graft-js', link: '/docs/getting-started/quick-start-js' },
-  { name: 'graft-py', lang: 'Python 3.10+', install: 'pip install graft-py', link: '/docs/getting-started/quick-start-python' },
-  { name: 'graft-go', lang: 'Go', install: 'go get github.com/graft-io/graft-go', link: '/docs/sdk-guides/javascript' },
-  { name: 'graft', lang: 'Rust (no_std core)', install: 'cargo add graft', link: '/docs/sdk-guides/javascript' },
-  { name: 'GraftKit', lang: 'Swift (iOS / macOS)', install: 'Swift Package Manager', link: '/docs/sdk-guides/javascript' },
+  { name: 'conduyt-firmware', lang: 'Arduino / C++', install: '#include <Conduyt.h>', link: '/docs/getting-started/quick-start-arduino' },
+  { name: 'conduyt-js', lang: 'JavaScript / TypeScript', install: 'npm install conduyt-js', link: '/docs/getting-started/quick-start-js' },
+  { name: 'conduyt-py', lang: 'Python 3.10+', install: 'pip install conduyt-py', link: '/docs/getting-started/quick-start-python' },
+  { name: 'conduyt-go', lang: 'Go', install: 'go get github.com/conduyt-io/conduyt-go', link: '/docs/sdk-guides/javascript' },
+  { name: 'conduyt', lang: 'Rust (no_std core)', install: 'cargo add conduyt', link: '/docs/sdk-guides/javascript' },
+  { name: 'ConduytKit', lang: 'Swift (iOS / macOS)', install: 'Swift Package Manager', link: '/docs/sdk-guides/javascript' },
 ]
 </script>
 

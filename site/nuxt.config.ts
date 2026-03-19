@@ -24,7 +24,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'GRAFT — Generic Remote Actuator Firmware Transport',
+      title: 'CONDUYT — Open Binary Protocol for Hardware Control',
       meta: [
         { name: 'description', content: 'Open binary protocol for transport-agnostic, capability-first hardware control. Replaces Firmata, Johnny-Five, and Blynk.' },
       ],

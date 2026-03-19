@@ -1,11 +1,11 @@
 ---
 title: Packet Structure
-description: GRAFT wire format — binary packet layout
+description: CONDUYT wire format — binary packet layout
 ---
 
 # Packet Structure
 
-Every GRAFT packet follows a fixed header + variable payload structure.
+Every CONDUYT packet follows a fixed header + variable payload structure.
 
 ## Frame Layout
 

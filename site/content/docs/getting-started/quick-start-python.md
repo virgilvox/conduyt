@@ -1,6 +1,6 @@
 ---
 title: 'Quick Start: Python'
-description: Control a GRAFT device from Python 3.10+
+description: Control a CONDUYT device from Python 3.10+
 ---
 
 # Quick Start: Python
@@ -8,22 +8,22 @@ description: Control a GRAFT device from Python 3.10+
 ## Install
 
 ```bash
-pip install graft-py
+pip install conduyt-py
 
 # With serial support:
-pip install graft-py[serial]
+pip install conduyt-py[serial]
 ```
 
 ## Connect and Blink
 
 ```python
 import asyncio
-from graft import GraftDevice
-from graft.transports.serial import SerialTransport
+from conduyt import ConduytDevice
+from conduyt.transports.serial import SerialTransport
 
 async def main():
     transport = SerialTransport('/dev/ttyUSB0')
-    device = GraftDevice(transport)
+    device = ConduytDevice(transport)
 
     hello = await device.connect()
     print(f"Connected: {hello.firmware_name}")
@@ -43,10 +43,10 @@ asyncio.run(main())
 ## Synchronous API
 
 ```python
-from graft import GraftDeviceSync
-from graft.transports.mock import MockTransport
+from conduyt import ConduytDeviceSync
+from conduyt.transports.mock import MockTransport
 
-device = GraftDeviceSync(MockTransport())
+device = ConduytDeviceSync(MockTransport())
 device.connect()
 device.pin(13).mode('output')
 device.pin(13).write(1)
@@ -56,14 +56,14 @@ device.close()
 ## Module Wrappers
 
 ```python
-from graft.modules import GraftServo
+from conduyt.modules import ConduytServo
 
-servo = GraftServo(device, module_id=0)
+servo = ConduytServo(device, module_id=0)
 await servo.attach(pin=9)
 await servo.write(90)
 ```
 
-Available: `GraftServo`, `GraftNeoPixel`, `GraftEncoder`, `GraftStepper`, `GraftDHT`, `GraftOLED`, `GraftPID`.
+Available: `ConduytServo`, `ConduytNeoPixel`, `ConduytEncoder`, `ConduytStepper`, `ConduytDHT`, `ConduytOLED`, `ConduytPID`.
 
 ## Next Steps
 

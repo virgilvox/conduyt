@@ -1,12 +1,12 @@
 /**
- * GRAFT Transport Interface
+ * CONDUYT Transport Interface
  *
  * All transport implementations must satisfy this interface.
  * The protocol layer calls these methods without knowing
  * whether bytes travel over serial, BLE, MQTT, or WebSocket.
  */
 
-export interface GraftTransport {
+export interface ConduytTransport {
   /** Establish the connection. Resolves when ready to send/receive. */
   connect(): Promise<void>
 

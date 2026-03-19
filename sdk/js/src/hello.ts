@@ -1,5 +1,5 @@
 /**
- * GRAFT HELLO_RESP Parser
+ * CONDUYT HELLO_RESP Parser
  *
  * Decodes the binary HELLO_RESP payload into a typed capability model.
  * This is the host SDK's source of truth for what the device can do.

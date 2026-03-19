@@ -1,29 +1,29 @@
 /**
- * GRAFT Device — Host-Side SDK
+ * CONDUYT Device — Host-Side SDK
  *
- * The main class for interacting with a GRAFT device from the host.
+ * The main class for interacting with a CONDUYT device from the host.
  * Handles connection, capability discovery, command sending, and event dispatch.
  */
 
 import { CMD, EVT, PROTOCOL_VERSION } from './core/constants.js'
 import { wireEncode, wireDecode, makePacket } from './core/wire.js'
 import { cobsEncode, cobsDecode } from './core/cobs.js'
-import { GraftNAKError, GraftDisconnectedError, GraftCapabilityError } from './core/errors.js'
+import { ConduytNAKError, ConduytDisconnectedError, ConduytCapabilityError } from './core/errors.js'
 import { SeqTracker } from './seq.js'
 import { parseHelloResp } from './hello.js'
-import type { GraftTransport } from './transports/transport.js'
-import type { GraftPacket, HelloResp, PinSubscribeOptions, DatastreamSubscribeOptions, DatastreamValue } from './core/types.js'
+import type { ConduytTransport } from './transports/transport.js'
+import type { ConduytPacket, HelloResp, PinSubscribeOptions, DatastreamSubscribeOptions, DatastreamValue } from './core/types.js'
 
-type EventHandler = (packet: GraftPacket) => void
+type EventHandler = (packet: ConduytPacket) => void
 
-export class GraftDevice {
-  private _transport: GraftTransport
+export class ConduytDevice {
+  private _transport: ConduytTransport
   private _seq: SeqTracker
   private _hello: HelloResp | null = null
   private _handlers = new Map<number, Set<EventHandler>>()
   private _cobsBuffer: number[] = []
 
-  constructor(transport: GraftTransport, options?: { timeoutMs?: number }) {
+  constructor(transport: ConduytTransport, options?: { timeoutMs?: number }) {
     this._transport = transport
     this._seq = new SeqTracker(options?.timeoutMs ?? 5000)
   }
@@ -42,8 +42,8 @@ export class GraftDevice {
    * Connect to the device and perform the HELLO handshake.
    * Returns the device capability model.
    */
-  static async connect(transport: GraftTransport, options?: { timeoutMs?: number }): Promise<GraftDevice> {
-    const device = new GraftDevice(transport, options)
+  static async connect(transport: ConduytTransport, options?: { timeoutMs?: number }): Promise<ConduytDevice> {
+    const device = new ConduytDevice(transport, options)
     await device.connect()
     return device
   }
@@ -65,7 +65,7 @@ export class GraftDevice {
 
   /** Disconnect from the device. */
   async disconnect(): Promise<void> {
-    this._seq.reset(new GraftDisconnectedError())
+    this._seq.reset(new ConduytDisconnectedError())
     await this._transport.disconnect()
     this._hello = null
   }
@@ -113,19 +113,19 @@ export class GraftDevice {
       get descriptor() { return ds ?? null },
 
       write: async (value: DatastreamValue) => {
-        if (!ds) throw new GraftCapabilityError(`Datastream "${name}" not found`)
-        if (!ds.writable) throw new GraftCapabilityError(`Datastream "${name}" is read-only`)
+        if (!ds) throw new ConduytCapabilityError(`Datastream "${name}" not found`)
+        if (!ds.writable) throw new ConduytCapabilityError(`Datastream "${name}" is read-only`)
         const payload = this._encodeDsValue(ds.index, value)
         await this._sendCommand(CMD.DS_WRITE, payload)
       },
 
       read: async (): Promise<Uint8Array> => {
-        if (!ds) throw new GraftCapabilityError(`Datastream "${name}" not found`)
+        if (!ds) throw new ConduytCapabilityError(`Datastream "${name}" not found`)
         return this._sendCommand(CMD.DS_READ, new Uint8Array([ds.index]))
       },
 
       subscribe: (opts: DatastreamSubscribeOptions = {}): AsyncIterable<DatastreamValue> => {
-        if (!ds) throw new GraftCapabilityError(`Datastream "${name}" not found`)
+        if (!ds) throw new ConduytCapabilityError(`Datastream "${name}" not found`)
         return this._dsSubscribe(ds.index, ds.type, opts)
       },
     }
@@ -136,7 +136,7 @@ export class GraftDevice {
   /** Get a module proxy by name. */
   module(name: string) {
     const mod = this._hello?.modules.find(m => m.name === name)
-    if (!mod) throw new GraftCapabilityError(`Module "${name}" not found`)
+    if (!mod) throw new ConduytCapabilityError(`Module "${name}" not found`)
 
     return {
       get descriptor() { return mod },
@@ -166,7 +166,7 @@ export class GraftDevice {
   /** Get an I2C bus proxy. */
   i2c(bus = 0) {
     if (this._hello && bus >= this._hello.i2cBuses) {
-      throw new GraftCapabilityError(`I2C bus ${bus} not available (device has ${this._hello.i2cBuses})`)
+      throw new ConduytCapabilityError(`I2C bus ${bus} not available (device has ${this._hello.i2cBuses})`)
     }
 
     return {
@@ -203,7 +203,7 @@ export class GraftDevice {
   }
 
   /** Register an event handler for a specific event type. */
-  on(eventType: number, handler: (packet: GraftPacket) => void): void {
+  on(eventType: number, handler: (packet: ConduytPacket) => void): void {
     this._on(eventType, handler)
   }
 
@@ -216,7 +216,7 @@ export class GraftDevice {
     this._handlers.get(eventType)!.add(handler)
   }
 
-  private _emit(eventType: number, packet: GraftPacket): void {
+  private _emit(eventType: number, packet: ConduytPacket): void {
     const handlers = this._handlers.get(eventType)
     if (handlers) {
       for (const h of handlers) h(packet)
@@ -224,7 +224,7 @@ export class GraftDevice {
   }
 
   private async _sendCommand(type: number, payload: Uint8Array = new Uint8Array(0)): Promise<Uint8Array> {
-    if (!this._transport.connected) throw new GraftDisconnectedError()
+    if (!this._transport.connected) throw new ConduytDisconnectedError()
 
     const seq = this._seq.next()
     const packet = makePacket(type, seq, payload)
@@ -266,7 +266,7 @@ export class GraftDevice {
   }
 
   private _handlePacket(raw: Uint8Array): void {
-    let packet: GraftPacket
+    let packet: ConduytPacket
     try {
       packet = wireDecode(raw)
     } catch {
@@ -280,7 +280,7 @@ export class GraftDevice {
 
       case EVT.NAK:
         if (packet.payload.length >= 1) {
-          this._seq.reject(packet.seq, new GraftNAKError(packet.payload[0], packet.seq))
+          this._seq.reject(packet.seq, new ConduytNAKError(packet.payload[0], packet.seq))
         }
         break
 

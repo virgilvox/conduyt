@@ -1,51 +1,51 @@
 ---
 title: Transport Adapters
-description: Available transport layers for GRAFT firmware
+description: Available transport layers for CONDUYT firmware
 ---
 
 # Transport Adapters
 
-GRAFT is transport-agnostic. The same binary protocol works over any of these:
+CONDUYT is transport-agnostic. The same binary protocol works over any of these:
 
 ## Available Transports
 
 | Transport | Class | COBS | Platform | Include Guard |
 |---|---|---|---|---|
-| Serial (UART/USB) | `GraftSerial` | Yes | All | — (default) |
-| USB CDC | `GraftUSBSerial` | Yes | RP2040, SAMD, nRF52 | — |
-| MQTT | `GraftMQTT` | No | ESP32, ESP8266 | `GRAFT_TRANSPORT_MQTT` |
-| BLE (NUS) | `GraftBLE` | Yes | ESP32, nRF52 | `GRAFT_TRANSPORT_BLE` |
-| TCP Server | `GraftTCP` | No | ESP32, ESP8266 | `GRAFT_TRANSPORT_TCP` |
-| CLASP | `GraftCLASP` | Yes | ESP32 | `GRAFT_TRANSPORT_CLASP` |
+| Serial (UART/USB) | `ConduytSerial` | Yes | All | — (default) |
+| USB CDC | `ConduytUSBSerial` | Yes | RP2040, SAMD, nRF52 | — |
+| MQTT | `ConduytMQTT` | No | ESP32, ESP8266 | `CONDUYT_TRANSPORT_MQTT` |
+| BLE (NUS) | `ConduytBLE` | Yes | ESP32, nRF52 | `CONDUYT_TRANSPORT_BLE` |
+| TCP Server | `ConduytTCP` | No | ESP32, ESP8266 | `CONDUYT_TRANSPORT_TCP` |
+| CLASP | `ConduytCLASP` | Yes | ESP32 | `CONDUYT_TRANSPORT_CLASP` |
 
 ## Serial (Default)
 
 ```cpp
-GraftSerial transport(Serial, 115200);
-GraftDevice device("MyBoard", "1.0.0", transport);
+ConduytSerial transport(Serial, 115200);
+ConduytDevice device("MyBoard", "1.0.0", transport);
 ```
 
 ## MQTT
 
 ```cpp
-#define GRAFT_TRANSPORT_MQTT
-#include <Graft.h>
+#define CONDUYT_TRANSPORT_MQTT
+#include <Conduyt.h>
 
 WiFiClient wifiClient;
-GraftMQTT transport(wifiClient, "broker.local", 1883, "device-001");
-GraftDevice device("MQTTBoard", "1.0.0", transport);
+ConduytMQTT transport(wifiClient, "broker.local", 1883, "device-001");
+ConduytDevice device("MQTTBoard", "1.0.0", transport);
 ```
 
-Topics follow the pattern `graft/{deviceId}/cmd` and `graft/{deviceId}/evt/{typeHex}`.
+Topics follow the pattern `conduyt/{deviceId}/cmd` and `conduyt/{deviceId}/evt/{typeHex}`.
 
 ## BLE
 
 ```cpp
-#define GRAFT_TRANSPORT_BLE
-#include <Graft.h>
+#define CONDUYT_TRANSPORT_BLE
+#include <Conduyt.h>
 
-GraftBLE transport("MyGraftDevice");
-GraftDevice device("BLEBoard", "1.0.0", transport);
+ConduytBLE transport("MyConduytDevice");
+ConduytDevice device("BLEBoard", "1.0.0", transport);
 ```
 
 Uses Nordic UART Service (NUS) UUIDs. COBS framing handles packet boundaries within BLE characteristic writes.
@@ -56,4 +56,4 @@ Serial and BLE transports use COBS (Consistent Overhead Byte Stuffing) to frame 
 
 TCP and MQTT transports don't need COBS — TCP has stream semantics with length-prefixed reads, and MQTT delivers discrete messages.
 
-The `needsCOBS` flag on each transport tells `GraftDevice` whether to apply COBS encoding/decoding.
+The `needsCOBS` flag on each transport tells `ConduytDevice` whether to apply COBS encoding/decoding.

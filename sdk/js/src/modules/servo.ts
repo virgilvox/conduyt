@@ -1,13 +1,13 @@
 /**
- * GRAFT Servo Module — Typed JS wrapper
+ * CONDUYT Servo Module — Typed JS wrapper
  */
 
-import type { GraftDevice } from '../device.js'
+import type { ConduytDevice } from '../device.js'
 
-export class GraftServo {
-  private _device: ReturnType<GraftDevice['module']>
+export class ConduytServo {
+  private _device: ReturnType<ConduytDevice['module']>
 
-  constructor(device: GraftDevice) {
+  constructor(device: ConduytDevice) {
     this._device = device.module('servo')
   }
 

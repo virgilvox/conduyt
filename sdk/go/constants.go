@@ -1,12 +1,12 @@
-// Package graft implements the GRAFT protocol SDK for Go.
+// Package conduyt implements the CONDUYT protocol SDK for Go.
 //
 // Generated from protocol/constants.json — DO NOT EDIT
-package graft
+package conduyt
 
 const (
 	ProtocolVersion = 0x01
-	Magic0          = 0x47 // 'G'
-	Magic1          = 0x46 // 'F'
+	Magic0          = 0x43 // 'C'
+	Magic1          = 0x44 // 'D'
 	HeaderSize      = 8    // MAGIC(2) + VER(1) + TYPE(1) + SEQ(1) + LEN(2) + CRC(1)
 )
 

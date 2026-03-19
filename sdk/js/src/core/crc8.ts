@@ -1,6 +1,6 @@
 /**
  * CRC8 Dallas/Maxim (polynomial 0x31, init 0x00)
- * Lookup table implementation — matches firmware/src/graft/core/graft_crc8.h
+ * Lookup table implementation — matches firmware/src/conduyt/core/conduyt_crc8.h
  */
 
 const TABLE = new Uint8Array([

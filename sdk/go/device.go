@@ -1,4 +1,4 @@
-package graft
+package conduyt
 
 import (
 	"context"
@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/graft-io/graft-go/transports"
+	"github.com/conduyt-io/conduyt-go/transports"
 )
 
-// Device is a high-level GRAFT device client.
+// Device is a high-level CONDUYT device client.
 type Device struct {
 	transport transports.Transport
 	timeout   time.Duration

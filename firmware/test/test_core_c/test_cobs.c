@@ -1,10 +1,10 @@
 /**
- * GRAFT COBS Tests — Desktop (no Arduino)
+ * CONDUYT COBS Tests — Desktop (no Arduino)
  */
 
 #include <stdio.h>
 #include <string.h>
-#include "graft_cobs.h"
+#include "conduyt_cobs.h"
 
 static int tests_run = 0;
 static int tests_passed = 0;
@@ -23,7 +23,7 @@ static void test_roundtrip(const uint8_t *data, size_t len, const char *label) {
     uint8_t encoded[512];
     uint8_t decoded[512];
 
-    size_t enc_len = graft_cobs_encode(encoded, sizeof(encoded), data, len);
+    size_t enc_len = conduyt_cobs_encode(encoded, sizeof(encoded), data, len);
     ASSERT(enc_len > 0, label);
 
     /* Verify no zeros in encoded output */
@@ -35,7 +35,7 @@ static void test_roundtrip(const uint8_t *data, size_t len, const char *label) {
     snprintf(no_zero_msg, sizeof(no_zero_msg), "%s — no zeros in encoded", label);
     ASSERT(!has_zero, no_zero_msg);
 
-    size_t dec_len = graft_cobs_decode(decoded, sizeof(decoded), encoded, enc_len);
+    size_t dec_len = conduyt_cobs_decode(decoded, sizeof(decoded), encoded, enc_len);
 
     char rt_msg[128];
     snprintf(rt_msg, sizeof(rt_msg), "%s — round-trip length", label);
@@ -91,7 +91,7 @@ int main(void) {
         uint8_t data[] = { 0x11, 0x22, 0x00, 0x33 };
         uint8_t expected[] = { 0x03, 0x11, 0x22, 0x02, 0x33 };
         uint8_t encoded[16];
-        size_t enc_len = graft_cobs_encode(encoded, sizeof(encoded), data, 4);
+        size_t enc_len = conduyt_cobs_encode(encoded, sizeof(encoded), data, 4);
         int match = (enc_len == 5) && (memcmp(encoded, expected, 5) == 0);
         ASSERT(match, "known encode vector");
     }
@@ -120,7 +120,7 @@ int main(void) {
     {
         uint8_t data[] = { 0x01, 0x02, 0x03 };
         uint8_t tiny[1];
-        size_t enc_len = graft_cobs_encode(tiny, 1, data, 3);
+        size_t enc_len = conduyt_cobs_encode(tiny, 1, data, 3);
         ASSERT(enc_len == 0, "encode rejects buffer too small");
     }
 

@@ -1,11 +1,11 @@
 ---
 title: Packet Types
-description: Complete table of GRAFT command and event packet types
+description: Complete table of CONDUYT command and event packet types
 ---
 
 # Packet Types
 
-Every GRAFT packet has a 1-byte type code in the header. Commands flow host → device, events flow device → host.
+Every CONDUYT packet has a 1-byte type code in the header. Commands flow host → device, events flow device → host.
 
 ## Commands (Host → Device)
 

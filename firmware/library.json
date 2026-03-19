@@ -1,11 +1,11 @@
 {
-  "name": "Graft",
+  "name": "Conduyt",
   "version": "0.1.0",
-  "description": "GRAFT protocol firmware library — transport-agnostic, capability-first binary protocol for host-device hardware control",
+  "description": "CONDUYT protocol firmware library — transport-agnostic, capability-first binary protocol for host-device hardware control",
   "keywords": ["iot", "protocol", "hardware", "serial", "mqtt", "ble", "firmware"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/virgilvox/graft"
+    "url": "https://github.com/virgilvox/conduyt"
   },
   "authors": [
     {
@@ -14,7 +14,7 @@
     }
   ],
   "license": "MIT",
-  "homepage": "https://github.com/virgilvox/graft",
+  "homepage": "https://github.com/virgilvox/conduyt",
   "frameworks": ["arduino"],
   "platforms": "*",
   "build": {

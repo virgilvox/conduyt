@@ -1,6 +1,6 @@
-//! GRAFT Transport Layer
+//! CONDUYT Transport Layer
 
-/// Transport trait for GRAFT connections.
+/// Transport trait for CONDUYT connections.
 pub trait Transport {
     /// Transport error type.
     type Error: core::fmt::Debug;

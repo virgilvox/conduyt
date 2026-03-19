@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { SeqTracker } from '../src/seq.js'
-import { GraftTimeoutError } from '../src/core/errors.js'
+import { ConduytTimeoutError } from '../src/core/errors.js'
 
 describe('SeqTracker', () => {
   it('starts at 0', () => {
@@ -42,7 +42,7 @@ describe('SeqTracker', () => {
 
     vi.advanceTimersByTime(60)
 
-    await expect(promise).rejects.toBeInstanceOf(GraftTimeoutError)
+    await expect(promise).rejects.toBeInstanceOf(ConduytTimeoutError)
     vi.useRealTimers()
   })
 

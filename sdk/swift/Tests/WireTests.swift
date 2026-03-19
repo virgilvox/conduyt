@@ -1,11 +1,11 @@
 import XCTest
-@testable import GraftKit
+@testable import ConduytKit
 
 final class WireTests: XCTestCase {
     func testPingRoundTrip() throws {
-        let pkt = GraftPacket(type: 0x01, seq: 7)
+        let pkt = ConduytPacket(type: 0x01, seq: 7)
         let encoded = wireEncode(pkt)
-        XCTAssertEqual(encoded.count, GraftProtocol.headerSize)
+        XCTAssertEqual(encoded.count, ConduytProtocol.headerSize)
 
         let decoded = try wireDecode(encoded)
         XCTAssertEqual(decoded.type, 0x01)
@@ -15,7 +15,7 @@ final class WireTests: XCTestCase {
 
     func testPinWriteRoundTrip() throws {
         let payload = Data([5, 128])
-        let pkt = GraftPacket(type: 0x11, seq: 255, payload: payload)
+        let pkt = ConduytPacket(type: 0x11, seq: 255, payload: payload)
         let encoded = wireEncode(pkt)
         let decoded = try wireDecode(encoded)
 
@@ -25,7 +25,7 @@ final class WireTests: XCTestCase {
     }
 
     func testRejectIncomplete() {
-        XCTAssertThrowsError(try wireDecode(Data([0x47, 0x46])))
+        XCTAssertThrowsError(try wireDecode(Data([0x43, 0x44])))
     }
 
     func testRejectBadMagic() {
@@ -33,7 +33,7 @@ final class WireTests: XCTestCase {
     }
 
     func testRejectCRCMismatch() {
-        let pkt = GraftPacket(type: 0x01, seq: 0)
+        let pkt = ConduytPacket(type: 0x01, seq: 0)
         var encoded = wireEncode(pkt)
         encoded[7] ^= 0xFF
         XCTAssertThrowsError(try wireDecode(encoded))

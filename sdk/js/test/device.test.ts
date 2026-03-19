@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { GraftDevice } from '../src/device.js'
+import { ConduytDevice } from '../src/device.js'
 import { MockTransport } from '../src/transports/mock.js'
 import { wireEncode, wireDecode, makePacket } from '../src/core/wire.js'
-import { CMD, EVT, PROTOCOL_VERSION, DS_TYPE } from '../src/core/constants.js'
+import { CMD, EVT, PROTOCOL_VERSION, MAGIC, HEADER_SIZE, DS_TYPE } from '../src/core/constants.js'
+import { crc8 } from '../src/core/crc8.js'
 
 /**
  * Build a HELLO_RESP packet that the mock device sends back.
@@ -71,7 +72,7 @@ function autoRespond(transport: MockTransport) {
   }
 }
 
-describe('GraftDevice', () => {
+describe('ConduytDevice', () => {
   let transport: MockTransport
 
   beforeEach(() => {
@@ -80,7 +81,7 @@ describe('GraftDevice', () => {
   })
 
   it('connects and parses HELLO_RESP', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     expect(device.connected).toBe(true)
     expect(device.capabilities).not.toBeNull()
     expect(device.capabilities!.firmwareName).toBe('MockBoard')
@@ -93,12 +94,12 @@ describe('GraftDevice', () => {
   })
 
   it('sends PING and receives PONG', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await device.ping() // should not throw
   })
 
   it('sets pin mode', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await device.pin(13).mode('output')
 
     // Verify a PIN_MODE command was sent
@@ -113,7 +114,7 @@ describe('GraftDevice', () => {
   })
 
   it('writes to pin', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await device.pin(13).write(1)
 
     const sent = transport.sentPackets
@@ -144,13 +145,13 @@ describe('GraftDevice', () => {
       } catch { /* ignore */ }
     }
 
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     const value = await device.pin(0).read()
     expect(value).toBe(512)
   })
 
   it('sends module command', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     const servo = device.module('servo')
     await servo.cmd(0x02, new Uint8Array([90])) // write angle 90
 
@@ -166,12 +167,12 @@ describe('GraftDevice', () => {
   })
 
   it('throws on unknown module', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     expect(() => device.module('nonexistent')).toThrow('not found')
   })
 
   it('sends reset', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await device.reset()
 
     const sent = transport.sentPackets
@@ -182,7 +183,7 @@ describe('GraftDevice', () => {
   })
 
   it('disconnects cleanly', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await device.disconnect()
     expect(device.connected).toBe(false)
     expect(device.capabilities).toBeNull()
@@ -202,12 +203,12 @@ describe('GraftDevice', () => {
       } catch { /* ignore */ }
     }
 
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
     await expect(device.pin(99).mode('output')).rejects.toThrow('NAK')
   })
 
   it('increments SEQ per command', async () => {
-    const device = await GraftDevice.connect(transport)
+    const device = await ConduytDevice.connect(transport)
 
     // HELLO was seq 0, so next commands start from 1
     await device.pin(13).mode('output')
@@ -223,5 +224,93 @@ describe('GraftDevice', () => {
     for (let i = 1; i < seqs.length; i++) {
       expect(seqs[i]).toBe((seqs[i - 1] + 1) & 0xFF)
     }
+  })
+
+  it('PIN_MODE wire encoding is fully spec-compliant', async () => {
+    const device = await ConduytDevice.connect(transport)
+    await device.pin(13).mode('output')
+
+    // Find the PIN_MODE packet
+    const pinModePkt = transport.sentPackets.find(p => {
+      try { return wireDecode(p).type === CMD.PIN_MODE } catch { return false }
+    })
+    expect(pinModePkt).toBeDefined()
+
+    const raw = pinModePkt!
+    const decoded = wireDecode(raw)
+
+    // Verify MAGIC bytes
+    expect(raw[0]).toBe(MAGIC[0]) // 0x43 'C'
+    expect(raw[1]).toBe(MAGIC[1]) // 0x44 'D'
+
+    // Verify VERSION
+    expect(raw[2]).toBe(PROTOCOL_VERSION)
+
+    // Verify TYPE = PIN_MODE (0x10)
+    expect(raw[3]).toBe(CMD.PIN_MODE)
+
+    // Verify SEQ is present (byte 4)
+    expect(raw[4]).toBe(decoded.seq)
+
+    // Verify LEN (little-endian uint16) — payload is [pin, mode] = 2 bytes
+    expect(raw[5]).toBe(2) // LEN lo
+    expect(raw[6]).toBe(0) // LEN hi
+
+    // Verify PAYLOAD: pin=13, mode=OUTPUT(0x01)
+    expect(raw[7]).toBe(13)
+    expect(raw[8]).toBe(0x01)
+
+    // Verify CRC8 over [VER..end of PAYLOAD] = bytes [2..8]
+    const crcRegion = raw.subarray(2, 9)
+    expect(raw[9]).toBe(crc8(crcRegion))
+
+    // Verify total length = HEADER_SIZE(8) + payload(2) = 10
+    expect(raw.length).toBe(HEADER_SIZE + 2)
+  })
+
+  it('datastream subscribe returns an async iterable', async () => {
+    const device = await ConduytDevice.connect(transport)
+    const ds = device.datastream('temperature')
+    const iter = ds.subscribe()
+
+    // Verify the subscribe method returns an AsyncIterable
+    expect(iter).toBeDefined()
+    expect(iter[Symbol.asyncIterator]).toBeDefined()
+    expect(typeof iter[Symbol.asyncIterator]).toBe('function')
+
+    // Verify the iterator has next() and return() methods
+    const iterator = iter[Symbol.asyncIterator]()
+    expect(typeof iterator.next).toBe('function')
+    expect(typeof iterator.return).toBe('function')
+
+    // Clean up by calling return
+    await iterator.return!()
+  })
+
+  it('datastream subscribe throws for unknown datastream', async () => {
+    const device = await ConduytDevice.connect(transport)
+    const ds = device.datastream('nonexistent')
+    expect(() => ds.subscribe()).toThrow('not found')
+  })
+
+  it('PIN_WRITE with value=0 sends correct payload', async () => {
+    const device = await ConduytDevice.connect(transport)
+    await device.pin(13).write(0)
+
+    const pinWritePkt = transport.sentPackets.find(p => {
+      try { return wireDecode(p).type === CMD.PIN_WRITE } catch { return false }
+    })
+    expect(pinWritePkt).toBeDefined()
+    const decoded = wireDecode(pinWritePkt!)
+
+    // pin=13, value=0 — value 0 is falsy in JS but must still be sent
+    expect(decoded.payload[0]).toBe(13)
+    expect(decoded.payload[1]).toBe(0)
+    expect(decoded.payload.length).toBe(2)
+
+    // Also verify wire-level: payload bytes are present in the raw packet
+    const raw = pinWritePkt!
+    expect(raw[7]).toBe(13) // pin byte in payload
+    expect(raw[8]).toBe(0)  // value byte must be 0, not omitted
   })
 })

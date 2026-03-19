@@ -1,6 +1,6 @@
 ---
 title: Python
-description: Python SDK API guide for graft-py
+description: Python SDK API guide for conduyt-py
 ---
 
 # Python SDK Guide
@@ -8,12 +8,12 @@ description: Python SDK API guide for graft-py
 ## Installation
 
 ```bash
-pip install graft-py
+pip install conduyt-py
 
 # With transport extras:
-pip install graft-py[serial]   # pyserial-asyncio
-pip install graft-py[mqtt]     # aiomqtt
-pip install graft-py[all]      # everything
+pip install conduyt-py[serial]   # pyserial-asyncio
+pip install conduyt-py[mqtt]     # aiomqtt
+pip install conduyt-py[all]      # everything
 ```
 
 Requires Python 3.10+.
@@ -22,12 +22,12 @@ Requires Python 3.10+.
 
 ```python
 import asyncio
-from graft import GraftDevice
-from graft.transports.serial import SerialTransport
+from conduyt import ConduytDevice
+from conduyt.transports.serial import SerialTransport
 
 async def main():
     transport = SerialTransport('/dev/ttyUSB0')
-    device = GraftDevice(transport, timeout_ms=5000)
+    device = ConduytDevice(transport, timeout_ms=5000)
 
     hello = await device.connect()
     print(f"Firmware: {hello.firmware_name}")
@@ -44,10 +44,10 @@ asyncio.run(main())
 ## Synchronous Wrapper
 
 ```python
-from graft import GraftDeviceSync
-from graft.transports.mock import MockTransport
+from conduyt import ConduytDeviceSync
+from conduyt.transports.mock import MockTransport
 
-device = GraftDeviceSync(MockTransport())
+device = ConduytDeviceSync(MockTransport())
 device.connect()
 device.ping()
 device.close()
@@ -67,22 +67,22 @@ Pin modes: `input`, `output`, `pwm`, `analog`, `input_pullup`.
 ## Modules
 
 ```python
-from graft.modules import GraftServo, GraftNeoPixel, GraftDHT
+from conduyt.modules import ConduytServo, ConduytNeoPixel, ConduytDHT
 
 # Servo
-servo = GraftServo(device, module_id=0)
+servo = ConduytServo(device, module_id=0)
 await servo.attach(9)
 await servo.write(90)
 await servo.detach()
 
 # NeoPixel
-neo = GraftNeoPixel(device, module_id=1)
+neo = ConduytNeoPixel(device, module_id=1)
 await neo.begin(pin=6, count=30)
 await neo.fill(255, 0, 0)
 await neo.show()
 
 # DHT
-dht = GraftDHT(device, module_id=2)
+dht = ConduytDHT(device, module_id=2)
 await dht.begin(pin=4, sensor_type=22)
 reading = await dht.read()
 print(f"Temp: {reading.temperature}°C, Humidity: {reading.humidity}%")
@@ -91,15 +91,15 @@ print(f"Temp: {reading.temperature}°C, Humidity: {reading.humidity}%")
 ## Error Handling
 
 ```python
-from graft import GraftNAKError, GraftTimeoutError, GraftDisconnectedError
+from conduyt import ConduytNAKError, ConduytTimeoutError, ConduytDisconnectedError
 
 try:
     await device.pin(99).write(1)
-except GraftNAKError as e:
+except ConduytNAKError as e:
     print(f"Device error: {e.error_name} (0x{e.code:02x})")
-except GraftTimeoutError:
+except ConduytTimeoutError:
     print("Command timed out")
-except GraftDisconnectedError:
+except ConduytDisconnectedError:
     print("Device disconnected")
 ```
 
@@ -107,6 +107,6 @@ except GraftDisconnectedError:
 
 | Transport | Import | Requirements |
 |---|---|---|
-| Mock | `graft.transports.mock` | — |
-| Serial | `graft.transports.serial` | `pip install graft-py[serial]` |
-| MQTT | `graft.transports.mqtt` | `pip install graft-py[mqtt]` |
+| Mock | `conduyt.transports.mock` | — |
+| Serial | `conduyt.transports.serial` | `pip install conduyt-py[serial]` |
+| MQTT | `conduyt.transports.mqtt` | `pip install conduyt-py[mqtt]` |

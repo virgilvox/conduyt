@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "GraftKit",
+    name: "ConduytKit",
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
-        .library(name: "GraftKit", targets: ["GraftKit"]),
+        .library(name: "ConduytKit", targets: ["ConduytKit"]),
     ],
     targets: [
-        .target(name: "GraftKit", path: "Sources/GraftKit"),
-        .testTarget(name: "GraftKitTests", dependencies: ["GraftKit"], path: "Tests"),
+        .target(name: "ConduytKit", path: "Sources/ConduytKit"),
+        .testTarget(name: "ConduytKitTests", dependencies: ["ConduytKit"], path: "Tests"),
     ]
 )

@@ -100,8 +100,8 @@
 const phase = ref<'idle' | 'sending' | 'responding' | 'done'>('idle')
 const activeCmd = ref('blink')
 const hostCode = ref('await device.pin(13).write(1)')
-const cmdBytes = ref('47 46 01 11 00 02 0D 01')
-const respBytes = ref('47 46 01 82 00 00')
+const cmdBytes = ref('43 44 01 11 00 02 0D 01')
+const respBytes = ref('43 44 01 82 00 00')
 const wireLabel = ref('serial @ 115200')
 const deviceStatus = ref('Ready')
 const ledOn = ref(false)
@@ -113,33 +113,33 @@ const commands = [
     label: 'Blink LED',
     icon: '/',
     host: 'await device.pin(13).write(1)',
-    cmd: '47 46 01 11 00 02 0D 01',
-    resp: '47 46 01 82 00 00',
+    cmd: '43 44 01 11 00 02 0D 01',
+    resp: '43 44 01 82 00 00',
     status: 'Pin 13 HIGH',
     led: true,
-    packet: ['47', '46', '01', '11', '00', '02', '00', '0D', '01'],
+    packet: ['43', '44', '01', '11', '00', '02', '00', '0D', '01'],
   },
   {
     name: 'read',
     label: 'Read Sensor',
     icon: '~',
     host: 'await device.pin(0).read("analog")',
-    cmd: '47 46 01 12 01 02 00 03',
-    resp: '47 46 01 91 00 03 00 01 A4',
+    cmd: '43 44 01 12 01 02 00 03',
+    resp: '43 44 01 91 00 03 00 01 A4',
     status: 'A0 = 420',
     led: false,
-    packet: ['47', '46', '01', '12', '01', '02', '00', '00', '03'],
+    packet: ['43', '44', '01', '12', '01', '02', '00', '00', '03'],
   },
   {
     name: 'servo',
     label: 'Move Servo',
     icon: '>',
     host: 'await servo.write(90)',
-    cmd: '47 46 01 40 02 03 00 01 5A',
-    resp: '47 46 01 82 02 00',
+    cmd: '43 44 01 40 02 03 00 01 5A',
+    resp: '43 44 01 82 02 00',
     status: 'Servo 90deg',
     led: false,
-    packet: ['47', '46', '01', '40', '02', '03', '00', '00', '01', '5A'],
+    packet: ['43', '44', '01', '40', '02', '03', '00', '00', '01', '5A'],
   },
 ]
 

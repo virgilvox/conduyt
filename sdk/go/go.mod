@@ -1,3 +1,3 @@
-module github.com/graft-io/graft-go
+module github.com/conduyt-io/conduyt-go
 
 go 1.22

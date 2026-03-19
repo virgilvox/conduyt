@@ -1,10 +1,9 @@
 {
   "protocol": {
-    "name": "GRAFT",
-    "fullName": "Generic Remote Actuator Firmware Transport",
+    "name": "CONDUYT",
     "version": 1,
-    "magic": [71, 70],
-    "magicHex": ["0x47", "0x46"],
+    "magic": [67, 68],
+    "magicHex": ["0x43", "0x44"],
     "license": "CC BY 4.0"
   },
 

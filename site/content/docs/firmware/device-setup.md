@@ -1,6 +1,6 @@
 ---
 title: Device Setup
-description: Setting up GRAFT firmware on your microcontroller
+description: Setting up CONDUYT firmware on your microcontroller
 ---
 
 # Device Setup
@@ -8,10 +8,10 @@ description: Setting up GRAFT firmware on your microcontroller
 ## Minimal Sketch
 
 ```cpp
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("MyBoard", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("MyBoard", "1.0.0", transport);
 
 void setup() {
   device.begin();
@@ -26,19 +26,19 @@ That's it. The device will respond to HELLO, PING, and all pin control commands.
 
 ## Adding Modules
 
-Enable modules with `#define` before including Graft.h:
+Enable modules with `#define` before including Conduyt.h:
 
 ```cpp
-#define GRAFT_MODULE_SERVO
-#define GRAFT_MODULE_NEOPIXEL
-#include <Graft.h>
+#define CONDUYT_MODULE_SERVO
+#define CONDUYT_MODULE_NEOPIXEL
+#include <Conduyt.h>
 
-GraftSerial  transport(Serial, 115200);
-GraftDevice  device("MyBoard", "1.0.0", transport);
+ConduytSerial  transport(Serial, 115200);
+ConduytDevice  device("MyBoard", "1.0.0", transport);
 
 void setup() {
-  device.addModule(new GraftModuleServo());
-  device.addModule(new GraftModuleNeoPixel());
+  device.addModule(new ConduytModuleServo());
+  device.addModule(new ConduytModuleNeoPixel());
   device.begin();
 }
 ```
@@ -48,11 +48,11 @@ void setup() {
 Datastreams are named, typed channels for higher-level data:
 
 ```cpp
-device.addDatastream("temperature", GRAFT_FLOAT32, "celsius", false);  // read-only
-device.addDatastream("setpoint",    GRAFT_FLOAT32, "celsius", true);   // writable
+device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);  // read-only
+device.addDatastream("setpoint",    CONDUYT_FLOAT32, "celsius", true);   // writable
 
 // Handle writes from the host
-device.onDatastreamWrite("setpoint", [](GraftPayloadReader &payload, GraftContext &ctx) {
+device.onDatastreamWrite("setpoint", [](ConduytPayloadReader &payload, ConduytContext &ctx) {
   float val = payload.readFloat32();
   pid.setTarget(val);
   ctx.ack();
@@ -69,7 +69,7 @@ void loop() {
 
 ## Supported Boards
 
-GRAFT auto-detects your board and configures memory limits:
+CONDUYT auto-detects your board and configures memory limits:
 
 | Board | RAM Budget | Max Modules | Max Subs | Max Datastreams |
 |---|---|---|---|---|
@@ -82,24 +82,24 @@ GRAFT auto-detects your board and configures memory limits:
 | SAMD | 256B buf | 6 | 12 | 8 |
 | Teensy | 512B buf | 8 | 16 | 16 |
 
-All limits are overridable via `#define` before including Graft.h.
+All limits are overridable via `#define` before including Conduyt.h.
 
 ## Transport Options
 
 ```cpp
 // Serial (all boards)
-GraftSerial transport(Serial, 115200);
+ConduytSerial transport(Serial, 115200);
 
 // MQTT (ESP32/8266 with WiFi)
 WiFiClient wifi;
-GraftMQTT transport(wifi, "mqtt://broker.local", 1883, "my-device");
+ConduytMQTT transport(wifi, "mqtt://broker.local", 1883, "my-device");
 
 // BLE (ESP32)
-GraftBLE transport("GRAFT-Device");
+ConduytBLE transport("CONDUYT-Device");
 
 // TCP (any board with Client)
 WiFiClient client;
-GraftTCP transport(client, "192.168.1.100", 3000);
+ConduytTCP transport(client, "192.168.1.100", 3000);
 ```
 
 The transport accepts any Arduino `Client&` — your networking hardware is irrelevant to the protocol.

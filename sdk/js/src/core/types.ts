@@ -1,12 +1,12 @@
 /**
- * GRAFT Core TypeScript Types
+ * CONDUYT Core TypeScript Types
  */
 
 import type { CMD, EVT, DS_TYPE, PIN_MODE, SUB_MODE } from './constants.js'
 
 // ── Packet ───────────────────────────────────────────────
 
-export interface GraftPacket {
+export interface ConduytPacket {
   version: number
   type: number
   seq: number
@@ -54,7 +54,7 @@ export interface DatastreamDescriptor {
 
 // ── Transport ────────────────────────────────────────────
 
-export interface GraftTransport {
+export interface ConduytTransport {
   connect(): Promise<void>
   disconnect(): Promise<void>
   send(packet: Uint8Array): Promise<void>

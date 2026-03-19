@@ -1,4 +1,4 @@
-//! GRAFT Device — async-free device client
+//! CONDUYT Device — async-free device client
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -29,7 +29,7 @@ impl<E: core::fmt::Debug> core::fmt::Display for DeviceError<E> {
     }
 }
 
-/// Synchronous GRAFT device client.
+/// Synchronous CONDUYT device client.
 pub struct Device<T: Transport> {
     transport: T,
     seq: u8,

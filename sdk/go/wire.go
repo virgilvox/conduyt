@@ -1,11 +1,11 @@
-package graft
+package conduyt
 
 import (
 	"encoding/binary"
 	"fmt"
 )
 
-// Packet represents a decoded GRAFT packet.
+// Packet represents a decoded CONDUYT packet.
 type Packet struct {
 	Version byte
 	Type    byte

@@ -1,18 +1,18 @@
 /**
- * GRAFT WebSocket Transport
+ * CONDUYT WebSocket Transport
  *
  * Generic WebSocket transport. Binary frames, no COBS needed.
  * Works in both Node.js (via `ws` package) and browser (native WebSocket).
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
 export interface WebSocketTransportOptions {
   /** WebSocket URL (e.g., 'ws://localhost:8080') */
   url: string
 }
 
-export class WebSocketTransport implements GraftTransport {
+export class WebSocketTransport implements ConduytTransport {
   private _url: string
   private _ws: WebSocket | null = null
   private _handler: ((packet: Uint8Array) => void) | null = null

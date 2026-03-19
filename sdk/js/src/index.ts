@@ -1,7 +1,7 @@
 /**
- * graft-js — GRAFT Protocol SDK for JavaScript/TypeScript
+ * conduyt-js — CONDUYT Protocol SDK for JavaScript/TypeScript
  *
- * Reference host-side SDK for the GRAFT protocol.
+ * Reference host-side SDK for the CONDUYT protocol.
  * Transport-agnostic, capability-first hardware control.
  */
 
@@ -12,13 +12,13 @@ export { cobsEncode, cobsDecode } from './core/cobs.js'
 export { wireEncode, wireDecode, makePacket, wirePacketSize, wireFindPacket } from './core/wire.js'
 
 // Types
-export type { GraftPacket, HelloResp, PinCapability, ModuleDescriptor, DatastreamDescriptor, GraftTransport, PinSubscribeOptions, DatastreamSubscribeOptions, DatastreamValue } from './core/types.js'
+export type { ConduytPacket, HelloResp, PinCapability, ModuleDescriptor, DatastreamDescriptor, ConduytTransport, PinSubscribeOptions, DatastreamSubscribeOptions, DatastreamValue } from './core/types.js'
 
 // Errors
-export { GraftNAKError, GraftTimeoutError, GraftDisconnectedError, GraftCapabilityError, GraftWireError } from './core/errors.js'
+export { ConduytNAKError, ConduytTimeoutError, ConduytDisconnectedError, ConduytCapabilityError, ConduytWireError } from './core/errors.js'
 
 // Device
-export { GraftDevice } from './device.js'
+export { ConduytDevice } from './device.js'
 
 // HELLO parser
 export { parseHelloResp } from './hello.js'
@@ -31,4 +31,4 @@ export { ReconnectTransport } from './reconnect.js'
 export type { ReconnectOptions } from './reconnect.js'
 
 // Transport interface (re-export from types for convenience)
-export type { GraftTransport as GraftTransportInterface } from './transports/transport.js'
+export type { ConduytTransport as ConduytTransportInterface } from './transports/transport.js'

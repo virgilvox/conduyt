@@ -1,4 +1,4 @@
-//! GRAFT Servo Module — typed wrapper
+//! CONDUYT Servo Module — typed wrapper
 
 use crate::device::{Device, DeviceError};
 use crate::transports::Transport;

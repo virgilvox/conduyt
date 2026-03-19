@@ -1,6 +1,6 @@
 /**
- * GRAFT Wire Format — Packet encode/decode
- * Matches firmware/src/graft/core/graft_wire.{h,c}
+ * CONDUYT Wire Format — Packet encode/decode
+ * Matches firmware/src/conduyt/core/conduyt_wire.{h,c}
  *
  * Packet layout:
  *   MAGIC(2) + VER(1) + TYPE(1) + SEQ(1) + LEN(2 LE) + PAYLOAD(N) + CRC8(1)
@@ -8,13 +8,13 @@
 
 import { PROTOCOL_VERSION, MAGIC, HEADER_SIZE } from './constants.js'
 import { crc8 } from './crc8.js'
-import type { GraftPacket } from './types.js'
+import type { ConduytPacket } from './types.js'
 
 /**
- * Encode a GRAFT packet into a raw byte buffer.
+ * Encode a CONDUYT packet into a raw byte buffer.
  * @returns Complete packet bytes (MAGIC through CRC)
  */
-export function wireEncode(packet: GraftPacket): Uint8Array {
+export function wireEncode(packet: ConduytPacket): Uint8Array {
   const payloadLen = packet.payload.length
   const total = HEADER_SIZE + payloadLen
   const buf = new Uint8Array(total)
@@ -47,10 +47,10 @@ export function wireEncode(packet: GraftPacket): Uint8Array {
 }
 
 /**
- * Decode a raw byte buffer into a GRAFT packet.
+ * Decode a raw byte buffer into a CONDUYT packet.
  * @returns Decoded packet, or throws on error
  */
-export function wireDecode(buf: Uint8Array): GraftPacket {
+export function wireDecode(buf: Uint8Array): ConduytPacket {
   if (buf.length < HEADER_SIZE) {
     throw new Error(`Incomplete packet: need at least ${HEADER_SIZE} bytes, got ${buf.length}`)
   }
@@ -89,9 +89,9 @@ export function wireDecode(buf: Uint8Array): GraftPacket {
 }
 
 /**
- * Build a GraftPacket ready for encoding.
+ * Build a ConduytPacket ready for encoding.
  */
-export function makePacket(type: number, seq: number, payload: Uint8Array = new Uint8Array(0)): GraftPacket {
+export function makePacket(type: number, seq: number, payload: Uint8Array = new Uint8Array(0)): ConduytPacket {
   return {
     version: PROTOCOL_VERSION,
     type,
@@ -108,11 +108,11 @@ export function wirePacketSize(payloadLen: number): number {
 }
 
 /**
- * Try to find a complete GRAFT packet in a byte stream.
+ * Try to find a complete CONDUYT packet in a byte stream.
  * Scans for MAGIC bytes and attempts to decode.
  * @returns [packet, bytesConsumed] or null if no complete packet found
  */
-export function wireFindPacket(buf: Uint8Array): [GraftPacket, number] | null {
+export function wireFindPacket(buf: Uint8Array): [ConduytPacket, number] | null {
   for (let i = 0; i <= buf.length - HEADER_SIZE; i++) {
     if (buf[i] !== MAGIC[0] || buf[i + 1] !== MAGIC[1]) continue
 

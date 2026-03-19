@@ -1,25 +1,25 @@
 ---
 title: 'Quick Start: Arduino'
-description: Get a GRAFT device running in under 5 minutes
+description: Get a CONDUYT device running in under 5 minutes
 ---
 
 # Quick Start: Arduino
 
 ## Install
 
-Add GRAFT to your Arduino project via the Library Manager or PlatformIO:
+Add CONDUYT to your Arduino project via the Library Manager or PlatformIO:
 
 ```ini
-lib_deps = graft
+lib_deps = conduyt
 ```
 
 ## Minimal Sketch
 
 ```cpp
-#include <Graft.h>
+#include <Conduyt.h>
 
-GraftSerial transport(Serial, 115200);
-GraftDevice device("MyBoard", "1.0.0", transport);
+ConduytSerial transport(Serial, 115200);
+ConduytDevice device("MyBoard", "1.0.0", transport);
 
 void setup() {
   device.begin();
@@ -30,23 +30,23 @@ void loop() {
 }
 ```
 
-This gives you full pin control (digital, analog, PWM) from any GRAFT host SDK — no extra code needed.
+This gives you full pin control (digital, analog, PWM) from any CONDUYT host SDK — no extra code needed.
 
 ## Adding Modules
 
-Enable hardware modules with compile-time defines **before** including Graft.h:
+Enable hardware modules with compile-time defines **before** including Conduyt.h:
 
 ```cpp
-#define GRAFT_MODULE_SERVO
-#define GRAFT_MODULE_NEOPIXEL
-#include <Graft.h>
+#define CONDUYT_MODULE_SERVO
+#define CONDUYT_MODULE_NEOPIXEL
+#include <Conduyt.h>
 
-GraftSerial transport(Serial, 115200);
-GraftDevice device("LedServo", "1.0.0", transport);
+ConduytSerial transport(Serial, 115200);
+ConduytDevice device("LedServo", "1.0.0", transport);
 
 void setup() {
-  device.addModule(new GraftModuleServo());
-  device.addModule(new GraftModuleNeoPixel());
+  device.addModule(new ConduytModuleServo());
+  device.addModule(new ConduytModuleNeoPixel());
   device.begin();
 }
 
@@ -60,8 +60,8 @@ void loop() {
 Push device-side values to the host:
 
 ```cpp
-device.addDatastream("temperature", GRAFT_TYPE_FLOAT32, "celsius", false);
-device.addDatastream("setpoint", GRAFT_TYPE_FLOAT32, "celsius", true);
+device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
+device.addDatastream("setpoint", CONDUYT_TYPE_FLOAT32, "celsius", true);
 device.onDatastreamWrite("setpoint", onSetpoint);
 ```
 

@@ -33,12 +33,12 @@ When a command fails, the device responds with a NAK packet containing a 1-byte 
 ### JavaScript
 
 ```typescript
-import { GraftNAKError } from 'graft-js'
+import { ConduytNAKError } from 'conduyt-js'
 
 try {
   await device.pin(99).write(1)
 } catch (e) {
-  if (e instanceof GraftNAKError) {
+  if (e instanceof ConduytNAKError) {
     console.log(e.errorName) // "INVALID_PIN"
     console.log(e.code)      // 0x04
   }
@@ -48,11 +48,11 @@ try {
 ### Python
 
 ```python
-from graft import GraftNAKError
+from conduyt import ConduytNAKError
 
 try:
     await device.pin(99).write(1)
-except GraftNAKError as e:
+except ConduytNAKError as e:
     print(e.error_name)  # "INVALID_PIN"
     print(e.code)        # 0x04
 ```

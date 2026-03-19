@@ -1,4 +1,4 @@
-//! GRAFT Wire Format — Packet encode/decode
+//! CONDUYT Wire Format — Packet encode/decode
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -6,12 +6,12 @@ use crate::crc8::crc8;
 
 /// Protocol version.
 pub const PROTOCOL_VERSION: u8 = 0x01;
-/// Magic bytes ("GF").
-pub const MAGIC: [u8; 2] = [0x47, 0x46];
+/// Magic bytes ("CD").
+pub const MAGIC: [u8; 2] = [0x43, 0x44];
 /// Header size in bytes.
 pub const HEADER_SIZE: usize = 8;
 
-/// Decoded GRAFT packet.
+/// Decoded CONDUYT packet.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Packet {
     pub version: u8,
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     fn reject_incomplete() {
-        assert!(wire_decode(&[0x47, 0x46]).is_err());
+        assert!(wire_decode(&[0x43, 0x44]).is_err());
     }
 
     #[test]

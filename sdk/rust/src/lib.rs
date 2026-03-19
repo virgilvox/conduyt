@@ -1,4 +1,4 @@
-//! GRAFT Protocol SDK for Rust
+//! CONDUYT Protocol SDK for Rust
 //!
 //! `no_std` compatible core (wire, COBS, CRC8).
 //! Enable `std` feature for full device API with transports.

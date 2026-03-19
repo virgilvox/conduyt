@@ -1,11 +1,11 @@
 /**
- * GRAFT SEQ Tracker
+ * CONDUYT SEQ Tracker
  *
  * Manages the rolling 0-255 sequence counter, maps outstanding commands
  * to promise resolvers, and handles timeouts.
  */
 
-import { GraftTimeoutError } from './core/errors.js'
+import { ConduytTimeoutError } from './core/errors.js'
 
 interface PendingCommand {
   resolve: (payload: Uint8Array) => void
@@ -43,7 +43,7 @@ export class SeqTracker {
     return new Promise<Uint8Array>((resolve, reject) => {
       const timer = setTimeout(() => {
         this._pending.delete(seq)
-        reject(new GraftTimeoutError(seq, this._timeoutMs))
+        reject(new ConduytTimeoutError(seq, this._timeoutMs))
       }, this._timeoutMs)
 
       this._pending.set(seq, { resolve, reject, timer })

@@ -1,20 +1,20 @@
 {
-  "name": "graft-js",
+  "name": "conduyt-js",
   "version": "0.1.0",
-  "description": "GRAFT protocol SDK for JavaScript/TypeScript — host-side hardware control",
+  "description": "CONDUYT protocol SDK for JavaScript/TypeScript — host-side hardware control",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/virgilvox/graft",
+    "url": "https://github.com/virgilvox/conduyt",
     "directory": "sdk/js"
   },
-  "homepage": "https://github.com/virgilvox/graft",
+  "homepage": "https://github.com/virgilvox/conduyt",
   "bugs": {
-    "url": "https://github.com/virgilvox/graft/issues"
+    "url": "https://github.com/virgilvox/conduyt/issues"
   },
   "keywords": [
-    "graft",
+    "conduyt",
     "iot",
     "hardware",
     "serial",

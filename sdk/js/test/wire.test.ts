@@ -39,8 +39,8 @@ describe('Wire Format', () => {
 
       expect(buf.length).toBe(HEADER_SIZE)
       // Magic
-      expect(buf[0]).toBe(0x47)
-      expect(buf[1]).toBe(0x46)
+      expect(buf[0]).toBe(0x43)
+      expect(buf[1]).toBe(0x44)
       // Version
       expect(buf[2]).toBe(PROTOCOL_VERSION)
       // Type
@@ -108,7 +108,7 @@ describe('Wire Format', () => {
     })
 
     it('throws on incomplete packet', () => {
-      expect(() => wireDecode(new Uint8Array([0x47, 0x46]))).toThrow('Incomplete')
+      expect(() => wireDecode(new Uint8Array([0x43, 0x44]))).toThrow('Incomplete')
     })
 
     it('throws on bad magic', () => {

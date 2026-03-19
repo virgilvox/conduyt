@@ -1,13 +1,13 @@
 /**
- * GRAFT Mock Transport
+ * CONDUYT Mock Transport
  *
  * In-memory transport for testing. Supports injecting responses
  * and capturing sent packets without any real I/O.
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
-export class MockTransport implements GraftTransport {
+export class MockTransport implements ConduytTransport {
   private _connected = false
   private _handler: ((packet: Uint8Array) => void) | null = null
   private _sentPackets: Uint8Array[] = []

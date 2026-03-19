@@ -1,6 +1,6 @@
-# GraftKit
+# ConduytKit
 
-GRAFT protocol SDK for Swift. Async/await host-side hardware control for iOS and macOS.
+CONDUYT protocol SDK for Swift. Async/await host-side hardware control for iOS and macOS.
 
 ## Install
 
@@ -8,19 +8,19 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/virgilvox/graft", from: "0.1.0")
+    .package(url: "https://github.com/virgilvox/conduyt", from: "0.1.0")
 ]
 ```
 
-Then add `"GraftKit"` to your target's dependencies.
+Then add `"ConduytKit"` to your target's dependencies.
 
 ## Quick Start
 
 ```swift
-import GraftKit
+import ConduytKit
 
 let transport = BLETransport()
-let device = GraftDevice(transport: transport)
+let device = ConduytDevice(transport: transport)
 
 let hello = try await device.connect()
 print("Connected: \(hello)")
@@ -41,11 +41,11 @@ let response = try await device.modCmd(Data([0x00, 0x01, 90]))
 
 ## API Reference
 
-### GraftDevice
+### ConduytDevice
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `init(transport:, timeout:)` | `GraftDevice` | Create device instance |
+| `init(transport:, timeout:)` | `ConduytDevice` | Create device instance |
 | `connect()` | `Data` | Connect and HELLO handshake |
 | `disconnect()` | `Void` | Close connection |
 | `ping()` | `Void` | Ping/pong roundtrip |
@@ -61,10 +61,10 @@ let response = try await device.modCmd(Data([0x00, 0x01, 90]))
 |-----------|-------------|
 | `BLETransport` | Bluetooth Low Energy (CoreBluetooth) |
 
-### GraftTransport Protocol
+### ConduytTransport Protocol
 
 ```swift
-protocol GraftTransport: AnyObject {
+protocol ConduytTransport: AnyObject {
     func connect() async throws
     func disconnect() async throws
     func send(_ data: Data) async throws

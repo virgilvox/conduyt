@@ -1,13 +1,13 @@
 /**
- * GRAFT OLED SSD1306 Module — Typed JS wrapper
+ * CONDUYT OLED SSD1306 Module — Typed JS wrapper
  */
 
-import type { GraftDevice } from '../device.js'
+import type { ConduytDevice } from '../device.js'
 
-export class GraftOLED {
-  private _device: ReturnType<GraftDevice['module']>
+export class ConduytOLED {
+  private _device: ReturnType<ConduytDevice['module']>
 
-  constructor(device: GraftDevice) {
+  constructor(device: ConduytDevice) {
     this._device = device.module('oled1306')
   }
 

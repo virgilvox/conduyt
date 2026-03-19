@@ -1,4 +1,4 @@
-package graft
+package conduyt
 
 // CRC8 Dallas/Maxim lookup table (polynomial 0x31, init 0x00)
 var crc8Table = [256]byte{

@@ -1,6 +1,6 @@
-# GRAFT Broker
+# CONDUYT Broker
 
-Pre-configured Mosquitto MQTT broker for GRAFT devices. Supports MQTT (port 1883) and WebSocket (port 9001) connections.
+Pre-configured Mosquitto MQTT broker for CONDUYT devices. Supports MQTT (port 1883) and WebSocket (port 9001) connections.
 
 ## Quick Start
 
@@ -9,15 +9,15 @@ cd broker
 docker compose up -d
 ```
 
-The broker is now running. Connect a GRAFT device with `GraftMQTT` transport and a host SDK with `MQTTTransport`, both pointing at `localhost:1883`.
+The broker is now running. Connect a CONDUYT device with `ConduytMQTT` transport and a host SDK with `MQTTTransport`, both pointing at `localhost:1883`.
 
 ## Docker
 
 ### Build and Run
 
 ```bash
-docker build -t graft-broker .
-docker run -d -p 1883:1883 -p 9001:9001 graft-broker
+docker build -t conduyt-broker .
+docker run -d -p 1883:1883 -p 9001:9001 conduyt-broker
 ```
 
 ### Docker Compose
@@ -37,7 +37,7 @@ The Mosquitto config is in `mosquitto/mosquitto.conf`.
 | MQTT port | 1883 | Standard MQTT connections |
 | WebSocket port | 9001 | Browser and WebSocket clients |
 | `allow_anonymous` | `true` | No auth required (dev mode) |
-| `message_size_limit` | 65535 | Matches GRAFT max payload |
+| `message_size_limit` | 65535 | Matches CONDUYT max payload |
 
 ### Production
 

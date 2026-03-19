@@ -1,4 +1,4 @@
-# Contributing to GRAFT
+# Contributing to CONDUYT
 
 ## Development Setup
 
@@ -114,9 +114,9 @@ If you change wire encoding logic in any SDK, run all SDK test suites to verify 
 
 ## Adding a New Firmware Module
 
-1. Create `firmware/src/graft/modules/GraftModule<Name>.h`
-2. Extend `GraftModuleBase`, implement `begin()`, `poll()`, and `handle(cmd, payload, ctx)`
-3. Add a `#ifdef GRAFT_MODULE_<NAME>` guard in `firmware/src/Graft.h`
+1. Create `firmware/src/conduyt/modules/ConduytModule<Name>.h`
+2. Extend `ConduytModuleBase`, implement `begin()`, `poll()`, and `handle(cmd, payload, ctx)`
+3. Add a `#ifdef CONDUYT_MODULE_<NAME>` guard in `firmware/src/Conduyt.h`
 4. Add a matching module wrapper in each SDK under `modules/`
 5. Create an example sketch in `firmware/examples/`
 

@@ -1,11 +1,11 @@
 /**
- * GRAFT Auto-Reconnect Wrapper
+ * CONDUYT Auto-Reconnect Wrapper
  *
- * Wraps any GraftTransport with exponential backoff reconnection.
+ * Wraps any ConduytTransport with exponential backoff reconnection.
  * On reconnect: re-sends HELLO, rejects outstanding promises.
  */
 
-import type { GraftTransport } from './transports/transport.js'
+import type { ConduytTransport } from './transports/transport.js'
 
 export interface ReconnectOptions {
   /** Initial delay in ms (default: 1000) */
@@ -18,15 +18,15 @@ export interface ReconnectOptions {
   maxAttempts?: number
 }
 
-export class ReconnectTransport implements GraftTransport {
-  private _inner: GraftTransport
+export class ReconnectTransport implements ConduytTransport {
+  private _inner: ConduytTransport
   private _opts: Required<ReconnectOptions>
   private _handler: ((packet: Uint8Array) => void) | null = null
   private _reconnecting = false
   private _attempts = 0
   private _onReconnect: (() => void) | null = null
 
-  constructor(inner: GraftTransport, options: ReconnectOptions = {}) {
+  constructor(inner: ConduytTransport, options: ReconnectOptions = {}) {
     this._inner = inner
     this._opts = {
       initialDelay: options.initialDelay ?? 1000,

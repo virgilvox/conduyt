@@ -13,7 +13,7 @@
             <rect x="9" y="20" width="10" height="4" fill="var(--accent)" opacity="0.5"/>
             <circle cx="14" cy="14" r="2" fill="var(--accent)"/>
           </svg>
-          <span>GRAFT</span>
+          <span>CONDUYT</span>
         </NuxtLink>
         <div class="sidebar-version">v0.1</div>
       </div>

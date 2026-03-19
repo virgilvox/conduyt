@@ -1,15 +1,15 @@
 ---
 title: Built-in Modules
-description: Reference for all GRAFT firmware modules
+description: Reference for all CONDUYT firmware modules
 ---
 
 # Built-in Modules
 
-GRAFT ships with 8 hardware modules. Each is opt-in via a compile define.
+CONDUYT ships with 8 hardware modules. Each is opt-in via a compile define.
 
 ## Servo
 
-**Define:** `GRAFT_MODULE_SERVO` — **Name:** `servo`
+**Define:** `CONDUYT_MODULE_SERVO` — **Name:** `servo`
 
 | Cmd | Method | Payload |
 |---|---|---|
@@ -20,7 +20,7 @@ GRAFT ships with 8 hardware modules. Each is opt-in via a compile define.
 
 ## NeoPixel
 
-**Define:** `GRAFT_MODULE_NEOPIXEL` — **Name:** `neopixel`
+**Define:** `CONDUYT_MODULE_NEOPIXEL` — **Name:** `neopixel`
 
 | Cmd | Method | Payload |
 |---|---|---|
@@ -35,7 +35,7 @@ Requires: Adafruit_NeoPixel library.
 
 ## Encoder
 
-**Define:** `GRAFT_MODULE_ENCODER` — **Name:** `encoder`
+**Define:** `CONDUYT_MODULE_ENCODER` — **Name:** `encoder`
 
 | Cmd | Method | Payload | Response |
 |---|---|---|---|
@@ -47,7 +47,7 @@ Requires: Adafruit_NeoPixel library.
 
 ## Stepper
 
-**Define:** `GRAFT_MODULE_STEPPER` — **Name:** `stepper`
+**Define:** `CONDUYT_MODULE_STEPPER` — **Name:** `stepper`
 
 | Cmd | Method | Payload |
 |---|---|---|
@@ -60,7 +60,7 @@ Requires: Adafruit_NeoPixel library.
 
 ## DHT
 
-**Define:** `GRAFT_MODULE_DHT` — **Name:** `dht`
+**Define:** `CONDUYT_MODULE_DHT` — **Name:** `dht`
 
 | Cmd | Method | Payload | Response |
 |---|---|---|---|
@@ -71,7 +71,7 @@ Requires: DHT sensor library (Adafruit).
 
 ## OLED (SSD1306)
 
-**Define:** `GRAFT_MODULE_OLED` — **Name:** `oled1306`
+**Define:** `CONDUYT_MODULE_OLED` — **Name:** `oled1306`
 
 | Cmd | Method | Payload |
 |---|---|---|
@@ -86,7 +86,7 @@ Requires: Adafruit_SSD1306 + Adafruit_GFX.
 
 ## PID Controller
 
-**Define:** `GRAFT_MODULE_PID` — **Name:** `pid`
+**Define:** `CONDUYT_MODULE_PID` — **Name:** `pid`
 
 | Cmd | Method | Payload |
 |---|---|---|
@@ -100,6 +100,6 @@ PID loop runs at 100ms intervals in `poll()`.
 
 ## I2C Passthrough
 
-**Define:** `GRAFT_MODULE_I2C` — **Name:** `i2c`
+**Define:** `CONDUYT_MODULE_I2C` — **Name:** `i2c`
 
 Not a traditional module — exists as a capability marker in HELLO_RESP. Raw I2C is handled by the core I2C_WRITE/I2C_READ commands.

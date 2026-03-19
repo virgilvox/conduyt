@@ -1,16 +1,16 @@
 """Wire format tests — cross-validates with C and JS implementations."""
 
 import pytest
-from graft.core.wire import wire_encode, wire_decode, make_packet, GraftPacket
-from graft.core.constants import CMD, EVT, PROTOCOL_VERSION, HEADER_SIZE
+from conduyt.core.wire import wire_encode, wire_decode, make_packet, ConduytPacket
+from conduyt.core.constants import CMD, EVT, PROTOCOL_VERSION, HEADER_SIZE
 
 
 def test_ping_encode():
     pkt = make_packet(CMD.PING, 0)
     buf = wire_encode(pkt)
     assert len(buf) == HEADER_SIZE
-    assert buf[0] == 0x47  # magic
-    assert buf[1] == 0x46
+    assert buf[0] == 0x43  # magic
+    assert buf[1] == 0x44
     assert buf[2] == PROTOCOL_VERSION
     assert buf[3] == CMD.PING
     assert buf[4] == 0  # seq
@@ -44,7 +44,7 @@ def test_large_payload_roundtrip():
 
 def test_incomplete_packet():
     with pytest.raises(ValueError, match="Incomplete"):
-        wire_decode(bytes([0x47, 0x46]))
+        wire_decode(bytes([0x43, 0x44]))
 
 
 def test_bad_magic():

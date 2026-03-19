@@ -17,12 +17,12 @@
             <rect x="9" y="20" width="10" height="4" :fill="accentColor" opacity="0.5"/>
             <circle cx="14" cy="14" r="2" :fill="accentColor"/>
           </svg>
-          <span>GRAFT</span>
+          <span>CONDUYT</span>
         </NuxtLink>
       </div>
       <nav class="header-nav">
         <NuxtLink to="/docs/getting-started/introduction" class="header-link">Docs</NuxtLink>
-        <a href="https://github.com/virgilvox/graft" class="header-link" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/virgilvox/conduyt" class="header-link" target="_blank" rel="noopener">GitHub</a>
         <ColorModeToggle />
       </nav>
     </div>

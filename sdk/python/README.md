@@ -1,20 +1,20 @@
-# graft-py
+# conduyt-py
 
-GRAFT protocol SDK for Python. Async and sync APIs for host-side hardware control.
+CONDUYT protocol SDK for Python. Async and sync APIs for host-side hardware control.
 
 ## Install
 
 ```bash
-pip install graft-py
+pip install conduyt-py
 
 # With serial transport
-pip install graft-py[serial]
+pip install conduyt-py[serial]
 
 # With MQTT transport
-pip install graft-py[mqtt]
+pip install conduyt-py[mqtt]
 
 # All transports
-pip install graft-py[all]
+pip install conduyt-py[all]
 ```
 
 ## Quick Start
@@ -22,10 +22,10 @@ pip install graft-py[all]
 ### Async
 
 ```python
-from graft import GraftDevice
-from graft.transports.serial import SerialTransport
+from conduyt import ConduytDevice
+from conduyt.transports.serial import SerialTransport
 
-device = GraftDevice(SerialTransport("/dev/ttyUSB0"))
+device = ConduytDevice(SerialTransport("/dev/ttyUSB0"))
 hello = await device.connect()
 
 await device.pin(13).mode("output")
@@ -38,10 +38,10 @@ await device.disconnect()
 ### Sync
 
 ```python
-from graft import GraftDeviceSync
-from graft.transports.serial import SerialTransport
+from conduyt import ConduytDeviceSync
+from conduyt.transports.serial import SerialTransport
 
-device = GraftDeviceSync(SerialTransport("/dev/ttyUSB0"))
+device = ConduytDeviceSync(SerialTransport("/dev/ttyUSB0"))
 device.connect()
 
 device.pin(13).mode("output")
@@ -54,16 +54,16 @@ device.disconnect()
 ### Module Usage
 
 ```python
-from graft.modules.servo import GraftServo
+from conduyt.modules.servo import ConduytServo
 
-servo = GraftServo(device)
+servo = ConduytServo(device)
 await servo.attach(9)
 await servo.write(90)
 ```
 
 ## API Reference
 
-### GraftDevice (async)
+### ConduytDevice (async)
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -73,9 +73,9 @@ await servo.write(90)
 | `reset()` | `None` | Reset device state |
 | `pin(num)` | `PinProxy` | Pin control object |
 
-### GraftDeviceSync
+### ConduytDeviceSync
 
-Synchronous wrapper around `GraftDevice`. Same methods, no `await`.
+Synchronous wrapper around `ConduytDevice`. Same methods, no `await`.
 
 ### PinProxy
 
@@ -89,29 +89,29 @@ Synchronous wrapper around `GraftDevice`. Same methods, no `await`.
 
 | Class | When |
 |-------|------|
-| `GraftNAKError` | Device rejected a command |
-| `GraftTimeoutError` | No response within timeout |
-| `GraftDisconnectedError` | Transport disconnected |
+| `ConduytNAKError` | Device rejected a command |
+| `ConduytTimeoutError` | No response within timeout |
+| `ConduytDisconnectedError` | Transport disconnected |
 
 ## Transports
 
 | Transport | Module | Dependency |
 |-----------|--------|------------|
-| `SerialTransport` | `graft.transports.serial` | `pyserial-asyncio` |
-| `MQTTTransport` | `graft.transports.mqtt` | `aiomqtt` |
-| `MockTransport` | `graft.transports.mock` | None |
+| `SerialTransport` | `conduyt.transports.serial` | `pyserial-asyncio` |
+| `MQTTTransport` | `conduyt.transports.mqtt` | `aiomqtt` |
+| `MockTransport` | `conduyt.transports.mock` | None |
 
 ## Modules
 
 | Module | Import | Hardware |
 |--------|--------|----------|
-| `GraftServo` | `graft.modules.servo` | Hobby servos |
-| `GraftNeoPixel` | `graft.modules.neopixel` | WS2812/SK6812 LEDs |
-| `GraftDHT` | `graft.modules.dht` | DHT11/DHT22 sensors |
-| `GraftOLED` | `graft.modules.oled` | SSD1306 OLED displays |
-| `GraftStepper` | `graft.modules.stepper` | Stepper motors |
-| `GraftEncoder` | `graft.modules.encoder` | Rotary encoders |
-| `GraftPID` | `graft.modules.pid` | PID controller |
+| `ConduytServo` | `conduyt.modules.servo` | Hobby servos |
+| `ConduytNeoPixel` | `conduyt.modules.neopixel` | WS2812/SK6812 LEDs |
+| `ConduytDHT` | `conduyt.modules.dht` | DHT11/DHT22 sensors |
+| `ConduytOLED` | `conduyt.modules.oled` | SSD1306 OLED displays |
+| `ConduytStepper` | `conduyt.modules.stepper` | Stepper motors |
+| `ConduytEncoder` | `conduyt.modules.encoder` | Rotary encoders |
+| `ConduytPID` | `conduyt.modules.pid` | PID controller |
 
 ## Requirements
 

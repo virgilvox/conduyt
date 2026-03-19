@@ -1,11 +1,11 @@
 [package]
-name = "graft"
+name = "conduyt"
 version = "0.1.0"
 edition = "2021"
-description = "GRAFT protocol SDK for Rust — host-side hardware control"
+description = "CONDUYT protocol SDK for Rust — host-side hardware control"
 license = "MIT"
-repository = "https://github.com/virgilvox/graft"
-homepage = "https://github.com/virgilvox/graft"
+repository = "https://github.com/virgilvox/conduyt"
+homepage = "https://github.com/virgilvox/conduyt"
 keywords = ["iot", "hardware", "protocol", "serial", "embedded"]
 categories = ["embedded", "hardware-support", "network-programming"]
 

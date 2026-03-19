@@ -1,6 +1,6 @@
 ---
 title: JavaScript / TypeScript
-description: graft-js SDK guide
+description: conduyt-js SDK guide
 ---
 
 # JavaScript / TypeScript SDK
@@ -8,16 +8,16 @@ description: graft-js SDK guide
 ## Install
 
 ```bash
-npm install graft-js
+npm install conduyt-js
 ```
 
 ## Connect
 
 ```typescript
-import { GraftDevice } from 'graft-js'
-import { SerialTransport } from 'graft-js/transports/serial'
+import { ConduytDevice } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
 
-const device = await GraftDevice.connect(
+const device = await ConduytDevice.connect(
   new SerialTransport({ path: '/dev/ttyUSB0' })
 )
 
@@ -62,9 +62,9 @@ await device.datastream('setpoint').write(25.0)
 ## Modules
 
 ```typescript
-import { GraftServo } from 'graft-js/modules/servo'
+import { ConduytServo } from 'conduyt-js/modules/servo'
 
-const servo = new GraftServo(device)
+const servo = new ConduytServo(device)
 await servo.attach(9, 500, 2500)
 await servo.write(90)
 await servo.detach()
@@ -74,25 +74,25 @@ await servo.detach()
 
 | Transport | Import | Environment |
 |---|---|---|
-| Serial | `graft-js/transports/serial` | Node.js |
-| WebSerial | `graft-js/transports/web-serial` | Browser |
-| BLE | `graft-js/transports/ble` | Browser |
-| MQTT | `graft-js/transports/mqtt` | Node.js + Browser |
-| CLASP | `graft-js/transports/clasp` | Browser |
-| WebSocket | `graft-js/transports/websocket` | Both |
-| Mock | `graft-js/transports/mock` | Testing |
+| Serial | `conduyt-js/transports/serial` | Node.js |
+| WebSerial | `conduyt-js/transports/web-serial` | Browser |
+| BLE | `conduyt-js/transports/ble` | Browser |
+| MQTT | `conduyt-js/transports/mqtt` | Node.js + Browser |
+| CLASP | `conduyt-js/transports/clasp` | Browser |
+| WebSocket | `conduyt-js/transports/websocket` | Both |
+| Mock | `conduyt-js/transports/mock` | Testing |
 
-All transports implement the same `GraftTransport` interface. The `GraftDevice` class works identically regardless of which transport you use.
+All transports implement the same `ConduytTransport` interface. The `ConduytDevice` class works identically regardless of which transport you use.
 
 ## Error Handling
 
 ```typescript
-import { GraftNAKError, GraftTimeoutError } from 'graft-js'
+import { ConduytNAKError, ConduytTimeoutError } from 'conduyt-js'
 
 try {
   await device.pin(99).mode('output')
 } catch (err) {
-  if (err instanceof GraftNAKError) {
+  if (err instanceof ConduytNAKError) {
     console.log(err.errorName)  // "INVALID_PIN"
     console.log(err.code)       // 0x04
   }

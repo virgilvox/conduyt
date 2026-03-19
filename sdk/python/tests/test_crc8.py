@@ -1,6 +1,6 @@
 """CRC8 tests — cross-validates with C and JS implementations."""
 
-from graft.core.crc8 import crc8
+from conduyt.core.crc8 import crc8
 
 
 def test_empty_input():

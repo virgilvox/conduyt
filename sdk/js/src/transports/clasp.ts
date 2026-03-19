@@ -1,23 +1,23 @@
 /**
- * GRAFT CLASP Transport
+ * CONDUYT CLASP Transport
  *
  * WebSocket relay through a CLASP server.
- * Channel = graft-{deviceId}, binary messages, no COBS.
+ * Channel = conduyt-{deviceId}, binary messages, no COBS.
  * Browser-native — no MQTT broker needed.
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
 export interface CLASPTransportOptions {
   /** CLASP relay URL (e.g., 'wss://relay.clasp.chat') */
   relay: string
-  /** Channel name (default: 'graft-{deviceId}') */
+  /** Channel name (default: 'conduyt-{deviceId}') */
   channel: string
   /** Auth token for the relay */
   token?: string
 }
 
-export class CLASPTransport implements GraftTransport {
+export class CLASPTransport implements ConduytTransport {
   private _options: CLASPTransportOptions
   private _ws: WebSocket | null = null
   private _handler: ((packet: Uint8Array) => void) | null = null

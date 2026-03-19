@@ -1,3 +1,3 @@
-//! GRAFT Modules
+//! CONDUYT Modules
 
 pub mod servo;

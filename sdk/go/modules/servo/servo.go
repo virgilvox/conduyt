@@ -1,21 +1,21 @@
-// Package servo provides a typed wrapper for the GRAFT servo module.
+// Package servo provides a typed wrapper for the CONDUYT servo module.
 package servo
 
 import (
 	"context"
 	"encoding/binary"
 
-	graft "github.com/graft-io/graft-go"
+	conduyt "github.com/conduyt-io/conduyt-go"
 )
 
 // Servo provides typed control of a servo module.
 type Servo struct {
-	device   *graft.Device
+	device   *conduyt.Device
 	moduleID byte
 }
 
 // New creates a Servo wrapper for the given device and module ID.
-func New(device *graft.Device, moduleID byte) *Servo {
+func New(device *conduyt.Device, moduleID byte) *Servo {
 	return &Servo{device: device, moduleID: moduleID}
 }
 

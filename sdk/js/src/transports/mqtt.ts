@@ -1,17 +1,17 @@
 /**
- * GRAFT MQTT Transport — Node.js + Browser
+ * CONDUYT MQTT Transport — Node.js + Browser
  *
  * Uses the `mqtt` npm package. Message-oriented (no COBS needed).
  * Install: npm install mqtt
  *
  * Topic schema:
- *   graft/{deviceId}/cmd/{typeHex}  — host publishes commands
- *   graft/{deviceId}/evt/{typeHex}  — device publishes events
- *   graft/{deviceId}/hello          — retained HELLO_RESP
- *   graft/{deviceId}/status         — online/offline (LWT)
+ *   conduyt/{deviceId}/cmd/{typeHex}  — host publishes commands
+ *   conduyt/{deviceId}/evt/{typeHex}  — device publishes events
+ *   conduyt/{deviceId}/hello          — retained HELLO_RESP
+ *   conduyt/{deviceId}/status         — online/offline (LWT)
  */
 
-import type { GraftTransport } from './transport.js'
+import type { ConduytTransport } from './transport.js'
 
 export interface MQTTTransportOptions {
   /** MQTT broker URL (e.g., 'mqtt://broker.local' or 'ws://broker.local:9001') */
@@ -26,7 +26,7 @@ export interface MQTTTransportOptions {
   qos?: 0 | 1 | 2
 }
 
-export class MQTTTransport implements GraftTransport {
+export class MQTTTransport implements ConduytTransport {
   private _options: MQTTTransportOptions
   private _client: any = null
   private _handler: ((packet: Uint8Array) => void) | null = null
@@ -37,7 +37,7 @@ export class MQTTTransport implements GraftTransport {
 
   constructor(options: MQTTTransportOptions) {
     this._options = options
-    this._prefix = `graft/${options.deviceId}`
+    this._prefix = `conduyt/${options.deviceId}`
   }
 
   get connected(): boolean {

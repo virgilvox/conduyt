@@ -1,7 +1,7 @@
 /**
  * COBS — Consistent Overhead Byte Stuffing
  * Eliminates 0x00 from data, allowing it as a packet delimiter.
- * Matches firmware/src/graft/core/graft_cobs.{h,c}
+ * Matches firmware/src/conduyt/core/conduyt_cobs.{h,c}
  */
 
 /**
