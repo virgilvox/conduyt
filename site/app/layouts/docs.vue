@@ -1,14 +1,17 @@
 <template>
   <div class="docs-layout">
-    <aside class="docs-sidebar">
+    <!-- Mobile backdrop -->
+    <div v-if="mobileNav.isOpen.value" class="sidebar-backdrop" @click="mobileNav.close()" />
+
+    <aside class="docs-sidebar" :class="{ open: mobileNav.isOpen.value }">
       <div class="sidebar-header">
         <NuxtLink to="/" class="sidebar-logo">
           <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
-            <rect x="2" y="8" width="5" height="12" fill="#00d4aa" opacity="0.9"/>
-            <rect x="21" y="8" width="5" height="12" fill="#00d4aa" opacity="0.9"/>
-            <rect x="9" y="4" width="10" height="4" fill="#00d4aa" opacity="0.5"/>
-            <rect x="9" y="20" width="10" height="4" fill="#00d4aa" opacity="0.5"/>
-            <circle cx="14" cy="14" r="2" fill="#00d4aa"/>
+            <rect x="2" y="8" width="5" height="12" fill="var(--accent)" opacity="0.9"/>
+            <rect x="21" y="8" width="5" height="12" fill="var(--accent)" opacity="0.9"/>
+            <rect x="9" y="4" width="10" height="4" fill="var(--accent)" opacity="0.5"/>
+            <rect x="9" y="20" width="10" height="4" fill="var(--accent)" opacity="0.5"/>
+            <circle cx="14" cy="14" r="2" fill="var(--accent)"/>
           </svg>
           <span>GRAFT</span>
         </NuxtLink>
@@ -23,8 +26,8 @@
             :key="item.path"
             :to="item.path"
             class="nav-link"
+            @click="mobileNav.close()"
           >
-            <span class="nav-dot" />
             {{ item.title }}
           </NuxtLink>
         </div>
@@ -38,6 +41,10 @@
 </template>
 
 <script setup lang="ts">
+import { useMobileNav } from '~/composables/useMobileNav'
+
+const mobileNav = useMobileNav()
+
 const navGroups = [
   {
     title: 'Getting Started',
@@ -88,18 +95,24 @@ const navGroups = [
 .docs-layout {
   display: flex;
   min-height: 100vh;
+  padding-top: 56px;
 }
 
 .docs-sidebar {
   width: 260px;
   position: fixed;
-  top: 0; left: 0; bottom: 0;
+  top: 56px; left: 0; bottom: 0;
   background: var(--surface);
   border-right: 1px solid var(--border);
   overflow-y: auto;
   z-index: 100;
   display: flex;
   flex-direction: column;
+  transition: transform 0.25s ease;
+}
+
+.sidebar-backdrop {
+  display: none;
 }
 
 .sidebar-header {
@@ -114,18 +127,18 @@ const navGroups = [
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--heading);
+  font-family: var(--sans);
   font-size: 16px;
-  letter-spacing: 4px;
+  font-weight: 700;
   color: var(--text-bright);
   text-decoration: none;
 }
 
 .sidebar-version {
-  font-family: var(--code);
-  font-size: 9px;
+  font-family: var(--mono);
+  font-size: 12px;
   color: var(--accent);
-  letter-spacing: 1px;
+  font-weight: 500;
 }
 
 .sidebar-nav {
@@ -136,106 +149,102 @@ const navGroups = [
 .nav-group { margin-bottom: 8px; }
 
 .nav-group-title {
-  font-size: 8px;
-  letter-spacing: 3px;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--text-dim);
   padding: 12px 20px 4px;
-  font-family: var(--mono);
 }
 
 .nav-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 20px;
-  color: var(--text-dim);
+  display: block;
+  padding: 6px 20px;
+  color: var(--text);
   text-decoration: none;
-  font-size: 11px;
-  letter-spacing: 0.5px;
+  font-size: 14px;
   border-left: 2px solid transparent;
   transition: color 0.15s, background 0.15s;
 }
 
-.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.nav-link:hover { color: var(--text-bright); background: var(--hover-bg); }
 .nav-link.router-link-active {
   color: var(--accent);
   border-left-color: var(--accent);
   background: var(--accent-dim);
-}
-
-.nav-dot {
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.5;
-  flex-shrink: 0;
+  font-weight: 500;
 }
 
 .docs-main {
   margin-left: 260px;
   flex: 1;
   padding: 48px 64px;
-  max-width: 800px;
+  max-width: 820px;
 }
 
 .docs-main :deep(h1) {
-  font-family: var(--heading);
   font-size: 28px;
-  letter-spacing: 4px;
+  font-weight: 700;
   margin-bottom: 16px;
 }
 
 .docs-main :deep(h2) {
-  font-family: var(--heading);
-  font-size: 18px;
-  letter-spacing: 3px;
-  margin: 32px 0 12px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed var(--border);
-  color: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 36px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-bright);
 }
 
 .docs-main :deep(h3) {
-  font-family: var(--code);
-  font-size: 13px;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-bright);
   margin: 24px 0 8px;
 }
 
 .docs-main :deep(p) {
-  line-height: 1.8;
+  line-height: 1.75;
   margin-bottom: 12px;
 }
 
 .docs-main :deep(pre) {
-  background: #070709;
+  background: var(--pre-bg);
   border: 1px solid var(--border);
-  border-left: 2px solid var(--accent);
+  border-radius: var(--radius);
   padding: 16px 20px;
   overflow-x: auto;
-  font-family: var(--code);
-  font-size: 11.5px;
-  line-height: 1.65;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
   margin: 16px 0;
+}
+
+.docs-main :deep(pre code) {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
 }
 
 .docs-main :deep(table) {
   width: 100%;
   border-collapse: collapse;
-  font-family: var(--code);
-  font-size: 11.5px;
+  font-size: 14px;
   margin: 16px 0;
 }
 
 .docs-main :deep(th) {
   text-align: left;
   padding: 8px 16px;
-  font-size: 8px;
-  letter-spacing: 2px;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 1px;
   color: var(--text-dim);
-  border-bottom: 1px solid var(--border-bright);
+  border-bottom: 2px solid var(--border);
 }
 
 .docs-main :deep(td) {
@@ -243,8 +252,36 @@ const navGroups = [
   border-bottom: 1px solid var(--border);
 }
 
+.docs-main :deep(td code) {
+  font-size: 13px;
+}
+
+.docs-main :deep(ul), .docs-main :deep(ol) {
+  padding-left: 24px;
+  margin-bottom: 12px;
+}
+
+.docs-main :deep(li) {
+  margin-bottom: 4px;
+  line-height: 1.7;
+}
+
 @media (max-width: 900px) {
-  .docs-sidebar { display: none; }
+  .docs-sidebar {
+    transform: translateX(-100%);
+    z-index: 150;
+  }
+  .docs-sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: 56px;
+    background: rgba(0,0,0,0.5);
+    z-index: 140;
+  }
   .docs-main { margin-left: 0; padding: 32px 24px; }
 }
 </style>
