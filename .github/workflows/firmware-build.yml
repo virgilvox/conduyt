@@ -3,37 +3,39 @@ name: Firmware Build
 on:
   push:
     branches: [main]
-    paths: ['firmware/**']
+    paths: ['firmware/**', '.github/workflows/firmware-build.yml']
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - env: esp32dev
+          - board: esp32dev
             name: ESP32
-          - env: uno
+          - board: uno
             name: Arduino Uno
-          - env: pico
+          - board: pico
             name: Raspberry Pi Pico
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: ~/.platformio
-          key: pio-${{ matrix.env }}-${{ hashFiles('firmware/platformio.ini') }}
+          key: pio-build-${{ matrix.board }}-${{ hashFiles('firmware/platformio.ini') }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install platformio
       - name: Build ${{ matrix.name }}
         working-directory: firmware
-        run: pio run -e ${{ matrix.env }}
+        run: pio ci --board=${{ matrix.board }} examples/BasicBlink/BasicBlink.ino --lib=src --build-dir=.pio/ci-build
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-${{ matrix.env }}
-          path: firmware/.pio/build/${{ matrix.env }}/*.bin
+          name: firmware-${{ matrix.board }}
+          path: |
+            firmware/.pio/ci-build/.pio/build/*/firmware.*
           if-no-files-found: warn
