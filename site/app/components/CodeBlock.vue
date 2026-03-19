@@ -1,34 +1,31 @@
 <template>
-  <div class="code-block" v-if="html" v-html="html" />
-  <pre v-else><code>{{ code }}</code></pre>
+  <div class="code-block">
+    <pre v-if="highlighted" v-html="highlighted" />
+    <pre v-else><code>{{ code }}</code></pre>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { codeToHtml } from 'shiki'
-
 const props = defineProps<{ code: string; lang: string }>()
+const highlighted = ref<string | null>(null)
 
-const codeHash = computed(() => {
-  let h = 0
-  for (let i = 0; i < props.code.length; i++) {
-    h = ((h << 5) - h + props.code.charCodeAt(i)) | 0
+onMounted(async () => {
+  try {
+    const { codeToHtml } = await import('shiki')
+    const html = await codeToHtml(props.code, {
+      lang: props.lang,
+      theme: 'github-dark',
+    })
+    highlighted.value = html
+  } catch {
+    // fallback to plain text
   }
-  return Math.abs(h).toString(36)
 })
-
-const { data: html } = await useAsyncData(
-  `code-${props.lang}-${codeHash.value}`,
-  () => codeToHtml(props.code, {
-    lang: props.lang,
-    themes: { light: 'github-light', dark: 'github-dark' },
-    defaultColor: false,
-  })
-)
 </script>
 
 <style scoped>
 .code-block :deep(pre) {
-  background: var(--pre-bg) !important;
+  background: #0d1117 !important;
   border: none;
   margin: 0;
   padding: 20px 24px;
@@ -37,6 +34,7 @@ const { data: html } = await useAsyncData(
   line-height: 1.7;
   overflow-x: auto;
   border-radius: 0;
+  color: #c9d1d9;
 }
 
 .code-block :deep(code) {
