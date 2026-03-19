@@ -1,3 +1,5 @@
+#![cfg(feature = "std")]
+
 use conduyt::transports::MockTransport;
 use conduyt::wire::{wire_encode, make_packet};
 use conduyt::constants::*;
