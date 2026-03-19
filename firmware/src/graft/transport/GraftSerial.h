@@ -20,10 +20,17 @@ public:
      * @param baud    Baud rate (default 115200)
      */
     GraftSerial(HardwareSerial &serial, uint32_t baud = 115200)
-        : _serial(serial), _baud(baud), _begun(false) {}
+        : _serial(serial), _hwSerial(&serial), _baud(baud), _begun(false) {}
+
+    /**
+     * @param stream  Reference to any Stream (usb_serial_class on Teensy, etc.)
+     * @param baud    Baud rate (used for HardwareSerial begin, ignored for USB)
+     */
+    GraftSerial(Stream &stream, uint32_t baud = 115200)
+        : _serial(stream), _hwSerial(nullptr), _baud(baud), _begun(false) {}
 
     bool begin() override {
-        _serial.begin(_baud);
+        if (_hwSerial) _hwSerial->begin(_baud);
         _begun = true;
         return true;
     }
@@ -57,7 +64,8 @@ public:
     bool needsCOBS() override { return true; }
 
 private:
-    HardwareSerial &_serial;
+    Stream &_serial;
+    HardwareSerial *_hwSerial;
     uint32_t _baud;
     bool _begun;
 };
