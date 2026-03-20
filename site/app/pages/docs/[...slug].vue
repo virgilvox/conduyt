@@ -4,7 +4,7 @@
     <div v-else class="not-found">
       <h1>Page Not Found</h1>
       <p>This documentation page doesn't exist yet.</p>
-      <NuxtLink to="/docs/getting-started/introduction">Go to Introduction</NuxtLink>
+      <NuxtLink to="/docs">Go to Documentation</NuxtLink>
     </div>
   </NuxtLayout>
 </template>

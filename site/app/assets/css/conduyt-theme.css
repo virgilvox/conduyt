@@ -106,14 +106,16 @@ pre code {
   color: inherit;
 }
 
-/* Shiki dual-theme: show correct theme based on color mode */
-.dark .shiki.github-light,
-.dark .shiki .github-light { display: none !important; }
-.light .shiki.github-dark,
-.light .shiki .github-dark { display: none !important; }
-
-.shiki {
+/* Shiki multi-theme: v4 uses CSS variables on a single element, not separate elements */
+.shiki,
+.shiki span {
+  color: var(--shiki-default) !important;
   background: transparent !important;
+}
+
+.dark .shiki span,
+html.dark .shiki span {
+  color: var(--shiki-dark) !important;
 }
 
 /* Tag badges */

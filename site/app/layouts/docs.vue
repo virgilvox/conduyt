@@ -49,15 +49,16 @@ const navGroups = [
   {
     title: 'Getting Started',
     items: [
-      { path: '/docs/tutorials/what-is-conduyt', title: 'What is Conduyt?' },
+      { path: '/docs', title: 'Overview' },
+      { path: '/docs/getting-started/quickstart-playground', title: 'Quick Start: Playground' },
       { path: '/docs/getting-started/quickstart-arduino-ide', title: 'Quick Start: Arduino IDE' },
       { path: '/docs/tutorials/first-blink', title: 'Quick Start: PlatformIO' },
-      { path: '/docs/getting-started/quickstart-playground', title: 'Quick Start: Playground' },
     ],
   },
   {
     title: 'Tutorials',
     items: [
+      { path: '/docs/tutorials/what-is-conduyt', title: 'What is Conduyt?' },
       { path: '/docs/tutorials/sensor-dashboard', title: 'Sensor Dashboard' },
     ],
   },
@@ -79,24 +80,24 @@ const navGroups = [
     ],
   },
   {
-    title: 'SDKs',
-    items: [
-      { path: '/docs/reference/js-api', title: 'JavaScript' },
-      { path: '/docs/reference/python-api', title: 'Python' },
-      { path: '/docs/sdks/wasm', title: 'WASM (Browser)' },
-      { path: '/docs/reference/firmware-api', title: 'Firmware (C++)' },
-    ],
-  },
-  {
     title: 'How-To Guides',
     items: [
       { path: '/docs/how-to/connect-serial', title: 'Connect over Serial' },
       { path: '/docs/how-to/connect-mqtt', title: 'Connect over MQTT' },
       { path: '/docs/how-to/connect-ble', title: 'Connect over BLE' },
-      { path: '/docs/how-to/add-module', title: 'Add a Firmware Module' },
       { path: '/docs/how-to/use-datastreams', title: 'Use Datastreams' },
+      { path: '/docs/how-to/add-module', title: 'Write a Module' },
       { path: '/docs/how-to/broker-setup', title: 'Set Up MQTT Broker' },
       { path: '/docs/how-to/troubleshooting', title: 'Troubleshooting' },
+    ],
+  },
+  {
+    title: 'SDKs & APIs',
+    items: [
+      { path: '/docs/reference/js-api', title: 'JavaScript' },
+      { path: '/docs/reference/python-api', title: 'Python' },
+      { path: '/docs/reference/firmware-api', title: 'Firmware (C++)' },
+      { path: '/docs/sdks/wasm', title: 'WASM (Browser)' },
     ],
   },
   {
@@ -114,7 +115,7 @@ const navGroups = [
     items: [
       { path: '/docs/concepts/why-binary', title: 'Why Binary' },
       { path: '/docs/concepts/transport-architecture', title: 'Transport Architecture' },
-      { path: '/docs/concepts/capability-model', title: 'The Capability Model' },
+      { path: '/docs/concepts/capability-model', title: 'Capability Model' },
     ],
   },
 ]

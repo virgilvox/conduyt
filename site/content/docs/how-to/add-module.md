@@ -1,35 +1,35 @@
 ---
-title: Add a Firmware Module
-description: Write and register a custom firmware module for a Conduyt device
+title: Write a Firmware Module
+description: Create and register a custom firmware module for a Conduyt device.
 ---
 
-# Add a Firmware Module
+# Write a Firmware Module
 
-Modules extend a Conduyt device with custom hardware capabilities. Each module handles commands, emits events, and runs a poll loop.
+Modules extend a CONDUYT device with custom hardware capabilities. Each module handles commands from the host, can emit events, and runs a poll loop for background work.
 
-Write a custom module when built-in pin control and datastreams are not enough for your hardware. Common cases: devices that need initialization sequences (e.g., display controllers), multi-step communication protocols (e.g., 1-Wire sensors), or continuous background processing (e.g., PID loops, stepper pulse generation).
+Write a custom module when built-in pin control and datastreams aren't enough — for example, devices with initialization sequences (displays), multi-step protocols (1-Wire sensors), or continuous processing (PID loops, stepper pulse generation).
 
-## Module Interface
+## The module interface
 
 Every module implements `ConduytModuleBase`:
 
 ```cpp
 class ConduytModuleBase {
 public:
-    virtual const char* name() = 0;        // max 8 characters
-    virtual uint8_t versionMajor() { return 1; }
-    virtual uint8_t versionMinor() { return 0; }
-    virtual void begin() {}                // called after device.begin()
-    virtual void handle(uint8_t cmd, ConduytPayloadReader &payload, ConduytContext &ctx) = 0;
-    virtual void poll() {}                 // called every loop cycle
-    virtual uint8_t pinCount() { return 0; }
-    virtual const uint8_t* pins() { return nullptr; }
+  virtual const char* name() = 0;        // module name, max 8 characters
+  virtual uint8_t versionMajor() { return 1; }
+  virtual uint8_t versionMinor() { return 0; }
+  virtual void begin() {}                // called after device.begin()
+  virtual void handle(uint8_t cmd, ConduytPayloadReader &payload, ConduytContext &ctx) = 0;
+  virtual void poll() {}                 // called every device.poll() cycle
+  virtual uint8_t pinCount() { return 0; }
+  virtual const uint8_t* pins() { return nullptr; }
 };
 ```
 
-## Write a Module
+## Example: a relay module
 
-Use the `CONDUYT_MODULE` macro and `CONDUYT_ON_CMD` for command dispatch:
+This module controls a relay on pin 4 with two commands: set state and read state.
 
 ```cpp
 #define CONDUYT_MODULE_RELAY
@@ -37,149 +37,164 @@ Use the `CONDUYT_MODULE` macro and `CONDUYT_ON_CMD` for command dispatch:
 
 CONDUYT_MODULE(RelayModule) {
 public:
-    const char* name() override { return "relay"; }
-    uint8_t versionMajor() override { return 1; }
-    uint8_t versionMinor() override { return 0; }
+  const char* name() override { return "relay"; }
+  uint8_t versionMajor() override { return 1; }
+  uint8_t versionMinor() override { return 0; }
 
-    void begin() override {
-        pinMode(_pin, OUTPUT);
-        digitalWrite(_pin, LOW);
+  void begin() override {
+    // Called once after device.begin() — initialize your hardware here
+    pinMode(_pin, OUTPUT);
+    digitalWrite(_pin, LOW);
+  }
+
+  void handle(uint8_t cmd, ConduytPayloadReader &payload, ConduytContext &ctx) override {
+    CONDUYT_ON_CMD(0x01) {
+      // Command 0x01: Set relay state
+      // Host sends: [0 or 1]
+      uint8_t state = payload.readUInt8();
+      digitalWrite(_pin, state ? HIGH : LOW);
+      ctx.ack();   // confirm the command succeeded
     }
 
-    void handle(uint8_t cmd, ConduytPayloadReader &payload, ConduytContext &ctx) override {
-        CONDUYT_ON_CMD(0x01) {
-            // Set relay state
-            uint8_t state = payload.readUInt8();
-            digitalWrite(_pin, state ? HIGH : LOW);
-            ctx.ack();
-        }
-
-        CONDUYT_ON_CMD(0x02) {
-            // Report relay state
-            uint8_t buf[1];
-            ConduytPayloadWriter w(buf, sizeof(buf));
-            w.writeUInt8(digitalRead(_pin));
-            ctx.sendModResp(0x02, buf, w.length());
-        }
+    CONDUYT_ON_CMD(0x02) {
+      // Command 0x02: Read relay state
+      // Host sends: nothing
+      // We respond with: [0 or 1]
+      uint8_t buf[1];
+      ConduytPayloadWriter w(buf, sizeof(buf));
+      w.writeUInt8(digitalRead(_pin));
+      ctx.sendModResp(0x02, buf, w.length());
     }
+  }
 
-    void poll() override {
-        // Nothing continuous for a relay
-    }
+  void poll() override {
+    // Called every loop cycle — nothing to do for a relay
+  }
 
 private:
-    uint8_t _pin = 4;
+  uint8_t _pin = 4;
 };
 ```
 
-## Register the Module
+## Register the module
 
-Add modules before calling `device.begin()`:
+Add modules before calling `device.begin()`. Module IDs are assigned by registration order — first module = ID 0, second = ID 1, etc.
 
 ```cpp
 void setup() {
-    device.addModule(new RelayModule());
-    device.addModule(new TempSensorModule());
-    device.begin();
+  Serial.begin(115200);
+
+  device.addModule(new RelayModule());        // module ID 0
+  device.addModule(new TempSensorModule());   // module ID 1
+  device.begin();
 }
 ```
 
-Module IDs are assigned by registration order. The first module added gets ID 0, the second gets ID 1, and so on. These IDs appear in the HELLO_RESP packet so the host knows what modules are available.
+These IDs appear in the HELLO_RESP packet so the host knows what modules are available and how to address them.
 
-## Context API
+## Context API reference
 
-The `ConduytContext` object passed to `handle()` controls responses:
+The `ConduytContext` passed to `handle()` controls how the device responds:
 
-| Method | Purpose |
-|---|---|
-| `ctx.ack()` | Send ACK to confirm the command succeeded |
-| `ctx.nak(errorCode)` | Send NAK with an error code |
-| `ctx.sendModResp(id, data, len)` | Send a typed response with payload data |
-| `ctx.emitModEvent(id, code, data, len)` | Emit an unsolicited event to the host |
+| Method | When to use | What it sends |
+|--------|------------|---------------|
+| `ctx.ack()` | Command succeeded, no data to return | ACK packet |
+| `ctx.nak(errorCode)` | Command failed | NAK packet with error code |
+| `ctx.sendModResp(cmdId, data, len)` | Command succeeded, returning data | MOD_RESP packet |
+| `ctx.emitModEvent(eventId, code, data, len)` | Unsolicited event from module | MOD_EVENT packet |
 
-If the handler does not call `ack()`, `nak()`, or `sendModResp()`, ConduytDevice auto-sends ACK.
+If your handler doesn't call any of these, `ConduytDevice` auto-sends an ACK.
 
-## Reading Payloads
+## Reading command payloads
 
-`ConduytPayloadReader` reads typed values from the command payload:
-
-```cpp
-uint8_t  val8  = payload.readUInt8();
-uint16_t val16 = payload.readUInt16();
-int32_t  val32 = payload.readInt32();
-float    valf  = payload.readFloat32();
-```
-
-All multi-byte values are little-endian.
-
-## Writing Payloads
-
-`ConduytPayloadWriter` builds response data:
+`ConduytPayloadReader` reads typed values in order from the command payload. All multi-byte values are **little-endian**.
 
 ```cpp
-uint8_t buf[8];
-ConduytPayloadWriter w(buf, sizeof(buf));
-w.writeUInt8(0x01);
-w.writeFloat32(23.5f);
-ctx.sendModResp(0x01, buf, w.length());
+void handle(uint8_t cmd, ConduytPayloadReader &payload, ConduytContext &ctx) override {
+  CONDUYT_ON_CMD(0x01) {
+    uint8_t  pin   = payload.readUInt8();     // 1 byte
+    uint16_t speed = payload.readUInt16();    // 2 bytes, little-endian
+    float    angle = payload.readFloat32();   // 4 bytes, IEEE 754
+    ctx.ack();
+  }
+}
 ```
 
-## Poll Loop
+## Writing response payloads
 
-The `poll()` method runs every `device.poll()` cycle. Use it for continuous behavior like stepper pulse generation or PID control loops. Keep `poll()` fast and non-blocking. Do not call `delay()` inside it.
+`ConduytPayloadWriter` builds response data into a buffer:
+
+```cpp
+CONDUYT_ON_CMD(0x02) {
+  uint8_t buf[8];
+  ConduytPayloadWriter w(buf, sizeof(buf));
+  w.writeUInt8(0x01);          // status byte
+  w.writeFloat32(23.5f);       // temperature
+  w.writeUInt16(512);          // raw ADC value
+  ctx.sendModResp(0x02, buf, w.length());  // w.length() = 7 bytes
+}
+```
+
+## Poll loop
+
+`poll()` runs every `device.poll()` cycle. Use it for continuous background work. Keep it **fast and non-blocking** — never call `delay()` inside `poll()`.
 
 ```cpp
 void poll() override {
-    unsigned long now = millis();
-    if (now - _lastRead >= 1000) {
-        _lastRead = now;
-        _latestTemp = readSensor();
-        _hasNewReading = true;
-    }
+  unsigned long now = millis();
+  if (now - _lastRead >= 1000) {
+    _lastRead = now;
+    _latestTemp = readSensor();
+    _hasNewReading = true;
+  }
 }
 ```
 
-The `poll()` method does not receive a `ConduytContext`, so it cannot send responses directly. Store results and return them when the host sends a command via `handle()`. For unsolicited events, use the device's `sendPacket()` method through a stored device reference.
+`poll()` doesn't receive a `ConduytContext`, so it can't send responses directly. Store results in member variables and return them when the host sends a read command via `handle()`.
 
-## Control the Module from the Host
-
-After flashing firmware with your module, use the host SDK to send commands. The module's ID is its registration index (first module added = 0).
+## Control the module from the host
 
 ### JavaScript
 
-```js
-// Get the module proxy by name (matches the name() return value)
+The JavaScript SDK has a `.module()` proxy that sends MOD_CMD packets by name:
+
+```javascript
+// Get the module proxy — 'relay' matches the name() return value in firmware
 const relay = device.module('relay')
 
 // Send command 0x01 (set state) with payload [1] (on)
 await relay.cmd(0x01, new Uint8Array([1]))
+console.log('Relay ON')
 
-// Send command 0x02 (read state), receive response
+// Send command 0x02 (read state), receive response bytes
 const resp = await relay.cmd(0x02)
-console.log('Relay state:', resp[0])
+console.log('Relay state:', resp[0])   // 0 or 1
 ```
 
 ### Python
 
-The Python SDK does not have a `.module()` proxy method. You send raw `MOD_CMD` packets. Built-in modules in `conduyt.modules` have pre-built wrappers that handle this for you, but for a custom module you write a thin wrapper class:
+The Python SDK doesn't have a `.module()` proxy. For custom modules, write a thin wrapper:
 
 ```python
+# relay.py
 from conduyt.protocol import CMD_MOD_CMD
 
 
 class RelayModule:
-    """Wrapper for the relay firmware module."""
+    """Host-side wrapper for the relay firmware module."""
 
     def __init__(self, device, module_id: int):
         self._device = device
-        self._module_id = module_id
+        self._id = module_id
 
     async def set_state(self, on: bool):
-        payload = bytes([self._module_id, 0x01, int(on)])
+        """Send command 0x01: set relay state."""
+        payload = bytes([self._id, 0x01, int(on)])
         await self._device._send_command(CMD_MOD_CMD, payload)
 
     async def get_state(self) -> int:
-        payload = bytes([self._module_id, 0x02])
+        """Send command 0x02: read relay state."""
+        payload = bytes([self._id, 0x02])
         resp = await self._device._send_command(CMD_MOD_CMD, payload)
         return resp[0]
 ```
@@ -188,17 +203,19 @@ Usage:
 
 ```python
 relay = RelayModule(device, module_id=0)
+
 await relay.set_state(True)
+print("Relay ON")
 
 state = await relay.get_state()
-print(f"Relay state: {state}")
+print(f"Relay state: {state}")  # 0 or 1
 ```
 
-This calls `_send_command()` directly, which is a private method. The module wrappers in `conduyt.modules` for built-in modules use the same pattern internally. A public module API for Python is planned.
+The built-in module wrappers in `conduyt.modules` (Servo, NeoPixel, DHT, etc.) use the same `_send_command()` pattern internally.
 
-## Compile Guards
+## Compile guards
 
-Gate each module with a compile-time define to keep binary size small on constrained MCUs:
+Gate each module with a `#define` to keep binary size small on constrained boards (Uno R3 has only 32 KB flash):
 
 ```cpp
 #define CONDUYT_MODULE_RELAY
@@ -206,4 +223,4 @@ Gate each module with a compile-time define to keep binary size small on constra
 #include <Conduyt.h>
 ```
 
-Only the modules you define get compiled into the firmware.
+Only the modules you define get compiled. This is especially important on AVR boards where every kilobyte counts.

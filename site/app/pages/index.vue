@@ -8,7 +8,7 @@
           <h1 class="hero-title">CONDUYT</h1>
           <p class="hero-sub">Control any microcontroller from any language. One protocol, every transport.</p>
           <div class="hero-cta">
-            <a href="/docs/tutorials/what-is-conduyt" class="btn-primary">Get Started</a>
+            <a href="/docs" class="btn-primary">Get Started</a>
             <a href="https://github.com/virgilvox/conduyt" class="btn-secondary">GitHub</a>
           </div>
         </div>
@@ -133,7 +133,7 @@
           <div class="footer-meta">MIT License / LumenCanvas</div>
         </div>
         <div class="footer-links">
-          <a href="/docs/tutorials/first-blink">Docs</a>
+          <a href="/docs">Docs</a>
           <a href="/docs/reference/packet-structure">Protocol</a>
           <a href="/docs/reference/firmware-api">Firmware</a>
           <a href="https://github.com/virgilvox/conduyt">GitHub</a>

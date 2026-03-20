@@ -21,7 +21,7 @@
         </NuxtLink>
       </div>
       <nav class="header-nav">
-        <NuxtLink to="/docs/getting-started/introduction" class="header-link">Docs</NuxtLink>
+        <NuxtLink to="/docs" class="header-link">Docs</NuxtLink>
         <NuxtLink to="/playground" class="header-link">Playground</NuxtLink>
         <a href="https://github.com/virgilvox/conduyt" class="header-link" target="_blank" rel="noopener">GitHub</a>
         <ColorModeToggle />

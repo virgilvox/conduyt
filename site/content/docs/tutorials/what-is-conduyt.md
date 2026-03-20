@@ -1,15 +1,17 @@
 ---
 title: What is Conduyt?
-description: An introduction to the Conduyt protocol, its architecture, and core concepts
+description: A deep dive into the CONDUYT protocol architecture, core concepts, and design philosophy.
 ---
 
 # What is Conduyt?
 
-Conduyt is a binary protocol for controlling microcontrollers from a host computer. You flash a small firmware library onto an Arduino, ESP32, or similar board, then write code in JavaScript, Python, Go, Rust, or Swift to control it. The protocol handles communication over USB serial, Bluetooth, MQTT, or any other transport.
+CONDUYT is a binary protocol that lets you control microcontrollers from a host computer. You flash a firmware library onto a board, then talk to it from JavaScript, Python, Go, Rust, or Swift over any transport — USB serial, BLE, MQTT, WebSocket, or TCP.
 
-## The architecture
+This page walks through the architecture and core concepts. If you want to jump straight to code, try the [Playground Quick Start](/docs/getting-started/quickstart-playground) or the [Arduino IDE Quick Start](/docs/getting-started/quickstart-arduino-ide).
 
-A Conduyt system has two sides:
+## Architecture
+
+Every CONDUYT system has two halves:
 
 ```
 ┌──────────────┐                    ┌──────────────┐
@@ -20,100 +22,87 @@ A Conduyt system has two sides:
 └──────────────┘                    └──────────────┘
 ```
 
-**Device side**: An Arduino sketch includes the Conduyt library, creates a transport (serial, BLE, MQTT), and calls `device.begin()` and `device.poll()`. That is the entire firmware. The library handles all protocol logic, pin control, and module management.
+**Device side** — An Arduino sketch includes the CONDUYT library, picks a transport, and calls `device.begin()` / `device.poll()`. That is the entire firmware. The library handles pin control, module dispatch, capability reporting, and packet parsing.
 
-**Host side**: A program on your computer (or server, or phone) imports an SDK, connects to the device, and sends commands. Toggle a pin, read a sensor, control a servo. The SDK handles packet encoding, CRC validation, and capability discovery.
+**Host side** — Your application imports an SDK, opens a transport, and sends commands. The SDK handles packet encoding, CRC validation, sequence tracking, and capability discovery. You work with high-level abstractions like `device.pin(13).write(1)`.
 
-**Between them**: A compact binary protocol. Fixed 8-byte headers, CRC8 checksums, COBS framing on serial links. A complete "turn on LED" command is 10 bytes.
+**The wire** — A compact binary protocol. Fixed 8-byte header, CRC8 integrity check, optional COBS framing on byte-stream transports. A complete PIN_WRITE command is 10 bytes. See [Why Binary](/docs/concepts/why-binary) for the rationale.
 
-## Core concepts
+## Transports
 
-### Transports
+A transport is the physical channel between host and device. The protocol is identical across all transports — swap the wire, keep your application code.
 
-A transport is the physical channel between host and device. Serial USB, Bluetooth Low Energy, MQTT over WiFi, WebSocket, TCP. The protocol is identical across all of them. Swap the transport, keep all your application code.
-
-On the firmware side, pick a transport class:
+**Firmware picks a transport class:**
 
 ```cpp
-ConduytSerial transport(Serial, 115200);   // USB serial
-ConduytBLE transport("MyDevice");          // Bluetooth
-ConduytMQTT transport(wifi, "broker", 1883, "device-001");  // MQTT
+ConduytSerial transport(Serial, 115200);                          // USB
+ConduytBLE    transport("MyDevice");                              // Bluetooth
+ConduytMQTT   transport(wifi, "broker", 1883, "device-001");     // WiFi
 ```
 
-On the host side, pick a matching transport:
+**Host picks a matching one:**
 
-```typescript
-new SerialTransport({ path: '/dev/ttyUSB0' })  // USB serial
-new BLETransport()                               // Bluetooth
-new MQTTTransport({ broker: 'mqtt://...' })     // MQTT
+```javascript
+new SerialTransport({ path: '/dev/ttyUSB0' })   // USB serial
+new BLETransport()                               // Web Bluetooth
+new MQTTTransport({ broker: 'mqtt://...' })      // MQTT
 ```
 
-### Capabilities
+The transport handles framing differences transparently. Serial and BLE use COBS encoding. MQTT and WebSocket are message-oriented and skip framing entirely. See [Transport Architecture](/docs/concepts/transport-architecture) for the details.
 
-When the host connects, the device describes itself. It sends a HELLO_RESP packet containing: how many pins it has, what each pin supports (digital, analog, PWM, I2C), what modules are loaded, what datastreams are declared, maximum payload size, firmware version, and more.
+## Capabilities
 
-The host SDK parses this into a capabilities object. From that point on, the SDK validates every operation before sending it. Request PWM on a pin that only supports digital? The SDK throws an error immediately, without wasting a round trip to the device.
+When the host connects, the device sends a HELLO_RESP packet describing itself:
 
-### Modules
+- How many pins it has and what each pin supports (digital in/out, analog, PWM, I2C, SPI, interrupts)
+- Which modules are loaded (servo, NeoPixel, DHT, etc.)
+- Which datastreams are declared (named typed channels)
+- Maximum payload size, firmware name, firmware version
 
-Modules are opt-in firmware plugins for specific hardware. Servo motors, NeoPixel LED strips, DHT temperature sensors, OLED displays, stepper motors, PID controllers. Enable a module with a compile flag, register it in your sketch, and the host SDK discovers it automatically.
+The SDK parses this into a capabilities object and validates every operation before sending. Request PWM on a digital-only pin? The SDK throws immediately, no round trip wasted. See [Capability Model](/docs/concepts/capability-model).
+
+## Modules
+
+Modules are opt-in firmware plugins for specific hardware. Servos, NeoPixel LED strips, DHT temperature sensors, OLED displays, stepper motors, PID controllers.
 
 ```cpp
-// Firmware: enable and register a servo module
+// Firmware: enable and register
 #define CONDUYT_MODULE_SERVO
 #include <Conduyt.h>
 
 device.addModule(new ConduytModuleServo());
 ```
 
-```typescript
+```javascript
 // Host: use the discovered module
 const servo = new ConduytServo(device)
 await servo.attach(9)
 await servo.write(90)
 ```
 
-You can also write your own modules for custom hardware.
+The host discovers modules automatically through the capability handshake — no hardcoding. You can also [write your own modules](/docs/how-to/add-module) for custom hardware.
 
-### Datastreams
+## Datastreams
 
-Datastreams are named, typed data channels. A temperature sensor publishes a `float32` value called "temperature" with unit "celsius". A thermostat exposes a writable "setpoint" channel. The host reads, writes, and subscribes to these channels by name.
+Datastreams are named, typed data channels for application-level data. A temperature sensor publishes a `float32` called `"temperature"` with unit `"celsius"`. A thermostat exposes a writable `"setpoint"` channel.
 
 ```cpp
-// Firmware: declare a read-only temperature datastream
+// Firmware: declare and push
 device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
 device.writeDatastream("temperature", 22.5f);
 ```
 
-```typescript
-// Host: subscribe to temperature updates
+```javascript
+// Host: subscribe to updates
 for await (const value of device.datastream('temperature').subscribe()) {
-    console.log('Temperature:', value)
+  console.log('Temperature:', value)
 }
 ```
 
-Datastreams are a higher-level abstraction than raw pin control. Use pins for GPIO (on/off, PWM, analog reads). Use datastreams for application-level data (sensor readings, configuration values, status indicators).
-
-## What Conduyt replaces
-
-| Protocol | Year | Limitation |
-|---|---|---|
-| Firmata | 2006 | MIDI-based encoding, serial only, no real capability negotiation |
-| Johnny-Five | 2012 | Node.js only, inherits all Firmata limits |
-| Blynk 2.0 | 2021 | Requires proprietary cloud service |
-
-Conduyt is binary (not MIDI), transport-agnostic (not serial-only), self-hostable (no cloud), and has SDKs for five languages.
-
-## How these docs are organized
-
-These docs follow the [Diataxis](https://diataxis.fr/) framework:
-
-- **Tutorials** walk you through complete projects step by step. Start here.
-- **How-To Guides** are targeted recipes for specific tasks: connecting over a particular transport, writing a custom module, configuring a broker.
-- **Reference** is the complete technical specification: every packet type, every API method, every constant.
-- **Concepts** explain the design decisions: why binary, how transports work, what the capability model does.
+Use pins for GPIO (on/off, PWM, analog reads). Use datastreams for structured application data. See [Use Datastreams](/docs/how-to/use-datastreams) for the full guide.
 
 ## Next steps
 
-- [First Blink](/docs/tutorials/first-blink): Flash firmware, connect from JavaScript, toggle an LED, read a sensor. Takes 10 minutes.
-- [Sensor Dashboard](/docs/tutorials/sensor-dashboard): Wire a DHT22, use the module system, read data from Python.
+- [Quick Start: Playground](/docs/getting-started/quickstart-playground) — flash and control a board from your browser in 2 minutes
+- [Quick Start: Arduino IDE](/docs/getting-started/quickstart-arduino-ide) — local setup with Arduino IDE and Node.js in 5 minutes
+- [Sensor Dashboard](/docs/tutorials/sensor-dashboard) — wire a DHT22, use the module system, read from Python
