@@ -8,18 +8,18 @@ export const examples: PlaygroundExample[] = [
   {
     name: 'Blink',
     description: 'Toggle the built-in LED on and off',
-    code: `// Blink — toggle LED on pin 2 (ESP32 built-in)
+    code: `// Blink — toggle LED on pin 13 (built-in LED)
 await device.connect()
 log('Connected:', device.capabilities.firmwareName)
 
-await device.pin(2).mode('output')
+await device.pin(13).mode('output')
 
 for (let i = 0; i < 10; i++) {
-  await device.pin(2).write(1)
+  await device.pin(13).write(1)
   log('LED ON')
   await sleep(500)
 
-  await device.pin(2).write(0)
+  await device.pin(13).write(0)
   log('LED OFF')
   await sleep(500)
 }
@@ -61,22 +61,22 @@ log(Array.from(device.capabilities.raw).map(b => b.toString(16).padStart(2, '0')
   {
     name: 'PWM Fade',
     description: 'Fade an LED using PWM',
-    code: `// PWM fade on pin 2
+    code: `// PWM fade on pin 13
 await device.connect()
 log('Connected!')
 
-await device.pin(2).mode('pwm')
+await device.pin(13).mode('pwm')
 
 // Fade up
 for (let i = 0; i <= 255; i += 5) {
-  await device.pin(2).write(i)
+  await device.pin(13).write(i)
   await sleep(20)
 }
 log('Fade up complete')
 
 // Fade down
 for (let i = 255; i >= 0; i -= 5) {
-  await device.pin(2).write(i)
+  await device.pin(13).write(i)
   await sleep(20)
 }
 log('Fade down complete')`,

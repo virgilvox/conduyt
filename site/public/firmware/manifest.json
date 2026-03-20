@@ -1,12 +1,15 @@
 {
   "name": "CONDUYT Firmware",
-  "version": "0.1.0",
-  "home_assistant_domain": "",
+  "version": "0.2.0",
   "new_install_prompt_erase": true,
   "builds": [
     {
       "chipFamily": "ESP32",
-      "parts": []
+      "parts": [
+        { "path": "conduyt-esp32-bootloader.bin", "offset": 4096 },
+        { "path": "conduyt-esp32-partitions.bin", "offset": 32768 },
+        { "path": "conduyt-esp32.bin", "offset": 65536 }
+      ]
     }
   ]
 }
