@@ -48,36 +48,27 @@
         <!-- ESP32 family: esp-web-tools -->
         <div v-if="activeVariant.flashMethod === 'esptool'" class="esp-flash">
           <ClientOnly>
-            <div v-if="!hasWebSerial" class="flash-unsupported">
-              Your browser doesn't support WebSerial.
-              Use <strong>Chrome</strong> or <strong>Edge</strong> on desktop.
-            </div>
-            <div v-else-if="!isSecureContext" class="flash-unsupported">
-              WebSerial requires a secure context. Make sure you're on <strong>HTTPS</strong>.
-            </div>
-            <template v-else>
-              <esp-web-install-button
-                :manifest="activeVariant.manifest || manifestUrl"
-                class="esp-button"
-              >
-                <button slot="activate" class="flash-btn">
-                  Install CONDUYT on {{ activeVariant.name }}
-                </button>
-                <span slot="unsupported">
-                  <p class="flash-unsupported">
-                    WebSerial not available. Use <strong>Chrome</strong> or <strong>Edge</strong> on desktop.
-                  </p>
-                </span>
-                <span slot="not-allowed">
-                  <p class="flash-unsupported">
-                    WebSerial access denied. Make sure you're on HTTPS.
-                  </p>
-                </span>
-              </esp-web-install-button>
-              <p class="flash-note">
-                {{ activeVariant.notes || 'Connect your board via USB, then click Install. The correct chip variant is auto-detected.' }}
-              </p>
-            </template>
+            <esp-web-install-button
+              :manifest="activeVariant.manifest || manifestUrl"
+              class="esp-button"
+            >
+              <button slot="activate" class="flash-btn">
+                Install CONDUYT on {{ activeVariant.name }}
+              </button>
+              <span slot="unsupported">
+                <p class="flash-unsupported">
+                  WebSerial not available. Use <strong>Chrome</strong> or <strong>Edge</strong> on desktop.
+                </p>
+              </span>
+              <span slot="not-allowed">
+                <p class="flash-unsupported">
+                  WebSerial access denied. Make sure you're on HTTPS or localhost.
+                </p>
+              </span>
+            </esp-web-install-button>
+            <p class="flash-note">
+              {{ activeVariant.notes || 'Connect your board via USB, then click Install. The correct chip variant is auto-detected.' }}
+            </p>
           </ClientOnly>
         </div>
 
@@ -162,14 +153,6 @@ const flashProgress = ref(0)
 const FIRMWARE_BASE = '/firmware'
 const manifestUrl = '/firmware/manifest.json'
 
-// Client-side WebSerial detection
-const hasWebSerial = ref(false)
-const isSecureContext = ref(false)
-
-onMounted(() => {
-  hasWebSerial.value = 'serial' in navigator
-  isSecureContext.value = window.isSecureContext
-})
 
 // --- Board data ---
 

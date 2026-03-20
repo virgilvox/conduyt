@@ -68,11 +68,11 @@ jobs:
       - run: pip install platformio
       - name: Build ${{ matrix.name }}
         working-directory: firmware
-        run: pio ci --board=${{ matrix.board }} examples/BasicBlink/BasicBlink.ino --lib=src --build-dir=.pio/ci-build
+        run: pio run -e ${{ matrix.board }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ matrix.board }}
           path: |
-            firmware/.pio/ci-build/.pio/build/*/firmware.*
+            firmware/.pio/build/${{ matrix.board }}/firmware.*
           if-no-files-found: warn

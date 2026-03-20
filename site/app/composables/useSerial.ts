@@ -35,11 +35,6 @@ export function useSerial() {
       error.value = null
       const w = await loadWasm()
 
-      if (!('serial' in navigator)) {
-        error.value = 'WebSerial not supported in this browser. Use Chrome or Edge.'
-        return false
-      }
-
       port = await (navigator as any).serial.requestPort()
       await port!.open({ baudRate })
       writable = port!.writable!
