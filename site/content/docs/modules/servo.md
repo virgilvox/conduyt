@@ -1,6 +1,6 @@
 ---
 title: "Servo Module"
-description: "Control hobby servos — attach, set angle, microseconds, and detach."
+description: "Control hobby servos - attach, set angle, microseconds, and detach."
 ---
 
 # Servo Module
@@ -46,7 +46,7 @@ GND (brown/black)     ──► GND
 **Important:** For high-torque servos (MG996R and larger), power them from an **external 5V supply**, not the Arduino's 5V pin. The Arduino can't source enough current and may brown out. Connect all grounds together (Arduino GND + external supply GND + servo GND).
 
 **Which pins work?**
-- **Arduino Uno:** PWM pins only — 3, 5, 6, 9, 10, 11
+- **Arduino Uno:** PWM pins only - 3, 5, 6, 9, 10, 11
 - **ESP32:** Any GPIO pin works (uses the LEDC peripheral)
 - **Pico:** Any GPIO pin works
 

@@ -30,11 +30,11 @@ The host sent a packet but the device didn't respond in time.
 You tried to send a command before calling `device.connect()` or before the handshake completed.
 
 ```javascript
-// Wrong — sending before connect resolves
+// Wrong - sending before connect resolves
 const device = new ConduytDevice(transport)
 await device.pin(13).write(1)  // throws "Not connected"
 
-// Right — wait for connect first
+// Right - wait for connect first
 const device = await ConduytDevice.connect(transport)
 await device.pin(13).write(1)  // works
 ```
@@ -78,7 +78,7 @@ sudo usermod -aG dialout $USER
 The pin number doesn't exist on the board, or the pin doesn't support the requested mode.
 
 ```javascript
-// This fails on Arduino Uno — it only has pins 0-19
+// This fails on Arduino Uno - it only has pins 0-19
 await device.pin(25).mode('output')  // NAK: INVALID_PIN
 
 // This fails because pin 13 doesn't support analog input
@@ -110,12 +110,12 @@ You sent a module command but the firmware doesn't have that module enabled.
 
 ### "CRC mismatch"
 
-The packet's CRC8 checksum failed — data was corrupted in transit.
+The packet's CRC8 checksum failed - data was corrupted in transit.
 
 **Common causes:**
-- Baud rate mismatch between host and firmware — double-check both use 115200
-- Noisy/long USB cable — try a shorter cable
-- Payload exceeds the max buffer — default is 256 bytes on Uno, 512 on ESP32
+- Baud rate mismatch between host and firmware - double-check both use 115200
+- Noisy/long USB cable - try a shorter cable
+- Payload exceeds the max buffer - default is 256 bytes on Uno, 512 on ESP32
 
 ## Firmware issues
 
@@ -133,9 +133,9 @@ void loop() {
 If you see "alive" repeating but the host can't connect, the transport might not be initialized. Make sure `Serial.begin(115200)` is in `setup()`.
 
 Common crash causes:
-- **Out of RAM** (especially Uno R3 with 2 KB) — reduce modules, datastreams, or payload size
-- **Blocking calls in loop()** — never call `delay()` in the main loop; use non-blocking timing with `millis()`
-- **I2C/SPI bus locked** — a sensor not responding can hang the bus
+- **Out of RAM** (especially Uno R3 with 2 KB) - reduce modules, datastreams, or payload size
+- **Blocking calls in loop()** - never call `delay()` in the main loop; use non-blocking timing with `millis()`
+- **I2C/SPI bus locked** - a sensor not responding can hang the bus
 
 ### "not in sync" during upload (AVR boards)
 
@@ -158,7 +158,7 @@ The board isn't in DFU mode. Double-tap the RESET button quickly (within ~500ms)
 
 ### Code runs but nothing happens on the board
 
-1. Check the Device panel — does it say "Connected"?
+1. Check the Device panel - does it say "Connected"?
 2. Make sure your code calls `await device.connect()` first
 3. Check the Console panel for error messages
 4. Try clicking **Stop**, then **Run** again

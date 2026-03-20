@@ -5,7 +5,7 @@ description: Set up serial communication between a host and a Conduyt device in 
 
 # Connect over Serial
 
-Serial (USB) is the default CONDUYT transport. No network, no broker, no configuration — just plug in and go.
+Serial (USB) is the default CONDUYT transport. No network, no broker, no configuration - just plug in and go.
 
 ## Firmware
 
@@ -58,7 +58,7 @@ Or from PowerShell:
 # COM4
 ```
 
-If no port appears, try a different USB cable — some cables are charge-only and don't carry data.
+If no port appears, try a different USB cable - some cables are charge-only and don't carry data.
 
 ## JavaScript (Node.js)
 
@@ -107,7 +107,7 @@ Pin 13 HIGH
 
 ### Browser (WebSerial)
 
-WebSerial requires a Chromium browser (Chrome or Edge) and a **user gesture** — you must call `connect()` inside a `click`, `keydown`, or `pointerdown` event handler. Calling it on page load will fail silently.
+WebSerial requires a Chromium browser (Chrome or Edge) and a **user gesture** - you must call `connect()` inside a `click`, `keydown`, or `pointerdown` event handler. Calling it on page load will fail silently.
 
 ```html
 <!-- index.html -->
@@ -121,7 +121,7 @@ WebSerial requires a Chromium browser (Chrome or Edge) and a **user gesture** �
   document.getElementById('connectBtn').addEventListener('click', async () => {
     const transport = new WebSerialTransport({ baudRate: 115200 })
     const device = await ConduytDevice.connect(transport)
-    // Browser opens a port picker — user selects their board
+    // Browser opens a port picker - user selects their board
 
     document.getElementById('log').textContent =
       `Connected to: ${device.capabilities.firmwareName}\n` +
@@ -249,6 +249,6 @@ The baud rate must match on both sides. If the firmware uses `115200` and the ho
 
 ### Device not detected / no port in `/dev`
 
-1. Try a different USB cable — charge-only cables don't carry data
+1. Try a different USB cable - charge-only cables don't carry data
 2. Try a different USB port on your computer
 3. On some boards (ESP32 with CH340 chip), you may need to install [CH340 drivers](https://www.wch-ic.com/downloads/CH341SER_EXE.html)

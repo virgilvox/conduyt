@@ -19,7 +19,7 @@ export function useRunner() {
     logFn: LogFn,
   ) {
     if (running.value) {
-      logFn('[runner] Already running — stop first')
+      logFn('[runner] Already running - stop first')
       return
     }
 

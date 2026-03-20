@@ -12,7 +12,7 @@
 
 Open binary protocol for host-to-device hardware control.
 
-Conduyt replaces ad-hoc serial text commands with a structured, transport-agnostic binary protocol. One firmware library handles framing, dispatch, and capabilities. Host SDKs in five languages connect over Serial, BLE, MQTT, WebSocket, or TCP. Flash a sketch, connect from any language, control pins, read sensors, drive modules.
+Conduyt is a structured, transport-agnostic binary protocol for host-to-device hardware control. One firmware library handles framing, dispatch, and capabilities. Host SDKs in five languages connect over Serial, BLE, MQTT, WebSocket, or TCP. Flash a sketch, connect from any language, control pins, read sensors, drive modules.
 
 ## Quick Start
 

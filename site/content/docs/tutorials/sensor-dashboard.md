@@ -10,15 +10,15 @@ Wire a DHT22 temperature/humidity sensor, flash CONDUYT firmware with the DHT mo
 ## Prerequisites
 
 - **Arduino Uno or ESP32** dev board
-- **DHT22 sensor** — either the bare 4-pin component or a 3-pin breakout board
-- **10k ohm resistor** — only needed for the bare 4-pin sensor (breakout boards have one built in)
+- **DHT22 sensor** - either the bare 4-pin component or a 3-pin breakout board
+- **10k ohm resistor** - only needed for the bare 4-pin sensor (breakout boards have one built in)
 - **Breadboard and jumper wires**
 - **USB cable** for your board
-- **[PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)** — verify:
+- **[PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)** - verify:
   ```bash
   pio --version
   ```
-- **Python 3.10+** — verify:
+- **Python 3.10+** - verify:
   ```bash
   python3 --version
   # Python 3.10.x or higher
@@ -47,7 +47,7 @@ Pin 4: GND
 
 | DHT22 Pin | Connect to | Notes |
 |-----------|-----------|-------|
-| 1 (VCC) | **5V** on Uno, **3.3V** on ESP32 | ESP32 GPIO is 3.3V — using 5V for VCC risks damage |
+| 1 (VCC) | **5V** on Uno, **3.3V** on ESP32 | ESP32 GPIO is 3.3V - using 5V for VCC risks damage |
 | 2 (DATA) | **D4** (digital pin 4) | |
 | 3 (NC) | Leave unconnected | |
 | 4 (GND) | **GND** | |
@@ -170,7 +170,7 @@ ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null
 
 ## 5. Connect and verify the module
 
-Create `dashboard.py` — replace `<YOUR_PORT>` with your port:
+Create `dashboard.py` - replace `<YOUR_PORT>` with your port:
 
 ```python
 # dashboard.py
@@ -314,10 +314,10 @@ When you call `dht.begin(pin=4, sensor_type=22)`, the Python SDK sends a MOD_CMD
 
 When you call `dht.read()`, another MOD_CMD is sent. The firmware module reads the physical sensor and returns the temperature and humidity as a MOD_RESP packet.
 
-You never construct these packets yourself — the SDK module wrappers handle the protocol.
+You never construct these packets yourself - the SDK module wrappers handle the protocol.
 
 ## Next steps
 
-- [Use Datastreams](/docs/how-to/use-datastreams) — push sensor data continuously from device to host without polling
-- [Write a Module](/docs/how-to/add-module) — create your own firmware module for custom hardware
-- [Packet Structure](/docs/reference/packet-structure) — full wire format specification
+- [Use Datastreams](/docs/how-to/use-datastreams) - push sensor data continuously from device to host without polling
+- [Write a Module](/docs/how-to/add-module) - create your own firmware module for custom hardware
+- [Packet Structure](/docs/reference/packet-structure) - full wire format specification

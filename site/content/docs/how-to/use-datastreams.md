@@ -32,8 +32,8 @@ void setup() {
 ```
 
 The fourth argument controls direction:
-- `false` = **read-only** — device pushes, host reads
-- `true` = **writable** — host writes, device receives
+- `false` = **read-only** - device pushes, host reads
+- `true` = **writable** - host writes, device receives
 
 ## 2. Push values from the device
 
@@ -55,7 +55,7 @@ void loop() {
 }
 ```
 
-Each `writeDatastream()` call sends a DS_EVENT packet to the host. Don't call it every loop iteration — the serial link can't keep up with tens of thousands of updates per second.
+Each `writeDatastream()` call sends a DS_EVENT packet to the host. Don't call it every loop iteration - the serial link can't keep up with tens of thousands of updates per second.
 
 ## 3. Receive writes on the device
 

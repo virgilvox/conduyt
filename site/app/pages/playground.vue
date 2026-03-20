@@ -55,7 +55,7 @@ import { useRunner } from '~/composables/useRunner'
 
 definePageMeta({ layout: 'playground' })
 
-useHead({ title: 'Playground — CONDUYT' })
+useHead({ title: 'Playground - CONDUYT' })
 
 const serial = useSerial()
 const runner = useRunner()
@@ -64,7 +64,7 @@ const activePanel = ref('')
 const mobileTab = ref('editor')
 const deviceCapabilities = ref<HelloResp | null>(null)
 
-// Code state — persist to localStorage
+// Code state - persist to localStorage
 const STORAGE_KEY = 'conduyt-playground-code'
 const defaultCode = examples[0].code
 
@@ -115,7 +115,7 @@ function togglePanel(panel: string) {
 
 async function runCode() {
   if (!serial.connected.value) {
-    log('[error] Not connected — click Connect first')
+    log('[error] Not connected - click Connect first')
     return
   }
   await runner.run(code.value, serial, log)

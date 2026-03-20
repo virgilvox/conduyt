@@ -5,7 +5,7 @@ description: "Use the CONDUYT protocol core in the browser or Node.js via WebAss
 
 # WASM SDK
 
-The `conduyt-wasm` package compiles the Rust protocol core to WebAssembly. It gives you CRC8, COBS framing, and wire encode/decode — the same implementation used by the native Rust SDK — running in the browser or Node.js.
+The `conduyt-wasm` package compiles the Rust protocol core to WebAssembly. It gives you CRC8, COBS framing, and wire encode/decode - the same implementation used by the native Rust SDK - running in the browser or Node.js.
 
 ## When to use
 
@@ -16,7 +16,7 @@ Use `conduyt-wasm` when you want to:
 - Avoid reimplementing the protocol in JavaScript
 - Build an **edge/serverless** app where WASM runs natively (Cloudflare Workers, Deno, etc.)
 
-If you're building a Node.js app, you can use either `conduyt-wasm` or the pure-JS `conduyt-js` SDK — both implement the same protocol. The JS SDK includes higher-level features (device management, transports, modules) while the WASM module provides just the protocol primitives.
+If you're building a Node.js app, you can use either `conduyt-wasm` or the pure-JS `conduyt-js` SDK - both implement the same protocol. The JS SDK includes higher-level features (device management, transports, modules) while the WASM module provides just the protocol primitives.
 
 ## Install
 
@@ -103,7 +103,7 @@ conduyt.HEADER_SIZE();         // 8
 
 ## WebSerial Example
 
-Complete browser example — connect to a CONDUYT board, send HELLO, and blink an LED:
+Complete browser example - connect to a CONDUYT board, send HELLO, and blink an LED:
 
 ```javascript
 import init, * as conduyt from 'conduyt-wasm';

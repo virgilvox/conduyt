@@ -49,7 +49,7 @@ DHT22 (front view)
 
 | DHT22 Pin | Connect to | Notes |
 |-----------|-----------|-------|
-| 1 (VCC) | **3.3V** (ESP32) or **5V** (Uno) | ESP32 GPIO is 3.3V — match VCC to it |
+| 1 (VCC) | **3.3V** (ESP32) or **5V** (Uno) | ESP32 GPIO is 3.3V - match VCC to it |
 | 2 (DATA) | **D4** (digital pin 4) | |
 | 3 (NC) | Leave unconnected | |
 | 4 (GND) | **GND** | |
@@ -58,7 +58,7 @@ DHT22 (front view)
 
 ### 3-pin breakout boards
 
-Breakout boards have the pull-up resistor built in. Just connect VCC, DATA, GND — no extra resistor needed. Check your breakout's labeling (often marked S/+/- or DATA/VCC/GND).
+Breakout boards have the pull-up resistor built in. Just connect VCC, DATA, GND - no extra resistor needed. Check your breakout's labeling (often marked S/+/- or DATA/VCC/GND).
 
 ## Host usage
 

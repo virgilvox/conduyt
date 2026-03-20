@@ -14,20 +14,49 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # ESP32 family
           - board: esp32dev
             name: esp32
-          - board: uno
-            name: uno-r3
-          - board: uno_r4_minima
-            name: uno-r4-minima
+          - board: esp32s2
+            name: esp32s2
+          - board: esp32s3
+            name: esp32s3
+          - board: esp32c3
+            name: esp32c3
+          # ESP8266
           - board: nodemcuv2
             name: nodemcuv2
+          # Arduino AVR
+          - board: uno
+            name: uno-r3
+          - board: mega2560
+            name: mega2560
+          - board: nano
+            name: nano
+          - board: leonardo
+            name: leonardo
+          # Arduino modern
+          - board: nano_every
+            name: nano-every
+          - board: nano_esp32
+            name: nano-esp32
+          - board: uno_r4_minima
+            name: uno-r4-minima
+          - board: uno_r4_wifi
+            name: uno-r4-wifi
+          # Nordic
           - board: nrf52840_dk
             name: nrf52840-dk
+          # Raspberry Pi
           - board: pico
             name: pico
+          # Teensy
           - board: teensy41
             name: teensy41
+          - board: teensy40
+            name: teensy40
+          - board: teensy36
+            name: teensy36
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4

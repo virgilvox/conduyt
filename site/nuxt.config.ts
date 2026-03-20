@@ -24,9 +24,9 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'CONDUYT — Open Binary Protocol for Hardware Control',
+      title: 'CONDUYT - Open Binary Protocol for Hardware Control',
       meta: [
-        { name: 'description', content: 'Open binary protocol for transport-agnostic, capability-first hardware control. Replaces Firmata, Johnny-Five, and Blynk.' },
+        { name: 'description', content: 'Open binary protocol for transport-agnostic, capability-first hardware control. An alternative to Firmata, Johnny-Five, and Blynk.' },
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

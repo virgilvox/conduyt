@@ -1,6 +1,6 @@
 ---
 title: "ESP32"
-description: "ESP32 board guide — WiFi, BLE, MQTT, OTA, and all CONDUYT transports."
+description: "ESP32 board guide - WiFi, BLE, MQTT, OTA, and all CONDUYT transports."
 ---
 
 # ESP32
@@ -58,7 +58,7 @@ pio run --target upload
 The ESP32 supports all CONDUYT transports. Pick the one that fits your project:
 
 ```cpp
-// USB Serial (simplest — just plug in)
+// USB Serial (simplest - just plug in)
 ConduytSerial transport(Serial, 115200);
 
 // Bluetooth Low Energy (wireless, no network needed)
@@ -88,8 +88,8 @@ See the transport-specific guides for full setup:
 
 **Pin 2** on most ESP32 dev boards (DevKitC, NodeMCU-32S, DOIT). Some boards differ:
 
-- **ESP32-S3** — uses an addressable RGB NeoPixel instead of a simple LED
-- **ESP32-C3** — pin 8 on some boards
+- **ESP32-S3** - uses an addressable RGB NeoPixel instead of a simple LED
+- **ESP32-C3** - pin 8 on some boards
 
 If in doubt, check your board's pinout diagram.
 
@@ -115,4 +115,4 @@ The host can then push new firmware using `OTA_BEGIN`, `OTA_CHUNK`, and `OTA_FIN
 - **WiFi won't connect:** The ESP32 only supports **2.4 GHz** networks. 5 GHz SSIDs are invisible to it. Also verify SSID and password are correct (case-sensitive).
 - **BLE disconnects when WiFi is active:** BLE and WiFi share the same 2.4 GHz radio. Running both simultaneously can cause instability. Pick one transport per project when possible.
 - **Inaccurate analog readings:** The ESP32's 12-bit ADC has known nonlinearity issues. For precision measurements, use an external ADC (ADS1115, MCP3008).
-- **GPIO 6-11:** These are connected to the internal SPI flash. Do not use them as GPIO — it will crash the board.
+- **GPIO 6-11:** These are connected to the internal SPI flash. Do not use them as GPIO - it will crash the board.

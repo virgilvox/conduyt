@@ -14,10 +14,42 @@
 
 #if defined(ESP32)
     #define CONDUYT_PLATFORM_ESP32
-    #define CONDUYT_BOARD_NAME        "ESP32"
+
+    /* Sub-variant detection */
+    #if CONFIG_IDF_TARGET_ESP32S2
+        #define CONDUYT_BOARD_NAME    "ESP32-S2"
+        #define CONDUYT_HAS_BLE       0
+        #define CONDUYT_HAS_USB_CDC   1
+    #elif CONFIG_IDF_TARGET_ESP32S3
+        #define CONDUYT_BOARD_NAME    "ESP32-S3"
+        #define CONDUYT_HAS_BLE       1
+        #define CONDUYT_HAS_USB_CDC   1
+    #elif CONFIG_IDF_TARGET_ESP32C3
+        #define CONDUYT_BOARD_NAME    "ESP32-C3"
+        #define CONDUYT_HAS_BLE       1
+        #define CONDUYT_HAS_USB_CDC   1
+    #elif CONFIG_IDF_TARGET_ESP32C6
+        #define CONDUYT_BOARD_NAME    "ESP32-C6"
+        #define CONDUYT_HAS_BLE       1
+        #define CONDUYT_HAS_USB_CDC   1
+    #elif CONFIG_IDF_TARGET_ESP32H2
+        #define CONDUYT_BOARD_NAME    "ESP32-H2"
+        #define CONDUYT_HAS_BLE       1
+        #define CONDUYT_HAS_USB_CDC   1
+    #else
+        #define CONDUYT_BOARD_NAME    "ESP32"
+        #define CONDUYT_HAS_BLE       1
+        #define CONDUYT_HAS_USB_CDC   0
+    #endif
+
     #define CONDUYT_HAS_WIFI          1
-    #define CONDUYT_HAS_BLE           1
-    #define CONDUYT_HAS_USB_CDC       0
+
+    /* ESP32-H2 has no WiFi */
+    #if CONFIG_IDF_TARGET_ESP32H2
+        #undef  CONDUYT_HAS_WIFI
+        #define CONDUYT_HAS_WIFI      0
+    #endif
+
     #ifndef CONDUYT_PACKET_BUF_SIZE
         #define CONDUYT_PACKET_BUF_SIZE   512
     #endif

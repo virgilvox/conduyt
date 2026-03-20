@@ -12,7 +12,7 @@ export function useSerial() {
   let writable: WritableStream<Uint8Array> | null = null
   let abortController: AbortController | null = null
 
-  // COBS frame buffer — accumulate until 0x00 delimiter
+  // COBS frame buffer - accumulate until 0x00 delimiter
   let frameBuffer = new Uint8Array(0)
 
   // Callbacks

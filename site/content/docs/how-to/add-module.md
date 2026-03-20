@@ -7,7 +7,7 @@ description: Create and register a custom firmware module for a Conduyt device.
 
 Modules extend a CONDUYT device with custom hardware capabilities. Each module handles commands from the host, can emit events, and runs a poll loop for background work.
 
-Write a custom module when built-in pin control and datastreams aren't enough — for example, devices with initialization sequences (displays), multi-step protocols (1-Wire sensors), or continuous processing (PID loops, stepper pulse generation).
+Write a custom module when built-in pin control and datastreams aren't enough - for example, devices with initialization sequences (displays), multi-step protocols (1-Wire sensors), or continuous processing (PID loops, stepper pulse generation).
 
 ## The module interface
 
@@ -42,7 +42,7 @@ public:
   uint8_t versionMinor() override { return 0; }
 
   void begin() override {
-    // Called once after device.begin() — initialize your hardware here
+    // Called once after device.begin() - initialize your hardware here
     pinMode(_pin, OUTPUT);
     digitalWrite(_pin, LOW);
   }
@@ -68,7 +68,7 @@ public:
   }
 
   void poll() override {
-    // Called every loop cycle — nothing to do for a relay
+    // Called every loop cycle - nothing to do for a relay
   }
 
 private:
@@ -78,7 +78,7 @@ private:
 
 ## Register the module
 
-Add modules before calling `device.begin()`. Module IDs are assigned by registration order — first module = ID 0, second = ID 1, etc.
+Add modules before calling `device.begin()`. Module IDs are assigned by registration order - first module = ID 0, second = ID 1, etc.
 
 ```cpp
 void setup() {
@@ -137,7 +137,7 @@ CONDUYT_ON_CMD(0x02) {
 
 ## Poll loop
 
-`poll()` runs every `device.poll()` cycle. Use it for continuous background work. Keep it **fast and non-blocking** — never call `delay()` inside `poll()`.
+`poll()` runs every `device.poll()` cycle. Use it for continuous background work. Keep it **fast and non-blocking** - never call `delay()` inside `poll()`.
 
 ```cpp
 void poll() override {
@@ -159,7 +159,7 @@ void poll() override {
 The JavaScript SDK has a `.module()` proxy that sends MOD_CMD packets by name:
 
 ```javascript
-// Get the module proxy — 'relay' matches the name() return value in firmware
+// Get the module proxy - 'relay' matches the name() return value in firmware
 const relay = device.module('relay')
 
 // Send command 0x01 (set state) with payload [1] (on)

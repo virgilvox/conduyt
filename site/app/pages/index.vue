@@ -91,20 +91,20 @@
       </div>
     </section>
 
-    <!-- REPLACES -->
+    <!-- COMPARISON -->
     <section class="section">
       <div class="section-header">
-        <h2>What Conduyt replaces</h2>
+        <h2>How Conduyt compares</h2>
       </div>
 
       <div class="compare-grid">
-        <div class="compare-card" v-for="item in replacements" :key="item.name">
+        <div class="compare-card" v-for="item in comparisons" :key="item.name">
           <div class="compare-top">
             <span class="compare-name">{{ item.name }}</span>
             <span class="compare-year">{{ item.year }}</span>
           </div>
-          <div class="compare-problem">{{ item.problem }}</div>
-          <div class="compare-fix">Conduyt: {{ item.fix }}</div>
+          <div class="compare-problem">{{ item.limitation }}</div>
+          <div class="compare-fix">Conduyt: {{ item.approach }}</div>
         </div>
       </div>
     </section>
@@ -155,11 +155,11 @@ const props = [
   { icon: '04', title: 'Module system', desc: 'Servo, NeoPixel, DHT, OLED, Stepper. Firmware opts in. Host discovers automatically.' },
 ]
 
-const replacements = [
-  { name: 'Firmata', year: '2006', problem: 'MIDI encoding, serial-only', fix: 'Binary packets, any transport' },
-  { name: 'Johnny-Five', year: '2012', problem: 'Node.js only, inherits Firmata limits', fix: 'Five SDKs, native binary' },
-  { name: 'Blynk 2.0', year: '2021', problem: 'Requires proprietary cloud', fix: 'Self-hostable, no cloud dependency' },
-  { name: 'CircuitPython', year: '2017', problem: 'Runtime, not a control protocol', fix: 'Structured host-device protocol' },
+const comparisons = [
+  { name: 'Firmata', year: '2006', limitation: 'MIDI encoding, serial-only', approach: 'Binary packets, any transport' },
+  { name: 'Johnny-Five', year: '2012', limitation: 'Node.js only, tied to Firmata', approach: 'Five SDKs, native binary protocol' },
+  { name: 'Blynk 2.0', year: '2021', limitation: 'Cloud-dependent architecture', approach: 'Self-hostable, no cloud required' },
+  { name: 'CircuitPython', year: '2017', limitation: 'On-device runtime, not a control protocol', approach: 'Structured host-device protocol' },
 ]
 
 const codeExamples = [

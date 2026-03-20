@@ -18,7 +18,7 @@ CONDUYT is a binary protocol for controlling microcontrollers from a host comput
 └──────────────┘                    └──────────────┘
 ```
 
-The **device** runs a small firmware sketch — just `device.begin()` and `device.poll()`. It handles pin control, modules, and protocol logic.
+The **device** runs a small firmware sketch - just `device.begin()` and `device.poll()`. It handles pin control, modules, and protocol logic.
 
 The **host** imports an SDK, connects over any transport, and sends commands: toggle pins, read sensors, control servos. The SDK handles packet encoding, CRC validation, and capability discovery.
 
@@ -42,29 +42,31 @@ The [Playground](/playground) lets you flash firmware, write code, and control h
 
 ## Core concepts
 
-**Transports** — Serial, BLE, MQTT, WebSocket, TCP. Same protocol, same packets. Swap the wire, keep the code.
+**Transports** - Serial, BLE, MQTT, WebSocket, TCP. Same protocol, same packets. Swap the wire, keep the code.
 
-**Capabilities** — On connect, the device describes itself: pin count, pin modes, loaded modules, declared datastreams, firmware version. The SDK validates operations before sending.
+**Capabilities** - On connect, the device describes itself: pin count, pin modes, loaded modules, declared datastreams, firmware version. The SDK validates operations before sending.
 
-**Modules** — Opt-in firmware plugins for servos, NeoPixels, DHT sensors, and more. Enable with a compile flag, register in your sketch, and the host discovers them automatically.
+**Modules** - Opt-in firmware plugins for servos, NeoPixels, DHT sensors, and more. Enable with a compile flag, register in your sketch, and the host discovers them automatically.
 
-**Datastreams** — Named, typed data channels for application-level data. Temperature readings, setpoints, status indicators. Read, write, and subscribe by name.
+**Datastreams** - Named, typed data channels for application-level data. Temperature readings, setpoints, status indicators. Read, write, and subscribe by name.
 
-## What it replaces
+## How it compares
 
-| Protocol | Year | Limitation | CONDUYT answer |
-|----------|------|-----------|----------------|
+Conduyt draws inspiration from projects like Firmata, Johnny-Five, and Blynk, and takes a different approach:
+
+| Protocol | Year | Approach | CONDUYT's approach |
+|----------|------|----------|-------------------|
 | Firmata | 2006 | MIDI encoding, serial only | Binary packets, any transport |
-| Johnny-Five | 2012 | Node.js only, inherits Firmata limits | Five SDKs, native binary |
-| Blynk 2.0 | 2021 | Requires proprietary cloud | Self-hostable, no cloud |
+| Johnny-Five | 2012 | Node.js, built on Firmata | Five SDKs, native binary protocol |
+| Blynk 2.0 | 2021 | Cloud-dependent architecture | Self-hostable, no cloud required |
 
 ## How these docs are organized
 
-- **Getting Started** — Quick starts for every toolchain. Pick one and go.
-- **Tutorials** — Step-by-step projects that teach the protocol through building.
-- **Boards** — Per-board setup, specs, transport support, and known issues.
-- **Modules** — Servo, NeoPixel, DHT — firmware setup and host SDK usage.
-- **SDKs & APIs** — Full API reference for each language SDK.
-- **How-To Guides** — Targeted recipes: connecting over a specific transport, writing modules, managing brokers.
-- **Reference** — Wire format, packet types, error codes, datastream types.
-- **Concepts** — Design decisions: why binary, how transports work, capability negotiation.
+- **Getting Started** - Quick starts for every toolchain. Pick one and go.
+- **Tutorials** - Step-by-step projects that teach the protocol through building.
+- **Boards** - Per-board setup, specs, transport support, and known issues.
+- **Modules** - Servo, NeoPixel, DHT - firmware setup and host SDK usage.
+- **SDKs & APIs** - Full API reference for each language SDK.
+- **How-To Guides** - Targeted recipes: connecting over a specific transport, writing modules, managing brokers.
+- **Reference** - Wire format, packet types, error codes, datastream types.
+- **Concepts** - Design decisions: why binary, how transports work, capability negotiation.

@@ -1,6 +1,6 @@
 ---
 title: "Arduino Uno R3"
-description: "Classic Arduino Uno board guide — ATmega328P, serial transport, memory constraints."
+description: "Classic Arduino Uno board guide - ATmega328P, serial transport, memory constraints."
 ---
 
 # Arduino Uno R3
@@ -28,7 +28,7 @@ The classic Arduino Uno with the ATmega328P. The most widely available Arduino b
 
 ### Arduino IDE
 
-Select **Arduino Uno** from **Tools → Board → Arduino AVR Boards**. This board package comes pre-installed with the Arduino IDE — no extra setup needed.
+Select **Arduino Uno** from **Tools → Board → Arduino AVR Boards**. This board package comes pre-installed with the Arduino IDE - no extra setup needed.
 
 ### PlatformIO
 
@@ -89,8 +89,8 @@ To reduce the receive buffer:
 ```
 
 **Other tips:**
-- Avoid Arduino `String` objects — they fragment the heap. Use `char[]` arrays instead.
-- Don't use `Serial.print()` for debug output while CONDUYT is running — it shares the same UART.
+- Avoid Arduino `String` objects - they fragment the heap. Use `char[]` arrays instead.
+- Don't use `Serial.print()` for debug output while CONDUYT is running - it shares the same UART.
 - Compile with `build_flags = -Os` (PlatformIO default) for smallest binary size.
 
 ## Common issues

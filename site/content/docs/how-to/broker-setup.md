@@ -106,7 +106,7 @@ The broker requires authentication (`allow_anonymous false`). Create users for y
 # You'll be prompted to enter a password
 docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/passwd conduyt-device
 
-# Add a second user for host scripts (no -c flag — appends to existing file)
+# Add a second user for host scripts (no -c flag - appends to existing file)
 docker exec -it mosquitto mosquitto_passwd /mosquitto/config/passwd conduyt-host
 ```
 
@@ -120,13 +120,13 @@ docker compose restart
 
 Open **two terminals**.
 
-Terminal 1 — subscribe to a test topic:
+Terminal 1 - subscribe to a test topic:
 
 ```bash
 docker exec mosquitto mosquitto_sub -u conduyt-host -P yourpassword -t "test/#" -v
 ```
 
-Terminal 2 — publish a test message:
+Terminal 2 - publish a test message:
 
 ```bash
 docker exec mosquitto mosquitto_pub -u conduyt-device -P yourpassword -t "test/hello" -m "working"

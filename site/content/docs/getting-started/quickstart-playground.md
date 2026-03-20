@@ -1,6 +1,6 @@
 ---
 title: "Quick Start: Browser Playground"
-description: "Flash firmware and control a board from your browser — no installs required."
+description: "Flash firmware and control a board from your browser - no installs required."
 ---
 
 # Quick Start: Browser Playground
@@ -10,16 +10,16 @@ The [CONDUYT Playground](/playground) lets you flash firmware, write code, and c
 ## Prerequisites
 
 - A supported board: **ESP32**, **Arduino Uno R4**, or **Raspberry Pi Pico**
-- A USB data cable (not a charge-only cable — if your board doesn't show up, try a different cable)
-- **Chrome** or **Edge** desktop browser (WebSerial and WebUSB require a Chromium-based browser — Firefox and Safari will not work)
+- A USB data cable (not a charge-only cable - if your board doesn't show up, try a different cable)
+- **Chrome** or **Edge** desktop browser (WebSerial and WebUSB require a Chromium-based browser - Firefox and Safari will not work)
 
 ## 1. Open the Playground
 
 Navigate to [/playground](/playground). You'll see three panels:
 
-- **Code Editor** (left) — Monaco editor with autocomplete for the CONDUYT API
-- **Console** (top right) — output from `log()` calls in your code
-- **Device** (bottom right) — connection status, firmware name, and pin count
+- **Code Editor** (left) - Monaco editor with autocomplete for the CONDUYT API
+- **Console** (top right) - output from `log()` calls in your code
+- **Device** (bottom right) - connection status, firmware name, and pin count
 
 ## 2. Flash firmware onto your board
 
@@ -28,19 +28,19 @@ Click **Flash** in the toolbar. Pick your board below and follow the steps.
 ### ESP32
 
 1. Click **Install CONDUYT Firmware**
-2. Chrome will open a serial port picker — select your ESP32
+2. Chrome will open a serial port picker - select your ESP32
 3. Wait for the installer to finish (it handles bootloader, partitions, and firmware automatically)
 
 If the port picker is empty, try a different USB cable or port. Some ESP32 boards need you to hold the **BOOT** button during the first few seconds.
 
 ### Arduino Uno R4
 
-1. **Double-tap the RESET button** on the board quickly (two taps within ~500ms) — the "L" LED should start pulsing slowly, which means DFU mode is active
+1. **Double-tap the RESET button** on the board quickly (two taps within ~500ms) - the "L" LED should start pulsing slowly, which means DFU mode is active
 2. Click **Flash Arduino Uno R4**
-3. Chrome will prompt for a USB device — select the Arduino DFU device (not a serial port)
+3. Chrome will prompt for a USB device - select the Arduino DFU device (not a serial port)
 4. Wait for the progress bar to complete
 
-If the "L" LED doesn't pulse, you tapped too slowly. Try again — two quick taps.
+If the "L" LED doesn't pulse, you tapped too slowly. Try again - two quick taps.
 
 On Windows, you may need to install [WinUSB drivers via Zadig](https://zadig.akeo.ie/) if no DFU device appears. On macOS and Linux it works without drivers.
 
@@ -49,12 +49,12 @@ On Windows, you may need to install [WinUSB drivers via Zadig](https://zadig.ake
 1. **Unplug** the Pico from USB
 2. Hold the **BOOTSEL** button (the small white button on the board)
 3. While holding BOOTSEL, plug the USB cable in
-4. Release BOOTSEL — the Pico appears as a USB drive (like a flash drive)
+4. Release BOOTSEL - the Pico appears as a USB drive (like a flash drive)
 5. Click **Flash Raspberry Pi Pico** in the Playground
 
 ## 3. Connect to the board
 
-Close the flash panel. Click **Connect** in the toolbar. Chrome opens a serial port picker — select your board's port.
+Close the flash panel. Click **Connect** in the toolbar. Chrome opens a serial port picker - select your board's port.
 
 The Device panel should update to show:
 
@@ -121,7 +121,7 @@ log('Done!')
 
 The Playground gives you four globals:
 
-### `device` — board control
+### `device` - board control
 
 ```javascript
 await device.connect()                    // open connection (done automatically by Run)
@@ -132,7 +132,7 @@ await device.ping()                       // round-trip connectivity test
 await device.reset()                      // soft-reset the device
 ```
 
-### `conduyt` — low-level WASM protocol
+### `conduyt` - low-level WASM protocol
 
 ```javascript
 const CMD = conduyt.getCMD()                    // command type constants
@@ -141,14 +141,14 @@ const wire = conduyt.wireEncode(pkt)            // encode to wire format
 const cobs = conduyt.cobsEncode(wire)           // apply COBS framing
 ```
 
-### `log(...)` — print to the Console panel
+### `log(...)` - print to the Console panel
 
 ```javascript
 log('sensor value:', val)
 log({ temperature: 23.5, humidity: 51 })
 ```
 
-### `sleep(ms)` — async delay
+### `sleep(ms)` - async delay
 
 ```javascript
 await sleep(1000)  // wait 1 second
@@ -165,6 +165,6 @@ Type `device.` or `conduyt.` in the editor to see full autocomplete suggestions.
 
 ## Next steps
 
-- [Quick Start: Arduino IDE](/docs/getting-started/quickstart-arduino-ide) — set up a local dev environment with full toolchain
-- [Quick Start: PlatformIO](/docs/tutorials/first-blink) — advanced build system for multi-board projects
-- [WASM SDK](/docs/sdks/wasm) — use the protocol encoder/decoder in your own web apps
+- [Quick Start: Arduino IDE](/docs/getting-started/quickstart-arduino-ide) - set up a local dev environment with full toolchain
+- [Quick Start: PlatformIO](/docs/tutorials/first-blink) - advanced build system for multi-board projects
+- [WASM SDK](/docs/sdks/wasm) - use the protocol encoder/decoder in your own web apps

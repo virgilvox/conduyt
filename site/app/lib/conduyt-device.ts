@@ -1,5 +1,5 @@
 /**
- * ConduytDevice — high-level browser API for interacting with a CONDUYT board.
+ * ConduytDevice - high-level browser API for interacting with a CONDUYT board.
  * Wraps the serial composable + conduyt-wasm for a friendly device.pin(13).write(1) API.
  */
 

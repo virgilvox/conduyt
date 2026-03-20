@@ -1,6 +1,6 @@
 ---
 title: "Quick Start: Arduino IDE"
-description: "Install the Conduyt library, flash firmware, and blink an LED — all from the Arduino IDE."
+description: "Install the Conduyt library, flash firmware, and blink an LED - all from the Arduino IDE."
 ---
 
 # Quick Start: Arduino IDE
@@ -9,10 +9,10 @@ Flash CONDUYT firmware and blink an LED from a Node.js script in about 5 minutes
 
 ## Prerequisites
 
-- **An Arduino board** — Uno R3, Uno R4, ESP32, or any board supported by the Arduino IDE
-- **USB data cable** for your board (not charge-only — if the board doesn't show up, try a different cable)
+- **An Arduino board** - Uno R3, Uno R4, ESP32, or any board supported by the Arduino IDE
+- **USB data cable** for your board (not charge-only - if the board doesn't show up, try a different cable)
 - **[Arduino IDE 2](https://www.arduino.cc/en/software)** installed
-- **[Node.js 20+](https://nodejs.org/)** installed — verify with `node --version` in your terminal
+- **[Node.js 20+](https://nodejs.org/)** installed - verify with `node --version` in your terminal
 
 ## 1. Install the CONDUYT library
 
@@ -101,7 +101,7 @@ npm install conduyt-js
 
 ## 5. Blink the LED
 
-Create `blink.mjs` — replace `<YOUR_PORT>` with the port you found in step 3:
+Create `blink.mjs` - replace `<YOUR_PORT>` with the port you found in step 3:
 
 ```javascript
 // blink.mjs
@@ -157,7 +157,7 @@ You should see the LED on pin 13 blink 10 times.
 ## Troubleshooting
 
 **"Connection failed" or timeout:**
-- Make sure the Arduino IDE Serial Monitor is **closed** — only one process can use a serial port at a time
+- Make sure the Arduino IDE Serial Monitor is **closed** - only one process can use a serial port at a time
 - Verify the port path matches your board. Re-run `ls /dev/cu.usb*` (macOS) or check Device Manager (Windows)
 - Try pressing the RESET button on the board, wait a second, then run the script again
 
@@ -176,6 +176,6 @@ sudo usermod -aG dialout $USER
 
 ## Next steps
 
-- [Sensor Dashboard](/docs/tutorials/sensor-dashboard) — wire a DHT22 sensor and read temperature from Python
-- [Connect over BLE](/docs/how-to/connect-ble) — wireless control from a browser
-- [Playground](/playground) — write and run code directly in the browser
+- [Sensor Dashboard](/docs/tutorials/sensor-dashboard) - wire a DHT22 sensor and read temperature from Python
+- [Connect over BLE](/docs/how-to/connect-ble) - wireless control from a browser
+- [Playground](/playground) - write and run code directly in the browser

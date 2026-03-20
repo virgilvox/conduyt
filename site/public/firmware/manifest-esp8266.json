@@ -1,0 +1,13 @@
+{
+  "name": "CONDUYT Firmware (ESP8266)",
+  "version": "0.2.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        { "path": "conduyt-nodemcuv2.bin", "offset": 0 }
+      ]
+    }
+  ]
+}

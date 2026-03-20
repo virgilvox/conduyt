@@ -8,7 +8,7 @@ export const examples: PlaygroundExample[] = [
   {
     name: 'Blink',
     description: 'Toggle the built-in LED on and off',
-    code: `// Blink — toggle LED on pin 13 (built-in LED)
+    code: `// Blink - toggle LED on pin 13 (built-in LED)
 await device.connect()
 log('Connected:', device.capabilities.firmwareName)
 

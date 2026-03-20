@@ -11,9 +11,9 @@ This tutorial walks through flashing CONDUYT firmware with PlatformIO, connectin
 
 - **Arduino Uno** (or compatible board with LED on pin 13)
 - **USB cable** (Type-A to Type-B for Uno)
-- **Potentiometer** (any value, 10k ohm is common) — only needed for section 6
-- **Three jumper wires** — only needed for section 6
-- **[PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)** — install with:
+- **Potentiometer** (any value, 10k ohm is common) - only needed for section 6
+- **Three jumper wires** - only needed for section 6
+- **[PlatformIO CLI](https://docs.platformio.org/en/latest/core/installation/index.html)** - install with:
   ```bash
   pip install platformio
   ```
@@ -22,7 +22,7 @@ This tutorial walks through flashing CONDUYT firmware with PlatformIO, connectin
   pio --version
   # PlatformIO Core, version 6.x.x
   ```
-- **[Node.js 20+](https://nodejs.org/)** — verify with:
+- **[Node.js 20+](https://nodejs.org/)** - verify with:
   ```bash
   node --version
   # v20.x.x or higher
@@ -30,7 +30,7 @@ This tutorial walks through flashing CONDUYT firmware with PlatformIO, connectin
 
 ## 1. Create the PlatformIO project
 
-PlatformIO is a build system for embedded development. It downloads toolchains, board definitions, and libraries automatically — no Arduino IDE needed.
+PlatformIO is a build system for embedded development. It downloads toolchains, board definitions, and libraries automatically - no Arduino IDE needed.
 
 ```bash
 mkdir conduyt-blink && cd conduyt-blink
@@ -80,10 +80,10 @@ void loop() {
 
 What each line does:
 
-- `ConduytSerial transport(Serial, 115200)` — creates a serial transport at 115200 baud. Both the firmware and host must use the same baud rate.
-- `ConduytDevice device("MyBoard", "1.0.0", transport)` — creates the device. `"MyBoard"` is the name reported during the handshake. `"1.0.0"` is a version string.
-- `device.begin()` — initializes pin maps and prepares to respond to host connections.
-- `device.poll()` — checks for incoming packets and processes them. Called every loop iteration so the device responds with minimal latency.
+- `ConduytSerial transport(Serial, 115200)` - creates a serial transport at 115200 baud. Both the firmware and host must use the same baud rate.
+- `ConduytDevice device("MyBoard", "1.0.0", transport)` - creates the device. `"MyBoard"` is the name reported during the handshake. `"1.0.0"` is a version string.
+- `device.begin()` - initializes pin maps and prepares to respond to host connections.
+- `device.poll()` - checks for incoming packets and processes them. Called every loop iteration so the device responds with minimal latency.
 
 Now plug in your board and flash:
 
@@ -140,7 +140,7 @@ added 3 packages in 1.2s
 
 ## 5. Connect and inspect capabilities
 
-Create `blink.mjs` — replace `<YOUR_PORT>` with the port from step 3:
+Create `blink.mjs` - replace `<YOUR_PORT>` with the port from step 3:
 
 ```javascript
 // blink.mjs
@@ -304,15 +304,15 @@ A0 = 100
 
 Each step triggered specific binary packets over the serial link:
 
-1. **HELLO handshake** — `ConduytDevice.connect()` sent a HELLO packet. The firmware replied with HELLO_RESP containing its name, version, pin count, and module list.
-2. **PIN_MODE** — `pin(13).mode('output')` sent a PIN_MODE packet telling the firmware to configure pin 13 as digital output.
-3. **PIN_WRITE** — `pin(13).write(1)` sent a PIN_WRITE packet with pin=13 and value=1. The firmware set the hardware pin HIGH.
-4. **PIN_READ** — `pin(0).read()` sent a PIN_READ packet. The firmware performed the ADC conversion and returned the result.
+1. **HELLO handshake** - `ConduytDevice.connect()` sent a HELLO packet. The firmware replied with HELLO_RESP containing its name, version, pin count, and module list.
+2. **PIN_MODE** - `pin(13).mode('output')` sent a PIN_MODE packet telling the firmware to configure pin 13 as digital output.
+3. **PIN_WRITE** - `pin(13).write(1)` sent a PIN_WRITE packet with pin=13 and value=1. The firmware set the hardware pin HIGH.
+4. **PIN_READ** - `pin(0).read()` sent a PIN_READ packet. The firmware performed the ADC conversion and returned the result.
 
 All packets are binary-encoded with CRC8 checksums and COBS framing. The SDK and firmware handle this automatically.
 
 ## Next steps
 
-- [Sensor Dashboard](/docs/tutorials/sensor-dashboard) — wire a DHT22 sensor, use the module system, read from Python
-- [Connect over Serial](/docs/how-to/connect-serial) — serial setup for JavaScript, Python, and Go
-- [What is Conduyt?](/docs/tutorials/what-is-conduyt) — deep dive into protocol architecture and concepts
+- [Sensor Dashboard](/docs/tutorials/sensor-dashboard) - wire a DHT22 sensor, use the module system, read from Python
+- [Connect over Serial](/docs/how-to/connect-serial) - serial setup for JavaScript, Python, and Go
+- [What is Conduyt?](/docs/tutorials/what-is-conduyt) - deep dive into protocol architecture and concepts

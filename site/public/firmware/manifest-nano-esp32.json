@@ -1,0 +1,15 @@
+{
+  "name": "CONDUYT Firmware (Arduino Nano ESP32)",
+  "version": "0.2.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        { "path": "conduyt-nano-esp32-bootloader.bin", "offset": 0 },
+        { "path": "conduyt-nano-esp32-partitions.bin", "offset": 32768 },
+        { "path": "conduyt-nano-esp32.bin", "offset": 65536 }
+      ]
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 ---
 title: "Raspberry Pi Pico"
-description: "RP2040 Pico board guide — dual-core, PIO, USB serial transport."
+description: "RP2040 Pico board guide - dual-core, PIO, USB serial transport."
 ---
 
 # Raspberry Pi Pico
 
-The Raspberry Pi Pico features the RP2040 — a dual-core ARM Cortex-M0+ with generous RAM and the unique PIO (Programmable I/O) subsystem. Good for projects needing precise timing or multiple serial buses.
+The Raspberry Pi Pico features the RP2040 - a dual-core ARM Cortex-M0+ with generous RAM and the unique PIO (Programmable I/O) subsystem. Good for projects needing precise timing or multiple serial buses.
 
 ## Specs
 
@@ -73,7 +73,7 @@ void loop() {
 1. **Unplug** the Pico from USB
 2. Hold the **BOOTSEL** button (small white button on the board)
 3. **While holding BOOTSEL**, plug the USB cable into the Pico
-4. Release BOOTSEL — the Pico appears as a USB mass storage device (like a flash drive) named `RPI-RP2`
+4. Release BOOTSEL - the Pico appears as a USB mass storage device (like a flash drive) named `RPI-RP2`
 5. Go to the [Playground](/playground), click **Flash**, select **Raspberry Pi Pico**
 
 If the Pico doesn't appear as a drive, make sure you're holding BOOTSEL **before** plugging in, not after.

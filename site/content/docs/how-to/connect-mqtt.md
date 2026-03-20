@@ -5,12 +5,12 @@ description: Set up MQTT transport for networked Conduyt devices and host SDKs.
 
 # Connect over MQTT
 
-MQTT transport lets CONDUYT devices communicate over WiFi through a message broker. The device and host don't need to be on the same machine or even the same network — they just need access to the same broker.
+MQTT transport lets CONDUYT devices communicate over WiFi through a message broker. The device and host don't need to be on the same machine or even the same network - they just need access to the same broker.
 
 ## Prerequisites
 
 - An **ESP32** (or other WiFi-capable board)
-- A running **MQTT broker** — see [Set Up MQTT Broker](/docs/how-to/broker-setup) for a Docker Compose setup with Mosquitto. If you don't have Docker, you can install Mosquitto directly:
+- A running **MQTT broker** - see [Set Up MQTT Broker](/docs/how-to/broker-setup) for a Docker Compose setup with Mosquitto. If you don't have Docker, you can install Mosquitto directly:
   ```bash
   # Ubuntu/Debian
   sudo apt install mosquitto mosquitto-clients
@@ -24,7 +24,7 @@ MQTT transport lets CONDUYT devices communicate over WiFi through a message brok
 
 ## Firmware
 
-The firmware needs WiFi credentials and broker connection details. The `device-001` string is the **device ID** — it determines the MQTT topic prefix for this device. The host must use the same device ID to find it.
+The firmware needs WiFi credentials and broker connection details. The `device-001` string is the **device ID** - it determines the MQTT topic prefix for this device. The host must use the same device ID to find it.
 
 ```cpp
 #include <WiFi.h>
@@ -205,4 +205,4 @@ Host SDKs subscribe to the `status` topic and fire disconnect events automatical
 
 ## Framing
 
-MQTT is message-oriented — each MQTT publish is one complete CONDUYT packet. No COBS framing is applied. This differs from serial and BLE, which are byte streams and need COBS to delimit packets.
+MQTT is message-oriented - each MQTT publish is one complete CONDUYT packet. No COBS framing is applied. This differs from serial and BLE, which are byte streams and need COBS to delimit packets.

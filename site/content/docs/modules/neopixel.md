@@ -42,10 +42,10 @@ GND            ────► GND (connect Arduino GND + supply GND + strip GND
 ```
 
 **Recommended protection:**
-- **330 ohm resistor** on the data line (between pin and DIN) — prevents signal reflection
-- **1000 uF capacitor** across the power supply (+ to VCC, - to GND) — smooths power spikes on startup
+- **330 ohm resistor** on the data line (between pin and DIN) - prevents signal reflection
+- **1000 uF capacitor** across the power supply (+ to VCC, - to GND) - smooths power spikes on startup
 
-**Power math:** Each pixel draws up to 60 mA at full white. A 30-pixel strip can draw 1.8A — far more than an Arduino's 5V pin can supply. Use an external 5V power supply for anything over ~8 pixels.
+**Power math:** Each pixel draws up to 60 mA at full white. A 30-pixel strip can draw 1.8A - far more than an Arduino's 5V pin can supply. Use an external 5V power supply for anything over ~8 pixels.
 
 ## Host usage
 
