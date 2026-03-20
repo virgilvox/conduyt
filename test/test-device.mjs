@@ -189,6 +189,44 @@ describe('PIN operations', () => {
   });
 });
 
+describe('PIN_SUBSCRIBE', () => {
+  it('subscribes to analog pin with correct payload', async () => {
+    // Set pin A0 (14) to analog mode
+    await sendCommand(CMD.PIN_MODE, new Uint8Array([14, 0x03]));
+
+    // Subscribe: pin=14, mode=ANALOG_POLL(0x04), interval=200ms, threshold=0
+    const resp = await sendCommand(CMD.PIN_SUBSCRIBE, new Uint8Array([14, 0x04, 0xC8, 0x00, 0x00, 0x00]));
+    assert.equal(resp.type, EVT.ACK, `Expected ACK, got 0x${resp.type.toString(16)}`);
+
+    // Wait for events
+    const events = [];
+    const unsub = serial => {};
+    await new Promise(r => setTimeout(r, 600));
+
+    // Unsubscribe
+    const unsubResp = await sendCommand(CMD.PIN_UNSUBSCRIBE, new Uint8Array([14]));
+    assert.equal(unsubResp.type, EVT.ACK);
+  });
+
+  it('NAKs subscribe with too-short payload', async () => {
+    try {
+      await sendCommand(CMD.PIN_SUBSCRIBE, new Uint8Array([2, 0x01])); // only 2 bytes, need 5
+      assert.fail('Should have NAKed');
+    } catch (e) {
+      assert.ok(e.message.includes('NAK'), `Expected NAK, got: ${e.message}`);
+    }
+  });
+
+  it('unsubscribe NAKs for non-subscribed pin', async () => {
+    try {
+      await sendCommand(CMD.PIN_UNSUBSCRIBE, new Uint8Array([99]));
+      assert.fail('Should have NAKed');
+    } catch (e) {
+      assert.ok(e.message.includes('NAK'), `Expected NAK, got: ${e.message}`);
+    }
+  });
+});
+
 describe('error handling', () => {
   it('short PIN_MODE payload NAKs', async () => {
     try {

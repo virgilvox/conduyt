@@ -140,6 +140,20 @@ export class ConduytDevice {
         if (p.length >= 3) return p[1] | (p[2] << 8)
         return 0
       },
+      async subscribe(opts: { mode?: number, intervalMs?: number, threshold?: number } = {}): Promise<() => void> {
+        const mode = opts.mode ?? 0x04 // ANALOG_POLL default
+        const interval = opts.intervalMs ?? 100
+        const threshold = opts.threshold ?? 0
+        const payload = new Uint8Array([
+          pinNum, mode,
+          interval & 0xFF, (interval >> 8) & 0xFF,
+          threshold & 0xFF, (threshold >> 8) & 0xFF,
+        ])
+        await self.sendCommand(CMD.PIN_SUBSCRIBE, payload)
+        return async () => {
+          await self.sendCommand(CMD.PIN_UNSUBSCRIBE, new Uint8Array([pinNum]))
+        }
+      },
     }
   }
 

@@ -95,6 +95,7 @@ declare const device: {
     mode(m: 'input' | 'output' | 'pwm' | 'analog' | 'input_pullup'): Promise<void>;
     write(value: number): Promise<void>;
     read(): Promise<number>;
+    subscribe(opts?: { mode?: number; intervalMs?: number; threshold?: number }): Promise<() => Promise<void>>;
   };
   onEvent(handler: (pkt: ConduytPacket) => void): () => void;
 };
