@@ -19,8 +19,14 @@ jobs:
             name: Arduino Uno R3
           - board: uno_r4_minima
             name: Arduino Uno R4 Minima
+          - board: nodemcuv2
+            name: NodeMCU v2
+          - board: nrf52840_dk
+            name: nRF52840 DK
           - board: pico
             name: Raspberry Pi Pico
+          - board: teensy41
+            name: Teensy 4.1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4

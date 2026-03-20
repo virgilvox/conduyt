@@ -17,3 +17,9 @@ coverage/
 sdk/rust/target/
 sdk/wasm/target/
 sdk/wasm/pkg/
+__pycache__/
+*.pyc
+*.sqlite
+test/node_modules/
+test/package-lock.json
+*.zip

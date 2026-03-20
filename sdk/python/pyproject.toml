@@ -1,6 +1,6 @@
 [project]
 name = "conduyt-py"
-version = "0.1.0"
+version = "0.2.0"
 description = "CONDUYT protocol SDK for Python — host-side hardware control"
 readme = "README.md"
 license = {text = "MIT"}

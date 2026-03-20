@@ -20,8 +20,14 @@ jobs:
             name: uno-r3
           - board: uno_r4_minima
             name: uno-r4-minima
+          - board: nodemcuv2
+            name: nodemcuv2
+          - board: nrf52840_dk
+            name: nrf52840-dk
           - board: pico
             name: pico
+          - board: teensy41
+            name: teensy41
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -38,7 +44,6 @@ jobs:
       - name: Collect binaries
         run: |
           mkdir -p release-artifacts
-          # Find all firmware binaries and copy with board-prefixed names
           find firmware/.pio/ci-build -name "firmware.*" | while read f; do
             ext="${f##*.}"
             cp "$f" "release-artifacts/conduyt-${{ matrix.name }}.${ext}"
@@ -57,7 +62,10 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           mkdir -p Conduyt
-          cp -r firmware/src firmware/examples firmware/library.properties firmware/library.json Conduyt/
+          cp -r firmware/src firmware/examples Conduyt/
+          cp firmware/library.properties firmware/library.json Conduyt/
+          cp LICENSE Conduyt/ 2>/dev/null || true
+          cp README.md Conduyt/ 2>/dev/null || true
           zip -r "Conduyt-${VERSION}.zip" Conduyt/
           echo "ZIP_NAME=Conduyt-${VERSION}.zip" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v4
@@ -65,23 +73,12 @@ jobs:
           name: library-zip
           path: "*.zip"
 
-  build-wasm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - name: Build WASM
-        working-directory: sdk/wasm
-        run: wasm-pack build --target web --release --out-dir pkg
-      - name: Publish conduyt-wasm to npm
-        working-directory: sdk/wasm/pkg
-        run: npm publish --access public || echo "Version already published"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  # Package publishing is done manually in this order:
+  # 1. cargo publish (sdk/rust) — crates.io
+  # 2. wasm-pack build + npm publish (sdk/wasm/pkg) — npm
+  # 3. npm publish (sdk/js) — npm
+  # 4. python -m build + twine upload (sdk/python) — PyPI
+  # Go module is published automatically via git tag on proxy.golang.org
 
   create-release:
     needs: [build-firmware, build-library-zip]
