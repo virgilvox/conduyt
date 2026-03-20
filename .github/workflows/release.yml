@@ -42,20 +42,22 @@ jobs:
         working-directory: firmware
         run: pio ci --board=${{ matrix.board }} examples/BasicBlink/BasicBlink.ino --lib=src --build-dir=.pio/ci-build
       - name: Collect binaries
+        working-directory: firmware
         run: |
-          mkdir -p release-artifacts
-          find firmware/.pio -name "firmware.*" -not -name "*.o" -not -name "*.d" | while read f; do
+          mkdir -p ../release-artifacts
+          find .pio -name "firmware.*" -not -name "*.o" -not -name "*.d" | while read f; do
             ext="${f##*.}"
-            cp "$f" "release-artifacts/conduyt-${{ matrix.name }}.${ext}"
+            cp "$f" "../release-artifacts/conduyt-${{ matrix.name }}.${ext}"
           done
           # Also grab ESP32 bootloader/partitions if present
-          find firmware/.pio -name "bootloader.bin" -exec cp {} "release-artifacts/conduyt-${{ matrix.name }}-bootloader.bin" \; 2>/dev/null || true
-          find firmware/.pio -name "partitions.bin" -exec cp {} "release-artifacts/conduyt-${{ matrix.name }}-partitions.bin" \; 2>/dev/null || true
-          ls -la release-artifacts/
+          find .pio -name "bootloader.bin" -exec cp {} "../release-artifacts/conduyt-${{ matrix.name }}-bootloader.bin" \; 2>/dev/null || true
+          find .pio -name "partitions.bin" -exec cp {} "../release-artifacts/conduyt-${{ matrix.name }}-partitions.bin" \; 2>/dev/null || true
+          ls -la ../release-artifacts/
       - uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ matrix.name }}
           path: release-artifacts/
+          if-no-files-found: warn
 
   build-library-zip:
     runs-on: ubuntu-latest
