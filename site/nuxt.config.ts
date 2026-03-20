@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['~/assets/css/graft-theme.css'],
+  css: ['~/assets/css/conduyt-theme.css'],
 
   vite: {
     optimizeDeps: {
