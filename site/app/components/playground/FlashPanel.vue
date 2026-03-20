@@ -176,11 +176,9 @@ async function flashDFU() {
 
     // Write firmware — WebDFUProcessWrite is event-based, not a Promise
     const transferSize = dfu.properties?.TransferSize || 1024
-    const firmwareView = new DataView(firmwareData)
-    const totalSize = firmwareData.byteLength
 
     await new Promise<void>((resolve, reject) => {
-      const process = dfu.write(transferSize, firmwareView, true)
+      const process = dfu.write(transferSize, firmwareData, true)
 
       process.events.on('erase/start', () => {
         flashProgress.value = 0
