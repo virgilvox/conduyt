@@ -1,6 +1,6 @@
 {
   "name": "conduyt-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CONDUYT protocol SDK for JavaScript/TypeScript — host-side hardware control",
   "type": "module",
   "license": "MIT",
