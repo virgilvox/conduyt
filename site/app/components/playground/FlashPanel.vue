@@ -290,6 +290,16 @@ const boardFamilies: BoardFamily[] = [
         notes: 'Double-tap RESET to enter DFU mode, then click Flash. Uses WebUSB.',
       },
       {
+        id: 'uno_r2',
+        name: 'Uno R2',
+        chip: 'ATmega328P 16 MHz',
+        flashMethod: 'stk500',
+        firmwareReady: true,
+        firmwarePath: `${FIRMWARE_BASE}/conduyt-uno-r3.hex`,
+        firmwareFile: 'conduyt-uno-r3.hex',
+        notes: 'Same ATmega328P as the R3. Uses WebSerial with STK500 protocol (alpha).',
+      },
+      {
         id: 'uno_r3',
         name: 'Uno R3',
         chip: 'ATmega328P 16 MHz',
