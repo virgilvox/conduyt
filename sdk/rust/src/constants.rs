@@ -40,6 +40,13 @@ pub const EVT_DS_READ_RESP: u8 = 0xD2;
 pub const EVT_LOG: u8 = 0xE0;
 pub const EVT_FATAL: u8 = 0xFF;
 
+// Pin Modes
+pub const PIN_MODE_INPUT: u8 = 0x00;
+pub const PIN_MODE_OUTPUT: u8 = 0x01;
+pub const PIN_MODE_PWM: u8 = 0x02;
+pub const PIN_MODE_ANALOG: u8 = 0x03;
+pub const PIN_MODE_INPUT_PULLUP: u8 = 0x04;
+
 // NAK Error Codes
 pub const ERR_UNKNOWN_TYPE: u8 = 0x01;
 pub const ERR_CRC_MISMATCH: u8 = 0x02;

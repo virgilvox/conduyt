@@ -49,7 +49,7 @@ class ConduytDevice:
     async def reset(self) -> None:
         await self._send_command(CMD.RESET)
 
-    def pin(self, num: int) -> _PinProxy:
+    def pin(self, num: "int | str") -> _PinProxy:
         return _PinProxy(self, num)
 
     async def _send_command(self, cmd_type: int, payload: bytes = b"") -> bytes:
@@ -119,15 +119,30 @@ class ConduytDevice:
 
 
 class _PinProxy:
-    def __init__(self, device: ConduytDevice, pin: int) -> None:
+    """Pin proxy supporting numeric pins (0, 14) and analog names ('A0'-'A15')."""
+
+    def __init__(self, device: ConduytDevice, pin: int | str) -> None:
         self._device = device
-        self._pin = pin
+        self._is_analog = False
+
+        if isinstance(pin, str):
+            import re
+            m = re.match(r'^A(\d+)$', pin, re.IGNORECASE)
+            if m:
+                self._pin = int(m.group(1))
+                self._is_analog = True
+            else:
+                self._pin = int(pin)
+        else:
+            self._pin = pin
 
     async def mode(self, mode: str) -> "_PinProxy":
         modes = {"input": 0, "output": 1, "pwm": 2, "analog": 3, "input_pullup": 4}
         code = modes.get(mode)
         if code is None:
             raise ValueError(f"Unknown pin mode: {mode}")
+        if mode == "analog":
+            self._is_analog = True
         await self._device._send_command(CMD.PIN_MODE, bytes([self._pin, code]))
         return self
 
@@ -135,7 +150,26 @@ class _PinProxy:
         await self._device._send_command(CMD.PIN_WRITE, bytes([self._pin, value & 0xFF]))
 
     async def read(self) -> int:
-        resp = await self._device._send_command(CMD.PIN_READ, bytes([self._pin]))
+        """Read pin value. Uses analog mode if pin was created with 'A0' name or mode('analog')."""
+        if self._is_analog:
+            payload = bytes([self._pin, 0x03])  # ANALOG mode
+        else:
+            payload = bytes([self._pin])  # use stored mode on firmware
+        resp = await self._device._send_command(CMD.PIN_READ, payload)
+        if len(resp) >= 3:
+            return resp[1] | (resp[2] << 8)
+        return 0
+
+    async def analog_read(self) -> int:
+        """Explicitly read analog value (0-1023 for 10-bit ADC)."""
+        resp = await self._device._send_command(CMD.PIN_READ, bytes([self._pin, 0x03]))
+        if len(resp) >= 3:
+            return resp[1] | (resp[2] << 8)
+        return 0
+
+    async def digital_read(self) -> int:
+        """Explicitly read digital value (0 or 1)."""
+        resp = await self._device._send_command(CMD.PIN_READ, bytes([self._pin, 0x00]))
         if len(resp) >= 3:
             return resp[1] | (resp[2] << 8)
         return 0

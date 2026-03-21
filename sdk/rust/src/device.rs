@@ -77,9 +77,32 @@ impl<T: Transport> Device<T> {
         Ok(())
     }
 
-    /// Read a pin value.
+    /// Read a pin value using the mode stored on the firmware
+    /// (set via `pin_mode`). Defaults to digital if no mode was set.
     pub fn pin_read(&mut self, pin: u8) -> Result<u16, DeviceError<T::Error>> {
         let resp = self.send_command(CMD_PIN_READ, &[pin])?;
+        if resp.payload.len() >= 3 {
+            Ok(u16::from_le_bytes([resp.payload[1], resp.payload[2]]))
+        } else {
+            Ok(0)
+        }
+    }
+
+    /// Read analog value (0-1023 for 10-bit ADC).
+    /// Sends the ANALOG mode byte so the firmware calls analogRead().
+    pub fn analog_read(&mut self, pin: u8) -> Result<u16, DeviceError<T::Error>> {
+        let resp = self.send_command(CMD_PIN_READ, &[pin, PIN_MODE_ANALOG])?;
+        if resp.payload.len() >= 3 {
+            Ok(u16::from_le_bytes([resp.payload[1], resp.payload[2]]))
+        } else {
+            Ok(0)
+        }
+    }
+
+    /// Read digital value (0 or 1).
+    /// Sends the INPUT mode byte so the firmware calls digitalRead().
+    pub fn digital_read(&mut self, pin: u8) -> Result<u16, DeviceError<T::Error>> {
+        let resp = self.send_command(CMD_PIN_READ, &[pin, PIN_MODE_INPUT])?;
         if resp.payload.len() >= 3 {
             Ok(u16::from_le_bytes([resp.payload[1], resp.payload[2]]))
         } else {

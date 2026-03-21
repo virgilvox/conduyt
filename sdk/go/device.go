@@ -3,6 +3,8 @@ package conduyt
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -81,6 +83,21 @@ func (d *Device) Reset(ctx context.Context) error {
 // Pin returns a PinProxy for the given pin number.
 func (d *Device) Pin(n byte) *PinProxy {
 	return &PinProxy{device: d, pin: n}
+}
+
+// PinByName returns a PinProxy from a name like "A0", "A5", or "13".
+// Analog names (A0-A15) auto-set the proxy to analog mode.
+func (d *Device) PinByName(name string) (*PinProxy, error) {
+	m := analogPinRe.FindStringSubmatch(name)
+	if m != nil {
+		n, _ := strconv.Atoi(m[1])
+		return &PinProxy{device: d, pin: byte(n), isAnalog: true}, nil
+	}
+	n, err := strconv.Atoi(strings.TrimSpace(name))
+	if err != nil {
+		return nil, fmt.Errorf("invalid pin name: %q", name)
+	}
+	return &PinProxy{device: d, pin: byte(n)}, nil
 }
 
 // Capabilities returns the parsed HELLO_RESP, or nil if not connected.

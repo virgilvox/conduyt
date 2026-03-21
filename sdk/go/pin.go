@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"regexp"
 )
 
 // PinMode constants.
@@ -15,14 +16,20 @@ const (
 	PinModeInputPullup = 0x04
 )
 
+var analogPinRe = regexp.MustCompile(`(?i)^A(\d+)$`)
+
 // PinProxy provides pin-level control.
 type PinProxy struct {
-	device *Device
-	pin    byte
+	device   *Device
+	pin      byte
+	isAnalog bool
 }
 
 // Mode sets the pin mode.
 func (p *PinProxy) Mode(ctx context.Context, mode byte) error {
+	if mode == PinModeAnalog {
+		p.isAnalog = true
+	}
 	_, err := p.device.sendCommand(ctx, CmdPinMode, []byte{p.pin, mode})
 	return err
 }
@@ -33,9 +40,30 @@ func (p *PinProxy) Write(ctx context.Context, value byte) error {
 	return err
 }
 
-// Read reads the pin value (16-bit).
+// Read reads the pin value. Uses analog mode if pin was created with "A0" name
+// or Mode(PinModeAnalog) was called.
 func (p *PinProxy) Read(ctx context.Context) (uint16, error) {
-	resp, err := p.device.sendCommand(ctx, CmdPinRead, []byte{p.pin})
+	var payload []byte
+	if p.isAnalog {
+		payload = []byte{p.pin, PinModeAnalog}
+	} else {
+		payload = []byte{p.pin}
+	}
+	return p.readWith(ctx, payload)
+}
+
+// AnalogRead explicitly reads the analog value (0-1023 for 10-bit ADC).
+func (p *PinProxy) AnalogRead(ctx context.Context) (uint16, error) {
+	return p.readWith(ctx, []byte{p.pin, PinModeAnalog})
+}
+
+// DigitalRead explicitly reads the digital value (0 or 1).
+func (p *PinProxy) DigitalRead(ctx context.Context) (uint16, error) {
+	return p.readWith(ctx, []byte{p.pin, PinModeInput})
+}
+
+func (p *PinProxy) readWith(ctx context.Context, payload []byte) (uint16, error) {
+	resp, err := p.device.sendCommand(ctx, CmdPinRead, payload)
 	if err != nil {
 		return 0, err
 	}
