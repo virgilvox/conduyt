@@ -89,12 +89,16 @@
         <!-- WebSerial STK500 (AVR boards) -->
         <div v-else-if="activeVariant.flashMethod === 'stk500'" class="avr-flash">
           <button class="flash-btn" @click="flashSTK500" :disabled="flashing || !activeVariant.firmwareReady">
-            {{ flashing ? 'Flashing...' : `Flash ${activeVariant.name}` }}
+            {{ flashing ? flashPhase : `Flash ${activeVariant.name}` }}
           </button>
           <p class="flash-note">
             {{ activeVariant.notes || 'Uses WebSerial with STK500 protocol. Chrome or Edge required.' }}
             <span v-if="!activeVariant.firmwareReady" class="coming-soon">Firmware binary coming soon.</span>
           </p>
+          <div v-if="flashProgress > 0 && flashing" class="flash-progress">
+            <div class="flash-progress-bar" :style="{ width: flashProgress + '%' }" />
+            <span class="flash-progress-text">{{ flashProgress }}%</span>
+          </div>
         </div>
 
         <!-- UF2 / PICOBOOT -->
@@ -141,6 +145,8 @@
 </template>
 
 <script setup lang="ts">
+import { flashSTK500v1, flashSTK500v2 } from '~/utils/avr-flash'
+
 defineEmits<{ close: [] }>()
 
 // Register esp-web-install-button custom element (client-side only)
@@ -152,6 +158,7 @@ const flashing = ref(false)
 const flashError = ref('')
 const flashSuccess = ref(false)
 const flashProgress = ref(0)
+const flashPhase = ref('Flashing...')
 
 const FIRMWARE_BASE = '/firmware'
 const manifestUrl = '/firmware/manifest.json'
@@ -333,11 +340,11 @@ const boardFamilies: BoardFamily[] = [
         id: 'nano_every',
         name: 'Nano Every',
         chip: 'ATmega4809 20 MHz',
-        flashMethod: 'stk500',
+        flashMethod: 'hex',
         firmwareReady: true,
         firmwarePath: `${FIRMWARE_BASE}/conduyt-nano-every.hex`,
         firmwareFile: 'conduyt-nano-every.hex',
-        notes: 'Upgraded Nano with more memory. Uses WebSerial.',
+        notes: 'Download HEX and flash with Arduino IDE. Uses JTAG2UPDI bootloader (not STK500).',
       },
       {
         id: 'nano_esp32',
@@ -673,16 +680,36 @@ async function flashDFU() {
 }
 
 async function flashSTK500() {
+  if (!activeVariant.value?.firmwareReady || !activeVariant.value.firmwarePath) return
   flashing.value = true
   flashError.value = ''
   flashSuccess.value = false
+  flashProgress.value = 0
+  flashPhase.value = 'Fetching firmware...'
+
   try {
-    if (!activeVariant.value?.firmwareReady) {
-      flashError.value = `${activeVariant.value?.name || 'Board'} firmware binary not yet available.`
+    const resp = await fetch(activeVariant.value.firmwarePath)
+    if (!resp.ok) throw new Error(`Firmware not found at ${activeVariant.value.firmwarePath}`)
+    const hexData = await resp.text()
+
+    const onProgress = (p: { phase: string; percent: number }) => {
+      flashPhase.value = p.phase
+      flashProgress.value = p.percent
+    }
+
+    const chip = activeVariant.value.chip.toLowerCase()
+    if (chip.includes('atmega2560')) {
+      await flashSTK500v2(hexData, 256, onProgress)
+    } else {
+      await flashSTK500v1(hexData, 128, onProgress)
+    }
+
+    flashSuccess.value = true
+  } catch (e: any) {
+    if (e.name === 'NotFoundError') {
+      // User cancelled port selection
       return
     }
-    flashError.value = `STK500 web flashing for ${activeVariant.value.name} is in alpha. Use Arduino IDE for now.`
-  } catch (e: any) {
     flashError.value = e.message || 'Flash failed'
   } finally {
     flashing.value = false
