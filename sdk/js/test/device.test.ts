@@ -150,6 +150,52 @@ describe('ConduytDevice', () => {
     expect(value).toBe(512)
   })
 
+  it('analogRead sends mode byte 0x03', async () => {
+    transport.send = async (packet: Uint8Array) => {
+      transport.sentPackets.push(new Uint8Array(packet))
+      try {
+        const decoded = wireDecode(packet)
+        if (decoded.type === CMD.HELLO) {
+          transport.inject(wireEncode(makePacket(EVT.HELLO_RESP, decoded.seq, makeHelloRespPayload())))
+        } else if (decoded.type === CMD.PIN_READ) {
+          // Verify the mode byte is present and is ANALOG (0x03)
+          expect(decoded.payload.length).toBeGreaterThanOrEqual(2)
+          expect(decoded.payload[1]).toBe(0x03) // ANALOG mode
+          const resp = wireEncode(makePacket(EVT.PIN_READ_RESP, decoded.seq, new Uint8Array([0, 0xAB, 0x01])))
+          transport.inject(resp)
+        } else {
+          transport.inject(wireEncode(makePacket(EVT.ACK, decoded.seq)))
+        }
+      } catch { /* ignore */ }
+    }
+
+    const device = await ConduytDevice.connect(transport)
+    const value = await device.pin(0).analogRead()
+    expect(value).toBe(0x01AB) // 427 in decimal
+  })
+
+  it('pin("A0") auto-sets analog mode', async () => {
+    transport.send = async (packet: Uint8Array) => {
+      transport.sentPackets.push(new Uint8Array(packet))
+      try {
+        const decoded = wireDecode(packet)
+        if (decoded.type === CMD.HELLO) {
+          transport.inject(wireEncode(makePacket(EVT.HELLO_RESP, decoded.seq, makeHelloRespPayload())))
+        } else if (decoded.type === CMD.PIN_READ) {
+          expect(decoded.payload[1]).toBe(0x03) // ANALOG mode from 'A0' name
+          const resp = wireEncode(makePacket(EVT.PIN_READ_RESP, decoded.seq, new Uint8Array([0, 0xC8, 0x00])))
+          transport.inject(resp)
+        } else {
+          transport.inject(wireEncode(makePacket(EVT.ACK, decoded.seq)))
+        }
+      } catch { /* ignore */ }
+    }
+
+    const device = await ConduytDevice.connect(transport)
+    const value = await device.pin('A0').read()
+    expect(value).toBe(200) // 0x00C8
+  })
+
   it('sends module command', async () => {
     const device = await ConduytDevice.connect(transport)
     const servo = device.module('servo')

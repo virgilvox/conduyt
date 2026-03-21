@@ -28,6 +28,7 @@ ConduytDevice::ConduytDevice(const char *name, const char *version, ConduytTrans
     memset(_modules, 0, sizeof(_modules));
     memset(_datastreams, 0, sizeof(_datastreams));
     memset(_subs, 0, sizeof(_subs));
+    memset(_pinModes, CONDUYT_PIN_MODE_INPUT, sizeof(_pinModes));
 }
 
 void ConduytDevice::parseVersion(const char *version) {
@@ -301,6 +302,7 @@ void ConduytDevice::handlePinMode(const ConduytPacket &pkt) {
             sendNak(pkt.seq, CONDUYT_ERR_PIN_MODE_UNSUPPORTED);
             return;
     }
+    if (pin < sizeof(_pinModes)) _pinModes[pin] = mode;
     sendAck(pkt.seq);
 #else
     sendAck(pkt.seq);
@@ -341,7 +343,16 @@ void ConduytDevice::handlePinRead(const ConduytPacket &pkt) {
     if (pkt.payload_len < 1) { sendNak(pkt.seq, CONDUYT_ERR_INVALID_PIN); return; }
     ConduytPayloadReader r(pkt.payload, pkt.payload_len);
     uint8_t pin = r.readUInt8();
-    uint8_t mode = (pkt.payload_len >= 2) ? r.readUInt8() : CONDUYT_PIN_MODE_INPUT;
+
+    /* Mode priority: explicit byte in packet > stored from prior PIN_MODE > INPUT */
+    uint8_t mode;
+    if (pkt.payload_len >= 2) {
+        mode = r.readUInt8();
+    } else if (pin < sizeof(_pinModes)) {
+        mode = _pinModes[pin];
+    } else {
+        mode = CONDUYT_PIN_MODE_INPUT;
+    }
 
     uint8_t respBuf[4];
     ConduytPayloadWriter w(respBuf, sizeof(respBuf));

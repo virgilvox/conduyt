@@ -135,6 +135,9 @@ private:
     ConduytSubscriptionEntry _subs[CONDUYT_MAX_SUBSCRIPTIONS];
     uint8_t _subCount;
 
+    /* ── Pin mode tracking (for reads without explicit mode) ──── */
+    uint8_t _pinModes[70]; /* up to 70 pins — covers Mega 2560's 54 digital + 16 analog */
+
     /* ── Buffers ──── */
     uint8_t _rxBuf[CONDUYT_PACKET_BUF_SIZE + CONDUYT_HEADER_SIZE];
     size_t  _rxLen;

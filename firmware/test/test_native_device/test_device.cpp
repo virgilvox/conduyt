@@ -504,6 +504,30 @@ void test_pin_write_payload_too_short_naks() { ConduytDevice device("FW", "1.0.0
 void test_pin_read_digital() { ConduytDevice device("FW", "1.0.0", transport); device.begin(); transport.clearWrite(); uint8_t payload[] = {7}; feedCommand(CONDUYT_CMD_PIN_READ, 6, payload, 1); device.poll(); ConduytPacket resp; decodeResponse(&resp); TEST_ASSERT_EQUAL(CONDUYT_EVT_PIN_READ_RESP, resp.type); TEST_ASSERT_EQUAL(6, resp.seq); TEST_ASSERT_EQUAL(7, resp.payload[0]); uint16_t value = resp.payload[1] | (resp.payload[2] << 8); TEST_ASSERT_EQUAL(1, value); }
 void test_pin_read_digital_returns_uint16() { ConduytDevice device("FW", "1.0.0", transport); device.begin(); transport.clearWrite(); uint8_t payload[] = {7}; feedCommand(CONDUYT_CMD_PIN_READ, 6, payload, 1); device.poll(); ConduytPacket resp; decodeResponse(&resp); uint16_t value = resp.payload[1] | (resp.payload[2] << 8); TEST_ASSERT_EQUAL(1, value); TEST_ASSERT_EQUAL(3, resp.payload_len); }
 void test_pin_read_analog() { ConduytDevice device("FW", "1.0.0", transport); device.begin(); transport.clearWrite(); uint8_t payload[] = {0, CONDUYT_PIN_MODE_ANALOG}; feedCommand(CONDUYT_CMD_PIN_READ, 7, payload, 2); device.poll(); ConduytPacket resp; decodeResponse(&resp); TEST_ASSERT_EQUAL(CONDUYT_EVT_PIN_READ_RESP, resp.type); uint16_t value = resp.payload[1] | (resp.payload[2] << 8); TEST_ASSERT_EQUAL(512, value); }
+void test_pin_read_uses_stored_mode() {
+    /* Set pin 0 to ANALOG mode, then read without explicit mode byte —
+       firmware should remember and call analogRead. */
+    ConduytDevice device("FW", "1.0.0", transport);
+    device.begin();
+
+    /* Step 1: PIN_MODE pin 0 → ANALOG */
+    uint8_t modePayload[] = {0, CONDUYT_PIN_MODE_ANALOG};
+    feedCommand(CONDUYT_CMD_PIN_MODE, 20, modePayload, 2);
+    device.poll();
+    transport.clearWrite();
+
+    /* Step 2: PIN_READ pin 0 with NO mode byte */
+    uint8_t readPayload[] = {0};
+    feedCommand(CONDUYT_CMD_PIN_READ, 21, readPayload, 1);
+    device.poll();
+
+    ConduytPacket resp;
+    decodeResponse(&resp);
+    TEST_ASSERT_EQUAL(CONDUYT_EVT_PIN_READ_RESP, resp.type);
+    uint16_t value = resp.payload[1] | (resp.payload[2] << 8);
+    /* Should return analogRead value (512 from ArduinoFake mock), not digitalRead (0 or 1) */
+    TEST_ASSERT_EQUAL(512, value);
+}
 void test_pin_read_empty_payload_naks() { ConduytDevice device("FW", "1.0.0", transport); device.begin(); transport.clearWrite(); feedCommand(CONDUYT_CMD_PIN_READ, 8); device.poll(); ConduytPacket resp; decodeResponse(&resp); TEST_ASSERT_EQUAL(CONDUYT_EVT_NAK, resp.type); }
 
 void test_mod_cmd_dispatches_to_module() { TestModule mod; ConduytDevice device("FW", "1.0.0", transport); device.addModule(&mod); device.begin(); transport.clearWrite(); uint8_t payload[] = {0, 0x02, 0xAA}; feedCommand(CONDUYT_CMD_MOD_CMD, 8, payload, 3); device.poll(); TEST_ASSERT_EQUAL(1, mod.handleCallCount); TEST_ASSERT_EQUAL(0x02, mod.lastCmd); TEST_ASSERT_EQUAL(0xAA, mod.lastPayloadByte); }
@@ -588,6 +612,7 @@ int main(int argc, char **argv) {
     RUN_TEST(test_pin_read_digital);
     RUN_TEST(test_pin_read_digital_returns_uint16);
     RUN_TEST(test_pin_read_analog);
+    RUN_TEST(test_pin_read_uses_stored_mode);
     RUN_TEST(test_pin_read_empty_payload_naks);
     RUN_TEST(test_mod_cmd_dispatches_to_module);
     RUN_TEST(test_mod_cmd_mod_resp_suppresses_auto_ack);

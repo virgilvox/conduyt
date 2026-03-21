@@ -72,8 +72,30 @@ export class ConduytDevice {
 
   // ── Pin API ────────────────────────────────────────────
 
-  /** Get a pin proxy for the given pin number. */
-  pin(num: number) {
+  /**
+   * Get a pin proxy for the given pin number or name.
+   * Accepts numeric pin (0, 14) or analog name ('A0'-'A15').
+   */
+  pin(id: number | string) {
+    let num: number
+    let isAnalog = false
+
+    if (typeof id === 'string') {
+      const m = id.match(/^A(\d+)$/i)
+      if (m) {
+        // 'A0' → analog channel 0, 'A5' → analog channel 5, etc.
+        // On Uno A0=14, but analogRead(0) and analogRead(14) both work.
+        // We send the channel number and set analog mode.
+        num = parseInt(m[1], 10)
+        isAnalog = true
+      } else {
+        num = parseInt(id, 10)
+        if (isNaN(num)) throw new Error(`Invalid pin: ${id}`)
+      }
+    } else {
+      num = id
+    }
+
     return {
       mode: async (mode: string) => {
         const modeMap: Record<string, number> = {
@@ -81,6 +103,7 @@ export class ConduytDevice {
         }
         const modeCode = modeMap[mode]
         if (modeCode === undefined) throw new Error(`Unknown pin mode: ${mode}`)
+        if (mode === 'analog') isAnalog = true
         await this._sendCommand(CMD.PIN_MODE, new Uint8Array([num, modeCode]))
       },
 
@@ -88,9 +111,30 @@ export class ConduytDevice {
         await this._sendCommand(CMD.PIN_WRITE, new Uint8Array([num, value & 0xFF]))
       },
 
+      /** Read pin value. Uses the mode set via mode() or pin name (A0 = analog). */
       read: async (): Promise<number> => {
-        const resp = await this._sendCommand(CMD.PIN_READ, new Uint8Array([num]))
-        // Response: pin(1) + value(2 LE)
+        const payload = isAnalog
+          ? new Uint8Array([num, 0x03]) // ANALOG mode
+          : new Uint8Array([num])       // use stored mode on firmware
+        const resp = await this._sendCommand(CMD.PIN_READ, payload)
+        if (resp.length >= 3) {
+          return resp[1] | (resp[2] << 8)
+        }
+        return 0
+      },
+
+      /** Explicitly read analog value (0-1023 for 10-bit ADC). */
+      analogRead: async (): Promise<number> => {
+        const resp = await this._sendCommand(CMD.PIN_READ, new Uint8Array([num, 0x03]))
+        if (resp.length >= 3) {
+          return resp[1] | (resp[2] << 8)
+        }
+        return 0
+      },
+
+      /** Explicitly read digital value (0 or 1). */
+      digitalRead: async (): Promise<number> => {
+        const resp = await this._sendCommand(CMD.PIN_READ, new Uint8Array([num, 0x00]))
         if (resp.length >= 3) {
           return resp[1] | (resp[2] << 8)
         }

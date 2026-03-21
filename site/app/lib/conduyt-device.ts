@@ -118,9 +118,25 @@ export class ConduytDevice {
     await this.sendCommand(CMD.RESET, new Uint8Array(0))
   }
 
-  pin(pinNum: number) {
+  pin(id: number | string) {
     const self = this
     const CMD = self.wasm.getCMD()
+
+    let pinNum: number
+    let isAnalog = false
+
+    if (typeof id === 'string') {
+      const m = id.match(/^A(\d+)$/i)
+      if (m) {
+        pinNum = parseInt(m[1], 10)
+        isAnalog = true
+      } else {
+        pinNum = parseInt(id, 10)
+        if (isNaN(pinNum)) throw new Error(`Invalid pin: ${id}`)
+      }
+    } else {
+      pinNum = id
+    }
 
     return {
       async mode(m: string): Promise<void> {
@@ -129,13 +145,29 @@ export class ConduytDevice {
           analog: 0x03, input_pullup: 0x04,
         }
         const modeVal = modes[m.toLowerCase()] ?? 0x01
+        if (m.toLowerCase() === 'analog') isAnalog = true
         await self.sendCommand(CMD.PIN_MODE, new Uint8Array([pinNum, modeVal]))
       },
       async write(value: number): Promise<void> {
         await self.sendCommand(CMD.PIN_WRITE, new Uint8Array([pinNum, value & 0xFF, (value >> 8) & 0xFF]))
       },
       async read(): Promise<number> {
-        const resp = await self.sendCommand(CMD.PIN_READ, new Uint8Array([pinNum]))
+        const payload = isAnalog
+          ? new Uint8Array([pinNum, 0x03])
+          : new Uint8Array([pinNum])
+        const resp = await self.sendCommand(CMD.PIN_READ, payload)
+        const p = resp.payload
+        if (p.length >= 3) return p[1] | (p[2] << 8)
+        return 0
+      },
+      async analogRead(): Promise<number> {
+        const resp = await self.sendCommand(CMD.PIN_READ, new Uint8Array([pinNum, 0x03]))
+        const p = resp.payload
+        if (p.length >= 3) return p[1] | (p[2] << 8)
+        return 0
+      },
+      async digitalRead(): Promise<number> {
+        const resp = await self.sendCommand(CMD.PIN_READ, new Uint8Array([pinNum, 0x00]))
         const p = resp.payload
         if (p.length >= 3) return p[1] | (p[2] << 8)
         return 0
