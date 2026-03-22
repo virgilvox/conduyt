@@ -80,9 +80,17 @@ jobs:
             examples/BasicBlink/BasicBlink.ino \
             --lib=src \
             --build-dir=ci-build
+      - name: Find firmware output
+        id: find
+        working-directory: firmware
+        run: |
+          find ci-build -name 'firmware.*' -type f 2>/dev/null | head -10
+          DIR=$(dirname "$(find ci-build -name 'firmware.elf' -type f 2>/dev/null | head -1)" 2>/dev/null || echo "")
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
       - name: Upload artifacts
+        if: steps.find.outputs.dir != ''
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ matrix.board }}
-          path: firmware/ci-build/.pio/build/${{ matrix.board }}/firmware.*
+          path: firmware/${{ steps.find.outputs.dir }}/firmware.*
           if-no-files-found: warn
