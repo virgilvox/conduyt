@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install platformio
-      - name: Run native ConduytDevice tests (60 cases)
+      - name: Run native ConduytDevice + module tests
         run: cd firmware && pio test -e native
 
   compile-check:
