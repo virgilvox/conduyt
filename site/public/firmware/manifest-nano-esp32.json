@@ -6,9 +6,9 @@
     {
       "chipFamily": "ESP32-S3",
       "parts": [
-        { "path": "https://github.com/virgilvox/conduyt/releases/latest/download/conduyt-nano-esp32-bootloader.bin", "offset": 0 },
-        { "path": "https://github.com/virgilvox/conduyt/releases/latest/download/conduyt-nano-esp32-partitions.bin", "offset": 32768 },
-        { "path": "https://github.com/virgilvox/conduyt/releases/latest/download/conduyt-nano-esp32.bin", "offset": 65536 }
+        { "path": "conduyt-nano-esp32-bootloader.bin", "offset": 0 },
+        { "path": "conduyt-nano-esp32-partitions.bin", "offset": 32768 },
+        { "path": "conduyt-nano-esp32.bin", "offset": 65536 }
       ]
     }
   ]

@@ -33,4 +33,10 @@ protocol/package-lock.json
 site/dist/
 site/.data/
 **/conduyt_py.egg-info/
+# Firmware blobs are fetched at build time by site/scripts/fetch-latest-firmware.mjs
+# from the latest GitHub release. Don't commit them.
+site/public/firmware/conduyt-*.bin
+site/public/firmware/conduyt-*.hex
+site/public/firmware/conduyt-*.uf2
+site/public/firmware/conduyt-*.elf
 

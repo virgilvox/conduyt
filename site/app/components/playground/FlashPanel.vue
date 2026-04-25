@@ -160,15 +160,13 @@ const flashSuccess = ref(false)
 const flashProgress = ref(0)
 const flashPhase = ref('Flashing...')
 
-// Firmware artifacts now ship with each GitHub release. The
-// /releases/latest/download/ path always resolves to the latest
-// published release's asset, so the playground is automatically
-// in sync with the most recent firmware build without re-deploying
-// the site or committing binaries to the repo.
-const FIRMWARE_BASE = 'https://github.com/virgilvox/conduyt/releases/latest/download'
-// ESP32 manifests still need to be served same-origin so esp-web-tools
-// can fetch the bootloader/partitions/firmware bundle without CORS issues.
-// We commit the manifests but the binaries they reference are now GitHub URLs.
+// Firmware is served same-origin from /firmware/. The DO build's
+// `prebuild` step (site/scripts/fetch-latest-firmware.mjs) pulls the
+// latest GitHub release into public/firmware/ on every deploy. We can't
+// fetch directly from GitHub release URLs at runtime — release-assets.
+// githubusercontent.com sets no Access-Control-Allow-Origin header,
+// so browser fetch() gets CORS-blocked.
+const FIRMWARE_BASE = '/firmware'
 const manifestUrl = '/firmware/manifest.json'
 
 
