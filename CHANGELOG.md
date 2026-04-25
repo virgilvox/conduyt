@@ -1,5 +1,80 @@
 # Changelog
 
+## 0.3.3 — Codegen owns SDK constants + WebSerial write race + CI gap
+
+Three audit-pass fixes bundled to keep the protocol/SDK/firmware story
+internally consistent:
+
+1. **WebSerial write race in the playground.** With multiple polling
+   widgets active in the Panel tab and a mode change firing in parallel,
+   `writable.getWriter()` would throw "Cannot create writer when
+   WritableStream is locked." `site/app/composables/useSerial.ts` now
+   serializes every write through a Promise-chain mutex so concurrent
+   `sendPacket` / `sendRaw` calls queue cleanly.
+
+2. **`protocol/generate.ts` now owns SDK constants files.** The 0.3.2
+   PROTOCOL_VERSION oversight (firmware bumped to 2, but the JS/Python/
+   Go/Rust/Swift constants files all still said 1) was a class of bug
+   where five files had to be hand-edited every time the protocol
+   changed. The generator now writes those files itself from
+   `protocol/constants.json`, so `node protocol/generate.ts` is a single
+   command that can never disagree with itself again. Acronym preservation
+   (`NAK`/`ACK`/`OTA`/`I2C`/`SPI`/`PWM`/`CRC`/`UART`/`BLE`/`JSON`/`ID`)
+   is encoded in the pascal-case helper to keep Go identifiers like
+   `EvtNAK` and `CmdModCmd` byte-identical to what the SDK expects.
+
+3. **CI gap closed.** `firmware-ci.yml` now runs the 60-test
+   `pio test -e native` ConduytDevice suite — it was committed but never
+   actually executed in CI.
+
+Also in 0.3.3:
+- Two leftover `assert encoded[2] == 0x01` checks in
+  `sdk/python/tests/test_conformance.py` and
+  `sdk/wasm/tests/node.test.mjs` updated to the current PROTOCOL_VERSION
+  (0x02). The Python test now imports `PROTOCOL_VERSION` from
+  `conduyt.core.constants` so future bumps don't require a test edit.
+- `site/scripts/fetch-latest-firmware.mjs` rewrites the version field in
+  every `manifest*.json` to the GitHub release tag it just pulled, so
+  the playground "version" badge can't drift from what's actually
+  served.
+- `site/package-lock.json` refreshed to pull `conduyt-wasm@0.3.3`
+  (was pinned at 0.3.0 — the lockfile fix the 0.3.2 release should
+  have shipped).
+
+## 0.3.2 — PROTOCOL_VERSION SDK fix + Panel widgets
+
+Reissue of 0.3.1 because every SDK still hardcoded `PROTOCOL_VERSION =
+0x01` in its constants module. The firmware C header and
+`protocol/constants.json` had been bumped to 2, but the generated SDK
+constants in `sdk/{js,python,go,rust,swift}` had not — every Hello/Pong
+round-trip from a v0.3 firmware to a fresh SDK would fail
+`VERSION_MISMATCH` decode in the SDK. Republished:
+- `conduyt-wasm@0.3.2` (npm)
+- `conduyt-js@0.3.2` (npm)
+- `conduyt-py@0.3.2` (PyPI)
+- `conduyt@0.3.2` (crates.io)
+
+Other 0.3.2 work shipped at the same time:
+- **Panel tab** in the playground (`site/app/components/playground/PanelPanel.vue`,
+  ~1100 LOC). A Blynk-style widget dashboard with switch/momentary/slider/
+  LED/gauge/scope tiles. Widgets bind to a pin or datastream and respect
+  declared capabilities — a pin without `PWM` won't accept a slider.
+  Widget instantiation now `await ensureDevice()` before issuing
+  `setPinMode`, so the first-render race no longer required selecting a
+  different pin to "kick" initialization. Polling timers are tracked and
+  cleared on widget removal / board change.
+- **Pin label heuristic**: pin dropdowns now show `D0`/`A0`/`GP18`/
+  `GPIO32` etc. derived from the board's `pin_count` and ADC layout,
+  instead of raw indices.
+- **Post-flash success card** (`FlashPanel.vue`) with a board-specific
+  reset hint and a "Connect & open playground" button that emits both
+  `connect` and `close` so users land in the playground with the port
+  already opened.
+- **`site/app/composables/useSerial.ts` PIN_WRITE 3-byte bug** — the
+  composable's wrapper was sending the explicit-mode 3-byte form, which
+  the firmware decoded as `mode=INPUT`, breaking the PWM slider. Now
+  always sends the 2-byte (pin, value) form.
+
 ## 0.3.1 — Build fixes + always-latest firmware delivery
 
 The 0.3.0 firmware-build CI failed on the megaAVR (Nano Every) target

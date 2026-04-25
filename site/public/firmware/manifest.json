@@ -1,39 +1,75 @@
 {
   "name": "CONDUYT Firmware",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "new_install_prompt_erase": true,
   "_comment": "Part paths are relative to this manifest. site/scripts/fetch-latest-firmware.mjs runs at build time and downloads the latest GitHub release artifacts into this directory so esp-web-tools can fetch them same-origin.",
   "builds": [
     {
       "chipFamily": "ESP32",
       "parts": [
-        { "path": "conduyt-esp32-bootloader.bin", "offset": 4096 },
-        { "path": "conduyt-esp32-partitions.bin", "offset": 32768 },
-        { "path": "conduyt-esp32.bin", "offset": 65536 }
+        {
+          "path": "conduyt-esp32-bootloader.bin",
+          "offset": 4096
+        },
+        {
+          "path": "conduyt-esp32-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "conduyt-esp32.bin",
+          "offset": 65536
+        }
       ]
     },
     {
       "chipFamily": "ESP32-S2",
       "parts": [
-        { "path": "conduyt-esp32s2-bootloader.bin", "offset": 4096 },
-        { "path": "conduyt-esp32s2-partitions.bin", "offset": 32768 },
-        { "path": "conduyt-esp32s2.bin",            "offset": 65536 }
+        {
+          "path": "conduyt-esp32s2-bootloader.bin",
+          "offset": 4096
+        },
+        {
+          "path": "conduyt-esp32s2-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "conduyt-esp32s2.bin",
+          "offset": 65536
+        }
       ]
     },
     {
       "chipFamily": "ESP32-S3",
       "parts": [
-        { "path": "conduyt-esp32s3-bootloader.bin", "offset": 0 },
-        { "path": "conduyt-esp32s3-partitions.bin", "offset": 32768 },
-        { "path": "conduyt-esp32s3.bin", "offset": 65536 }
+        {
+          "path": "conduyt-esp32s3-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "conduyt-esp32s3-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "conduyt-esp32s3.bin",
+          "offset": 65536
+        }
       ]
     },
     {
       "chipFamily": "ESP32-C3",
       "parts": [
-        { "path": "conduyt-esp32c3-bootloader.bin", "offset": 0 },
-        { "path": "conduyt-esp32c3-partitions.bin", "offset": 32768 },
-        { "path": "conduyt-esp32c3.bin", "offset": 65536 }
+        {
+          "path": "conduyt-esp32c3-bootloader.bin",
+          "offset": 0
+        },
+        {
+          "path": "conduyt-esp32c3-partitions.bin",
+          "offset": 32768
+        },
+        {
+          "path": "conduyt-esp32c3.bin",
+          "offset": 65536
+        }
       ]
     }
   ]

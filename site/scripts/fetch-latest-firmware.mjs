@@ -16,7 +16,7 @@
  * don't want to network-fetch on every nuxt build).
  */
 
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
+import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -75,6 +75,28 @@ for (const asset of wanted) {
     console.log(`  ✓ ${r.name} (${(r.bytes / 1024).toFixed(1)} KB)`)
   } catch (e) {
     console.warn(`  ✗ ${asset.name}: ${e.message}`)
+  }
+}
+
+// Sync manifest "version" fields to whatever release we just pulled. The
+// version string is purely informational (esp-web-tools dispatches by
+// chipFamily + parts paths, not by version), but stale labels misled us
+// twice — easier to keep them honest from the source of truth.
+const semver = (release.tag_name || '').replace(/^v/, '')
+if (semver) {
+  for (const f of readdirSync(FIRMWARE_DIR)) {
+    if (!/^manifest.*\.json$/.test(f)) continue
+    const path = join(FIRMWARE_DIR, f)
+    try {
+      const m = JSON.parse(readFileSync(path, 'utf-8'))
+      if (m.version !== semver) {
+        m.version = semver
+        writeFileSync(path, JSON.stringify(m, null, 2) + '\n')
+        console.log(`  ↻ ${f} version → ${semver}`)
+      }
+    } catch (e) {
+      console.warn(`  ✗ ${f}: ${e.message}`)
+    }
   }
 }
 
