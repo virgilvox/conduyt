@@ -21,6 +21,11 @@ Navigate to [/playground](/playground). You'll see three panels:
 - **Console** (top right) - output from `log()` calls in your code
 - **Device** (bottom right) - connection status, firmware name, and pin count
 
+There are two more views accessed from the toolbar:
+
+- **Flash** - one-click firmware install for every supported board (browser DFU/esp-tool flow)
+- **Panel** - a Blynk-style widget dashboard. Add switches, push buttons, PWM sliders, LED indicators, analog gauges, and pin scopes. Each widget is filtered by the board's declared capabilities so you can only bind a PWM slider to a pin that actually has hardware PWM. See [Panel](/docs/getting-started/panel).
+
 ## 2. Flash firmware onto your board
 
 Click **Flash** in the toolbar. Pick your board below and follow the steps.

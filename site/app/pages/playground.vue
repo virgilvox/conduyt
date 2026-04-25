@@ -32,6 +32,15 @@
     <!-- Flash overlay -->
     <FlashPanel v-if="activePanel === 'flash'" @close="activePanel = ''" />
 
+    <!-- Panel (Blynk-style widget dashboard) overlay -->
+    <PanelPanel
+      v-if="activePanel === 'panel'"
+      :serial="serial"
+      :capabilities="deviceCapabilities"
+      @close="activePanel = ''"
+      @capabilities="(c) => deviceCapabilities = c"
+    />
+
     <!-- Mobile tabs (visible on small screens) -->
     <div class="mobile-tabs">
       <button :class="{ active: mobileTab === 'editor' }" @click="mobileTab = 'editor'">Editor</button>
@@ -46,6 +55,7 @@ import CodeEditor from '~/components/playground/CodeEditor.vue'
 import ConsolePanel from '~/components/playground/ConsolePanel.vue'
 import DevicePanel from '~/components/playground/DevicePanel.vue'
 import FlashPanel from '~/components/playground/FlashPanel.vue'
+import PanelPanel from '~/components/playground/PanelPanel.vue'
 import Toolbar from '~/components/playground/Toolbar.vue'
 import type { ConsoleLine } from '~/components/playground/ConsolePanel.vue'
 import type { HelloResp } from '~/lib/conduyt-device'

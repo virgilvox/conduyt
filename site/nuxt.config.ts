@@ -1,3 +1,6 @@
+import wasm from 'vite-plugin-wasm'
+import topLevelAwait from 'vite-plugin-top-level-await'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
 
@@ -47,5 +50,10 @@ export default defineNuxtConfig({
     optimizeDeps: {
       exclude: ['conduyt-wasm'],
     },
+    plugins: [
+      // wasm-pack bundler-target packages need explicit Vite handling.
+      wasm(),
+      topLevelAwait(),
+    ],
   },
 })

@@ -12,15 +12,19 @@
     "node": "22.x"
   },
   "dependencies": {
-    "@oxc-parser/binding-linux-x64-gnu": "0.117.0",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@nuxt/content": "^3.12.0",
     "@nuxtjs/color-mode": "^4.0.0",
+    "@oxc-parser/binding-linux-x64-gnu": "0.117.0",
     "better-sqlite3": "^12.8.0",
-    "conduyt-wasm": "^0.2.0",
+    "conduyt-wasm": "^0.3.0",
     "dfu": "^0.1.5",
     "esp-web-tools": "^10.2.1",
     "nuxt": "^4.4.2",
     "shiki": "^4.0.2"
+  },
+  "devDependencies": {
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }

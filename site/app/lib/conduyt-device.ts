@@ -5,13 +5,91 @@
 
 type Serial = ReturnType<typeof import('../composables/useSerial').useSerial>
 
+export interface PinCap {
+  pin: number
+  capabilities: number
+}
+
 export interface HelloResp {
   firmwareName: string
   firmwareVersion: [number, number, number]
+  mcuId: Uint8Array
   pinCount: number
+  pins: PinCap[]
+  i2cBuses: number
+  spiBuses: number
+  uartCount: number
+  maxPayload: number
   moduleCount: number
   datastreamCount: number
   raw: Uint8Array
+}
+
+/**
+ * Capability bit flags. Match firmware/src/conduyt/core/conduyt_constants.h.
+ */
+export const PIN_CAP = {
+  DIGITAL_IN:  1 << 0,
+  DIGITAL_OUT: 1 << 1,
+  PWM_OUT:     1 << 2,
+  ANALOG_IN:   1 << 3,
+  I2C_SDA:     1 << 4,
+  I2C_SCL:     1 << 5,
+  SPI:         1 << 6,
+  INTERRUPT:   1 << 7,
+} as const
+
+function readFixedString(view: DataView, offset: number, len: number): [string, number] {
+  const bytes = new Uint8Array(view.buffer, view.byteOffset + offset, len)
+  let end = bytes.indexOf(0)
+  if (end === -1) end = len
+  return [new TextDecoder().decode(bytes.subarray(0, end)), offset + len]
+}
+
+/**
+ * Parse a HELLO_RESP payload (v2 protocol). Mirrors the firmware
+ * buildHelloResp byte order.
+ */
+export function parseHelloResp(payload: Uint8Array): HelloResp {
+  const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength)
+  let pos = 0
+  let firmwareName: string
+  ;[firmwareName, pos] = readFixedString(view, pos, 16)
+  const vMajor = view.getUint8(pos++)
+  const vMinor = view.getUint8(pos++)
+  const vPatch = view.getUint8(pos++)
+  const mcuId = new Uint8Array(payload.subarray(pos, pos + 8))
+  pos += 8
+  pos++ // ota_capable
+  const pinCount = view.getUint8(pos++)
+  const pins: PinCap[] = []
+  for (let i = 0; i < pinCount && pos < payload.length; i++) {
+    pins.push({ pin: i, capabilities: view.getUint8(pos++) })
+  }
+  const i2cBuses = pos < payload.length ? view.getUint8(pos++) : 0
+  const spiBuses = pos < payload.length ? view.getUint8(pos++) : 0
+  const uartCount = pos < payload.length ? view.getUint8(pos++) : 0
+  let maxPayload = 0
+  if (pos + 1 < payload.length) {
+    maxPayload = view.getUint16(pos, true); pos += 2
+  }
+  const moduleCount = pos < payload.length ? view.getUint8(pos++) : 0
+  // Datastream/module sub-records are skipped — the playground panel only
+  // needs pin-level data, and ConduytDevice exposes those by name elsewhere.
+  return {
+    firmwareName,
+    firmwareVersion: [vMajor, vMinor, vPatch],
+    mcuId,
+    pinCount,
+    pins,
+    i2cBuses,
+    spiBuses,
+    uartCount,
+    maxPayload,
+    moduleCount,
+    datastreamCount: 0,
+    raw: payload,
+  }
 }
 
 export class ConduytDevice {
@@ -48,17 +126,7 @@ export class ConduytDevice {
     // Send HELLO
     const resp = await this.sendCommand(CMD.HELLO, new Uint8Array(0), timeoutMs)
 
-    // Parse basic hello info from payload
-    const p = resp.payload
-    this._capabilities = {
-      firmwareName: String.fromCharCode(...p.slice(0, 16)).replace(/\0+$/, ''),
-      firmwareVersion: [p[16], p[17], p[18]] as [number, number, number],
-      pinCount: p.length > 28 ? p[28] : 0,
-      moduleCount: 0,
-      datastreamCount: 0,
-      raw: p,
-    }
-
+    this._capabilities = parseHelloResp(resp.payload)
     this._connected = true
     return this._capabilities
   }
