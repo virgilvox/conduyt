@@ -25,7 +25,14 @@ export function useSerial() {
   async function loadWasm() {
     if (wasm) return wasm
     const mod = await import('conduyt-wasm')
-    await mod.default()
+    // wasm-pack --target bundler exports an init function as `default`, but
+    // vite-plugin-wasm auto-initializes at import time and replaces the
+    // default export with the initialized binding object. So default() is
+    // only a function in environments without the plugin (e.g. some test
+    // runners). Be defensive.
+    if (typeof (mod as any).default === 'function') {
+      await (mod as any).default()
+    }
     wasm = mod
     return wasm
   }
