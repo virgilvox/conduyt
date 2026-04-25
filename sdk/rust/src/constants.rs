@@ -1,4 +1,10 @@
-//! CONDUYT Protocol Constants
+//! CONDUYT Protocol Constants.
+//! Protocol Version: 2
+//! Generated from protocol/constants.json — DO NOT EDIT.
+
+pub const PROTOCOL_VERSION: u8 = 0x02;
+pub const MAGIC: [u8; 2] = [0x43, 0x44];
+pub const HEADER_SIZE: usize = 8;
 
 // Host → Device Commands
 pub const CMD_PING: u8 = 0x01;
@@ -40,13 +46,6 @@ pub const EVT_DS_READ_RESP: u8 = 0xD2;
 pub const EVT_LOG: u8 = 0xE0;
 pub const EVT_FATAL: u8 = 0xFF;
 
-// Pin Modes
-pub const PIN_MODE_INPUT: u8 = 0x00;
-pub const PIN_MODE_OUTPUT: u8 = 0x01;
-pub const PIN_MODE_PWM: u8 = 0x02;
-pub const PIN_MODE_ANALOG: u8 = 0x03;
-pub const PIN_MODE_INPUT_PULLUP: u8 = 0x04;
-
 // NAK Error Codes
 pub const ERR_UNKNOWN_TYPE: u8 = 0x01;
 pub const ERR_CRC_MISMATCH: u8 = 0x02;
@@ -87,3 +86,37 @@ pub fn err_name(code: u8) -> &'static str {
         _ => "UNKNOWN",
     }
 }
+
+// Datastream Type Codes
+pub const TYPE_BOOL: u8 = 0x01;
+pub const TYPE_INT8: u8 = 0x02;
+pub const TYPE_UINT8: u8 = 0x03;
+pub const TYPE_INT16: u8 = 0x04;
+pub const TYPE_UINT16: u8 = 0x05;
+pub const TYPE_INT32: u8 = 0x06;
+pub const TYPE_FLOAT32: u8 = 0x07;
+pub const TYPE_STRING: u8 = 0x08;
+pub const TYPE_BYTES: u8 = 0x09;
+
+// Pin Capability Bitmask
+pub const PIN_CAP_DIGITAL_IN: u8 = 1 << 0;
+pub const PIN_CAP_DIGITAL_OUT: u8 = 1 << 1;
+pub const PIN_CAP_PWM_OUT: u8 = 1 << 2;
+pub const PIN_CAP_ANALOG_IN: u8 = 1 << 3;
+pub const PIN_CAP_I2C_SDA: u8 = 1 << 4;
+pub const PIN_CAP_I2C_SCL: u8 = 1 << 5;
+pub const PIN_CAP_SPI: u8 = 1 << 6;
+pub const PIN_CAP_INTERRUPT: u8 = 1 << 7;
+
+// Pin Modes
+pub const PIN_MODE_INPUT: u8 = 0x00;
+pub const PIN_MODE_OUTPUT: u8 = 0x01;
+pub const PIN_MODE_PWM: u8 = 0x02;
+pub const PIN_MODE_ANALOG: u8 = 0x03;
+pub const PIN_MODE_INPUT_PULLUP: u8 = 0x04;
+
+// Subscribe Modes
+pub const SUB_CHANGE: u8 = 0x01;
+pub const SUB_RISING: u8 = 0x02;
+pub const SUB_FALLING: u8 = 0x03;
+pub const SUB_ANALOG_POLL: u8 = 0x04;

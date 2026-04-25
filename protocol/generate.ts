@@ -375,6 +375,233 @@ function generateCrc8Swift(): string {
   ].join('\n')
 }
 
+// ── SDK constants generators (one per language) ────────────────────────────
+// These overwrite the previously hand-edited sdk/{js,python,go,rust,swift}
+// constants files. Today's PROTOCOL_VERSION 1→2 break revealed that having
+// 5 hand-edited copies of the same constants invites silent drift; owning
+// them in codegen prevents that class of bug.
+
+function generateConstantsTs(): string {
+  const lines = [
+    '/**',
+    ' * CONDUYT Protocol Constants',
+    ` * Protocol Version: ${constants.protocol.version}`,
+    ' * Generated from protocol/constants.json — DO NOT EDIT.',
+    ' */',
+    '',
+    `export const PROTOCOL_VERSION = ${hex(constants.protocol.version)}`,
+    `export const MAGIC = new Uint8Array([${hex(constants.protocol.magic[0])}, ${hex(constants.protocol.magic[1])}]) // "CD"`,
+    `export const HEADER_SIZE = ${constants.header.totalHeaderSize}`,
+    '',
+    'export const CMD = {',
+  ]
+  for (const [name, info] of Object.entries(constants.packetTypes.commands) as any)
+    lines.push(`  ${(name + ':').padEnd(17)} ${info.byte},`)
+  lines.push('} as const', '', 'export const EVT = {')
+  for (const [name, info] of Object.entries(constants.packetTypes.events) as any)
+    lines.push(`  ${(name + ':').padEnd(17)} ${info.byte},`)
+  lines.push('} as const', '', 'export const ERR = {')
+  for (const [name, info] of Object.entries(constants.errorCodes) as any)
+    lines.push(`  ${(name + ':').padEnd(21)} ${info.code},`)
+  lines.push('} as const', '', 'export const ERR_NAMES: Record<number, string> = {')
+  for (const [name] of Object.entries(constants.errorCodes) as any)
+    lines.push(`  [ERR.${name}]: ${JSON.stringify(name)},`)
+  lines.push('}', '', 'export const DS_TYPE = {')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`  ${(name + ':').padEnd(9)} ${info.code},`)
+  lines.push('} as const', '', '/** Fixed size in bytes for each data type (-1 for variable-length) */', 'export const DS_TYPE_SIZE: Record<number, number> = {')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`  [DS_TYPE.${name}]: ${info.size},`)
+  lines.push('}', '', 'export const PIN_CAP = {')
+  for (const [name, info] of Object.entries(constants.pinCapabilities) as any)
+    lines.push(`  ${(name + ':').padEnd(13)} 1 << ${info.bit},`)
+  lines.push('} as const', '', 'export const PIN_MODE = {')
+  for (const [name, info] of Object.entries(constants.pinModes) as any)
+    lines.push(`  ${(name + ':').padEnd(15)} ${info.code},`)
+  lines.push('} as const', '', 'export const SUB_MODE = {')
+  for (const [name, info] of Object.entries(constants.subscribeModes) as any)
+    lines.push(`  ${(name + ':').padEnd(14)} ${info.code},`)
+  lines.push('} as const', '')
+  return lines.join('\n')
+}
+
+function generateConstantsPy(): string {
+  const lines = [
+    '"""',
+    'CONDUYT Protocol Constants',
+    `Protocol Version: ${constants.protocol.version}`,
+    'Generated from protocol/constants.json — DO NOT EDIT.',
+    '"""',
+    '',
+    `PROTOCOL_VERSION = ${hex(constants.protocol.version)}`,
+    `MAGIC = bytes([${hex(constants.protocol.magic[0])}, ${hex(constants.protocol.magic[1])}])  # "CD"`,
+    `HEADER_SIZE = ${constants.header.totalHeaderSize}`,
+    '',
+    '',
+    'class CMD:',
+  ]
+  for (const [name, info] of Object.entries(constants.packetTypes.commands) as any)
+    lines.push(`    ${name.padEnd(20)} = ${info.byte}`)
+  lines.push('', '', 'class EVT:')
+  for (const [name, info] of Object.entries(constants.packetTypes.events) as any)
+    lines.push(`    ${name.padEnd(20)} = ${info.byte}`)
+  lines.push('', '', 'class ERR:')
+  for (const [name, info] of Object.entries(constants.errorCodes) as any)
+    lines.push(`    ${name.padEnd(20)} = ${info.code}`)
+  lines.push('', '', 'ERR_NAMES: dict[int, str] = {')
+  for (const [name] of Object.entries(constants.errorCodes) as any)
+    lines.push(`    ERR.${name}: ${JSON.stringify(name)},`)
+  lines.push('}', '', '', 'class DS_TYPE:')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`    ${name.padEnd(8)} = ${info.code}`)
+  lines.push('', '', 'DS_TYPE_SIZE: dict[int, int] = {')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`    DS_TYPE.${name}: ${info.size},`)
+  lines.push('}', '', '', 'class PIN_CAP:')
+  for (const [name, info] of Object.entries(constants.pinCapabilities) as any)
+    lines.push(`    ${name.padEnd(12)} = 1 << ${info.bit}`)
+  lines.push('', '', 'class PIN_MODE:')
+  for (const [name, info] of Object.entries(constants.pinModes) as any)
+    lines.push(`    ${name.padEnd(14)} = ${info.code}`)
+  lines.push('', '', 'class SUB_MODE:')
+  for (const [name, info] of Object.entries(constants.subscribeModes) as any)
+    lines.push(`    ${name.padEnd(13)} = ${info.code}`)
+  lines.push('')
+  return lines.join('\n')
+}
+
+function generateConstantsGo(): string {
+  // Preserve acronyms in their canonical casing so generated names match
+  // the conventions used elsewhere in the Go SDK (EvtNAK, CmdI2CWrite,
+  // ErrCRCMismatch). Anything not in this list gets standard PascalCase.
+  // Match the existing Go SDK's hand-edited casing: DS/I2C/SPI/CRC/OTA/NAK/
+  // ACK stay all-caps; MOD is a regular word ("Mod"). This is exactly the
+  // mix the original constants.go used.
+  const ACRONYMS = new Set(['NAK', 'ACK', 'OTA', 'DS', 'I2C', 'SPI', 'PWM', 'CRC', 'UART', 'BLE', 'JSON', 'ID'])
+  function pascal(s: string) {
+    return s.split('_').map(p => {
+      const u = p.toUpperCase()
+      return ACRONYMS.has(u) ? u : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()
+    }).join('')
+  }
+  const lines = [
+    '// Package conduyt — protocol constants.',
+    `// Protocol Version: ${constants.protocol.version}`,
+    '// Generated from protocol/constants.json — DO NOT EDIT.',
+    'package conduyt',
+    '',
+    'const (',
+    `\tProtocolVersion = ${hex(constants.protocol.version)}`,
+    `\tMagic0          = ${hex(constants.protocol.magic[0])} // 'C'`,
+    `\tMagic1          = ${hex(constants.protocol.magic[1])} // 'D'`,
+    `\tHeaderSize      = ${constants.header.totalHeaderSize}`,
+    ')',
+    '',
+    '// Host → Device Commands',
+    'const (',
+  ]
+  for (const [name, info] of Object.entries(constants.packetTypes.commands) as any)
+    lines.push(`\tCmd${pascal(name)} = ${info.byte}`)
+  lines.push(')', '', '// Device → Host Events', 'const (')
+  for (const [name, info] of Object.entries(constants.packetTypes.events) as any)
+    lines.push(`\tEvt${pascal(name)} = ${info.byte}`)
+  lines.push(')', '', '// NAK Error Codes', 'const (')
+  for (const [name, info] of Object.entries(constants.errorCodes) as any)
+    lines.push(`\tErr${pascal(name)} = ${info.code}`)
+  lines.push(')', '', '// ErrNames maps error codes to human-readable names.', 'var ErrNames = map[byte]string{')
+  for (const [name] of Object.entries(constants.errorCodes) as any)
+    lines.push(`\tErr${pascal(name)}: ${JSON.stringify(name)},`)
+  lines.push('}', '', '// Datastream Type Codes', 'const (')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`\tDsType${pascal(name)} = ${info.code}`)
+  lines.push(')', '', '// Pin Capability Bitmask', 'const (')
+  for (const [name, info] of Object.entries(constants.pinCapabilities) as any)
+    lines.push(`\tPinCap${pascal(name)} = 1 << ${info.bit}`)
+  // Note: PinMode constants live in pin.go alongside the Pin proxy methods.
+  // Don't redeclare them here.
+  lines.push(')', '', '// Subscribe Modes', 'const (')
+  for (const [name, info] of Object.entries(constants.subscribeModes) as any)
+    lines.push(`\tSubMode${pascal(name)} = ${info.code}`)
+  lines.push(')', '')
+  return lines.join('\n')
+}
+
+function generateConstantsRust(): string {
+  const lines = [
+    '//! CONDUYT Protocol Constants.',
+    `//! Protocol Version: ${constants.protocol.version}`,
+    '//! Generated from protocol/constants.json — DO NOT EDIT.',
+    '',
+    `pub const PROTOCOL_VERSION: u8 = ${hex(constants.protocol.version)};`,
+    `pub const MAGIC: [u8; 2] = [${hex(constants.protocol.magic[0])}, ${hex(constants.protocol.magic[1])}];`,
+    `pub const HEADER_SIZE: usize = ${constants.header.totalHeaderSize};`,
+    '',
+    '// Host → Device Commands',
+  ]
+  for (const [name, info] of Object.entries(constants.packetTypes.commands) as any)
+    lines.push(`pub const CMD_${name}: u8 = ${info.byte};`)
+  lines.push('', '// Device → Host Events')
+  for (const [name, info] of Object.entries(constants.packetTypes.events) as any)
+    lines.push(`pub const EVT_${name}: u8 = ${info.byte};`)
+  lines.push('', '// NAK Error Codes')
+  for (const [name, info] of Object.entries(constants.errorCodes) as any)
+    lines.push(`pub const ERR_${name}: u8 = ${info.code};`)
+  lines.push('', '/// Get error name string from error code.', 'pub fn err_name(code: u8) -> &\'static str {', '    match code {')
+  for (const [name] of Object.entries(constants.errorCodes) as any)
+    lines.push(`        ERR_${name} => ${JSON.stringify(name)},`)
+  lines.push('        _ => "UNKNOWN",', '    }', '}', '', '// Datastream Type Codes')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`pub const TYPE_${name}: u8 = ${info.code};`)
+  lines.push('', '// Pin Capability Bitmask')
+  for (const [name, info] of Object.entries(constants.pinCapabilities) as any)
+    lines.push(`pub const PIN_CAP_${name}: u8 = 1 << ${info.bit};`)
+  lines.push('', '// Pin Modes')
+  for (const [name, info] of Object.entries(constants.pinModes) as any)
+    lines.push(`pub const PIN_MODE_${name}: u8 = ${info.code};`)
+  lines.push('', '// Subscribe Modes')
+  for (const [name, info] of Object.entries(constants.subscribeModes) as any)
+    lines.push(`pub const SUB_${name}: u8 = ${info.code};`)
+  lines.push('')
+  return lines.join('\n')
+}
+
+function generateConstantsSwift(): string {
+  function camel(s: string) { return s.toLowerCase().split('_').map((p, i) => i === 0 ? p : p.charAt(0).toUpperCase() + p.slice(1)).join('') }
+  const lines = [
+    '// CONDUYT Protocol Constants',
+    `// Protocol Version: ${constants.protocol.version}`,
+    '// Generated from protocol/constants.json — DO NOT EDIT.',
+    'import Foundation',
+    '',
+    'public enum ConduytCmd {',
+  ]
+  for (const [name, info] of Object.entries(constants.packetTypes.commands) as any)
+    lines.push(`    public static let ${camel(name).padEnd(16)}: UInt8 = ${info.byte}`)
+  lines.push('}', '', 'public enum ConduytEvt {')
+  for (const [name, info] of Object.entries(constants.packetTypes.events) as any)
+    lines.push(`    public static let ${camel(name).padEnd(16)}: UInt8 = ${info.byte}`)
+  lines.push('}', '', 'public enum ConduytErr {')
+  for (const [name, info] of Object.entries(constants.errorCodes) as any)
+    lines.push(`    public static let ${camel(name).padEnd(20)}: UInt8 = ${info.code}`)
+  lines.push('', '    public static func name(_ code: UInt8) -> String {', '        switch code {')
+  for (const [name] of Object.entries(constants.errorCodes) as any)
+    lines.push(`        case ${camel(name)}: return ${JSON.stringify(name)}`)
+  lines.push('        default: return "UNKNOWN_0x\\(String(code, radix: 16))"', '        }', '    }', '}', '', 'public enum ConduytDsType {')
+  for (const [name, info] of Object.entries(constants.dataTypes) as any)
+    lines.push(`    public static let ${camel(name).padEnd(8)}: UInt8 = ${info.code}`)
+  lines.push('}', '', 'public enum ConduytPinCap {')
+  for (const [name, info] of Object.entries(constants.pinCapabilities) as any)
+    lines.push(`    public static let ${camel(name).padEnd(12)}: UInt8 = 1 << ${info.bit}`)
+  lines.push('}', '', 'public enum ConduytPinMode {')
+  for (const [name, info] of Object.entries(constants.pinModes) as any)
+    lines.push(`    public static let ${camel(name).padEnd(14)}: UInt8 = ${info.code}`)
+  lines.push('}', '', 'public enum ConduytSubMode {')
+  for (const [name, info] of Object.entries(constants.subscribeModes) as any)
+    lines.push(`    public static let ${camel(name).padEnd(13)}: UInt8 = ${info.code}`)
+  lines.push('}', '')
+  return lines.join('\n')
+}
+
 function generateBoardProfilesH(): string {
   const lines = [
     '/**',
@@ -498,6 +725,12 @@ emit(join(repoRoot, 'sdk/python/src/conduyt/core/crc8.py'), generateCrc8Py(), 'p
 emit(join(repoRoot, 'sdk/go/crc8.go'), generateCrc8Go(), 'go crc8')
 emit(join(repoRoot, 'sdk/rust/src/crc8.rs'), generateCrc8Rust(), 'rust crc8')
 emit(join(repoRoot, 'sdk/swift/Sources/ConduytKit/Core/CRC8.swift'), generateCrc8Swift(), 'swift crc8')
+
+emit(join(repoRoot, 'sdk/js/src/core/constants.ts'), generateConstantsTs(), 'js constants')
+emit(join(repoRoot, 'sdk/python/src/conduyt/core/constants.py'), generateConstantsPy(), 'py constants')
+emit(join(repoRoot, 'sdk/go/constants.go'), generateConstantsGo(), 'go constants')
+emit(join(repoRoot, 'sdk/rust/src/constants.rs'), generateConstantsRust(), 'rust constants')
+emit(join(repoRoot, 'sdk/swift/Sources/ConduytKit/Core/Constants.swift'), generateConstantsSwift(), 'swift constants')
 
 emit(join(repoRoot, 'protocol/board-profiles.json'), generateBoardProfilesJson(), 'board profiles JSON')
 

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build and run C tests
+      - name: Build and run C core tests
         run: |
           cd firmware/test
           mkdir -p build && cd build
@@ -19,6 +19,21 @@ jobs:
           ./test_crc8
           ./test_cobs
           ./test_wire
+
+  device-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-native-${{ hashFiles('firmware/platformio.ini') }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install platformio
+      - name: Run native ConduytDevice tests (60 cases)
+        run: cd firmware && pio test -e native
 
   compile-check:
     runs-on: ubuntu-latest

@@ -1,6 +1,6 @@
 {
   "name": "Conduyt",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "CONDUYT protocol firmware library — transport-agnostic, capability-first binary protocol for host-device hardware control",
   "keywords": ["iot", "protocol", "hardware", "serial", "mqtt", "ble", "firmware"],
   "repository": {

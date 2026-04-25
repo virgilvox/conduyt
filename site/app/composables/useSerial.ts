@@ -125,6 +125,29 @@ export function useSerial() {
     frameBuffer = frameBuffer.slice(start)
   }
 
+  // WritableStream allows only one active writer at a time. Two concurrent
+  // calls to writable.getWriter() throw "Cannot create writer when
+  // WritableStream is locked" — which we hit whenever multiple polling
+  // widgets + a mode change fire simultaneously. Serialize all writes
+  // through a Promise-chain mutex so each call awaits the previous one.
+  let writeChain: Promise<void> = Promise.resolve()
+  function serialWrite(bytes: Uint8Array): Promise<void> {
+    const next = writeChain.then(async () => {
+      if (!writable) throw new Error('Not connected')
+      const writer = writable.getWriter()
+      try {
+        await writer.write(bytes)
+      } finally {
+        writer.releaseLock()
+      }
+    })
+    // Swallow errors on the chain itself so a single failed write doesn't
+    // permanently break the queue. The caller still sees the rejection
+    // because we return `next` directly.
+    writeChain = next.catch(() => {})
+    return next
+  }
+
   async function sendPacket(pktType: number, seq: number, payload: Uint8Array = new Uint8Array(0)) {
     if (!connected.value || !writable) throw new Error('Not connected')
 
@@ -138,22 +161,12 @@ export function useSerial() {
     frame.set(cobsBytes)
     frame[cobsBytes.length] = 0x00
 
-    const writer = writable.getWriter()
-    try {
-      await writer.write(frame)
-    } finally {
-      writer.releaseLock()
-    }
+    await serialWrite(frame)
   }
 
   async function sendRaw(data: Uint8Array) {
     if (!connected.value || !writable) throw new Error('Not connected')
-    const writer = writable.getWriter()
-    try {
-      await writer.write(data)
-    } finally {
-      writer.releaseLock()
-    }
+    await serialWrite(data)
   }
 
   function onPacket(handler: (packet: any) => void) {
