@@ -5,7 +5,7 @@
 
 // ── Protocol ─────────────────────────────────────────────
 
-export const PROTOCOL_VERSION = 0x01
+export const PROTOCOL_VERSION = 0x02
 export const MAGIC = new Uint8Array([0x43, 0x44]) // "CD"
 export const HEADER_SIZE = 8 // MAGIC(2) + VER(1) + TYPE(1) + SEQ(1) + LEN(2) + CRC(1)
 

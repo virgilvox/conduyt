@@ -2,7 +2,7 @@ import Foundation
 
 /// Protocol constants
 public enum ConduytProtocol {
-    public static let version: UInt8 = 0x01
+    public static let version: UInt8 = 0x02
     public static let magic: [UInt8] = [0x43, 0x44]
     public static let headerSize = 8
 }

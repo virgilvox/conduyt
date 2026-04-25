@@ -1,6 +1,6 @@
 [package]
 name = "conduyt-wasm"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "CONDUYT protocol core compiled to WebAssembly"
 license = "MIT"

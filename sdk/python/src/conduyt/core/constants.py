@@ -3,7 +3,7 @@ CONDUYT Protocol Constants
 Generated from protocol/constants.json — DO NOT EDIT
 """
 
-PROTOCOL_VERSION = 0x01
+PROTOCOL_VERSION = 0x02
 MAGIC = bytes([0x43, 0x44])  # "CD"
 HEADER_SIZE = 8  # MAGIC(2) + VER(1) + TYPE(1) + SEQ(1) + LEN(2) + CRC(1)
 

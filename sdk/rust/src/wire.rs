@@ -5,7 +5,7 @@ use alloc::vec::Vec;
 use crate::crc8::crc8;
 
 /// Protocol version.
-pub const PROTOCOL_VERSION: u8 = 0x01;
+pub const PROTOCOL_VERSION: u8 = 0x02;
 /// Magic bytes ("CD").
 pub const MAGIC: [u8; 2] = [0x43, 0x44];
 /// Header size in bytes.

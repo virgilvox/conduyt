@@ -4,7 +4,7 @@
 package conduyt
 
 const (
-	ProtocolVersion = 0x01
+	ProtocolVersion = 0x02
 	Magic0          = 0x43 // 'C'
 	Magic1          = 0x44 // 'D'
 	HeaderSize      = 8    // MAGIC(2) + VER(1) + TYPE(1) + SEQ(1) + LEN(2) + CRC(1)

@@ -55,6 +55,6 @@ export const ERR = new Proxy({}, {
   },
 });
 
-export const PROTOCOL_VERSION = 0x01;
+export const PROTOCOL_VERSION = 0x02;
 export const HEADER_SIZE = 8;
 export const MAGIC = new Uint8Array([0x43, 0x44]);
