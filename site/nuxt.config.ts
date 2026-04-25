@@ -50,6 +50,16 @@ export default defineNuxtConfig({
     optimizeDeps: {
       exclude: ['conduyt-wasm'],
     },
+    // Target esnext so esbuild doesn't try to transpile modern syntax
+    // (destructuring, top-level await, etc.) emitted by vite-plugin-top-level-await
+    // and the wasm-bindgen JS shim. The playground requires WebSerial / WebUSB
+    // anyway — all of those browsers support modern ES well past these features.
+    build: {
+      target: 'esnext',
+    },
+    esbuild: {
+      target: 'esnext',
+    },
     plugins: [
       // wasm-pack bundler-target packages need explicit Vite handling.
       wasm(),
