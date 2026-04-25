@@ -15,8 +15,8 @@ The Uno R4 uses the Renesas RA4M1 (ARM Cortex-M4) - a major upgrade from the cla
 | Flash | 256 KB |
 | RAM | 32 KB SRAM |
 | GPIO | 20 pins |
-| ADC | 6 channels (14-bit) |
-| PWM | 6 channels |
+| ADC | 6 channels (14-bit, A0–A5) |
+| PWM | Up to 8 pins (D3, D5, D6, D9, D10, D11, D12, D13). The silkscreen marks `~` only on the 6 pre-armed channels but the GPT/AGT timer fabric covers the rest — the firmware advertises the full set. |
 | I2C | 1 bus |
 | SPI | 1 bus |
 | UART | 1 port |

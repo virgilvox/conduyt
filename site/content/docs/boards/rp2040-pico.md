@@ -14,9 +14,9 @@ The Raspberry Pi Pico features the RP2040 - a dual-core ARM Cortex-M0+ with gene
 | MCU | RP2040, dual-core ARM Cortex-M0+, 133 MHz |
 | Flash | 2 MB |
 | RAM | 264 KB SRAM |
-| GPIO | 26 pins |
-| ADC | 3 channels (12-bit), pins GP26–GP28 |
-| PWM | 16 channels |
+| GPIO | 30 silicon GPIOs (GP0–GP29). GP23/GP24/GP29 are reserved for board functions (SMPS, VBUS sense, VSYS sense). |
+| ADC | 3 user-accessible channels (12-bit), pins GP26–GP28 |
+| PWM | 16 channels routable to every GPIO 0–29 (8 PWM slices × 2 channels) |
 | I2C | 2 buses |
 | SPI | 2 buses |
 | UART | 2 ports |
@@ -80,7 +80,7 @@ If the Pico doesn't appear as a drive, make sure you're holding BOOTSEL **before
 
 ## Built-in LED
 
-**Pin 25** (directly wired, no PWM support on this pin).
+**Pin 25** (directly wired). Like every other RP2040 GPIO, it can be driven by a PWM slice; the firmware profile marks it `pwm_out`-capable.
 
 On the **Pico W**, the LED is connected through the WiFi chip. Use `LED_BUILTIN` instead of a pin number:
 

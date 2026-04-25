@@ -74,20 +74,31 @@ export function parseHelloResp(payload: Uint8Array): HelloResp {
     maxPayload = view.getUint16(pos, true); pos += 2
   }
   const moduleCount = pos < payload.length ? view.getUint8(pos++) : 0
-  // Datastream/module sub-records are skipped — the playground panel only
-  // needs pin-level data, and ConduytDevice exposes those by name elsewhere.
+
+  // Walk module records to find the datastream_count byte that follows.
+  // Each record: module_id(1) + name(8) + verMajor(1) + verMinor(1) + pinCount(1) + pins(pinCount).
+  for (let m = 0; m < moduleCount && pos < payload.length; m++) {
+    pos++       // module_id
+    pos += 8    // name (8 bytes null-padded)
+    pos += 2    // version major + minor
+    if (pos >= payload.length) break
+    const modPinCount = view.getUint8(pos++)
+    pos += modPinCount
+  }
+  const datastreamCount = pos < payload.length ? view.getUint8(pos++) : 0
+
   return {
     firmwareName,
     firmwareVersion: [vMajor, vMinor, vPatch],
     mcuId,
-    pinCount,
+    pinCount: pins.length,
     pins,
     i2cBuses,
     spiBuses,
     uartCount,
     maxPayload,
     moduleCount,
-    datastreamCount: 0,
+    datastreamCount,
     raw: payload,
   }
 }
@@ -123,12 +134,17 @@ export class ConduytDevice {
       this.handlePacket(pkt, EVT)
     })
 
-    // Send HELLO
-    const resp = await this.sendCommand(CMD.HELLO, new Uint8Array(0), timeoutMs)
-
-    this._capabilities = parseHelloResp(resp.payload)
-    this._connected = true
-    return this._capabilities
+    try {
+      const resp = await this.sendCommand(CMD.HELLO, new Uint8Array(0), timeoutMs)
+      this._capabilities = parseHelloResp(resp.payload)
+      this._connected = true
+      return this._capabilities
+    } catch (e) {
+      // Don't leak the packet listener if HELLO times out or the payload is malformed.
+      this.unsubPacket?.()
+      this.unsubPacket = null
+      throw e
+    }
   }
 
   private handlePacket(pkt: any, EVT: any) {
@@ -188,6 +204,7 @@ export class ConduytDevice {
 
   pin(id: number | string) {
     const self = this
+    if (!self.wasm) throw new Error('Device not connected — call connect() before pin()')
     const CMD = self.wasm.getCMD()
 
     let pinNum: number
@@ -217,7 +234,13 @@ export class ConduytDevice {
         await self.sendCommand(CMD.PIN_MODE, new Uint8Array([pinNum, modeVal]))
       },
       async write(value: number): Promise<void> {
-        await self.sendCommand(CMD.PIN_WRITE, new Uint8Array([pinNum, value & 0xFF, (value >> 8) & 0xFF]))
+        // Send a 2-byte payload (pin + value). The firmware's default
+        // PIN_WRITE behavior is digitalWrite for value <= 1 and analogWrite
+        // (PWM) for higher values — which is what callers want. Sending a
+        // third "mode hint" byte forces the firmware down the digital branch
+        // for PWM values too, breaking sliders. (See firmware
+        // ConduytDevice.cpp:312-339.)
+        await self.sendCommand(CMD.PIN_WRITE, new Uint8Array([pinNum, value & 0xFF]))
       },
       async read(): Promise<number> {
         const payload = isAnalog

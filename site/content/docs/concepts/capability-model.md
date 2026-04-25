@@ -24,11 +24,11 @@ This is not a summary or a hint. It is the complete picture.
 
 ## Validation at the source
 
-The host SDK parses HELLO_RESP into a structured capabilities object. All subsequent API calls validate against this object. Requesting PWM on a pin that lacks PWM capability throws a `ConduytCapabilityError` before any packet is sent to the device. The error happens in the host, immediately, with a clear message about what the pin does and does not support.
+The host SDK parses HELLO_RESP into a structured capabilities object that applications and tooling can introspect. The structured form is exposed as `device.capabilities` (TypeScript: `HelloResp`) and includes every pin's capability bitmask, every datastream, every module, and the bus counts. Tools like the [Playground Panel](/docs/getting-started/panel) use it to filter widget pin dropdowns to compatible pins only.
 
-This is a deliberate design choice. Sending an invalid command to a constrained microcontroller wastes time on the serial link, consumes firmware cycles to reject it, and produces an error response that the host must then parse and handle. Catching the error in the host SDK is faster and produces better diagnostics.
+The SDK also throws `ConduytCapabilityError` for the cases it can validate cheaply at call time — datastream lookups by name, module lookups by name, and I2C bus index out of range. Pin-level validation in the SDK is not yet enforced; the firmware backstops invalid pin requests instead (see below). If you want strict pin validation in your application, read `device.capabilities.pins[N].capabilities` and check the bit yourself before issuing the command.
 
-The firmware backstops the host: if a sketch override or a stale SDK lets a bad command through, the firmware also validates against its own canonical board profile and replies with a `PIN_MODE_UNSUPPORTED` NAK rather than touching unsafe hardware (e.g. calling `analogRead` on a non-ADC pin, which on some MCU families would block forever).
+The firmware always validates pin operations against its own canonical board profile and replies with a `PIN_MODE_UNSUPPORTED` NAK rather than touching unsafe hardware. The most consequential example: on the Renesas RA4M1 (Uno R4), `analogRead` on a non-ADC pin would otherwise block the firmware indefinitely waiting on a conversion that never completes. The firmware-side guard makes that unreachable.
 
 ## Where the per-board capability data comes from
 

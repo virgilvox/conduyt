@@ -186,7 +186,7 @@ const props = defineProps<{
   capabilities: HelloResp | null
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   close: []
   capabilities: [caps: HelloResp]
 }>()
@@ -216,7 +216,8 @@ const logEl = ref<HTMLElement | null>(null)
 const scopeCanvases = new Map<number, HTMLCanvasElement>()
 
 let device: ConduytDevice | null = null
-const polls = new Map<number, { stop: boolean; errored: boolean }>()
+type PollLoop = { stop: boolean; errored: boolean; timerId: ReturnType<typeof setTimeout> | null }
+const polls = new Map<number, PollLoop>()
 
 function ts() {
   const d = new Date()
@@ -273,11 +274,22 @@ async function ensureDevice() {
     const c = await d.connect()
     device = d
     caps.value = c
+    emit('capabilities', c)
     const sum = ['DIGITAL_OUT', 'DIGITAL_IN', 'PWM_OUT', 'ANALOG_IN'] as const
     const summary = sum.map(k => `${k}=${c.pins.filter(p => (p.capabilities & PIN_CAP[k]) !== 0).length}`).join(' ')
     log(`connected: ${c.firmwareName} v${c.firmwareVersion.join('.')} (pins=${c.pinCount} ${summary})`, 'ok')
     if (c.pins.filter(p => (p.capabilities & PIN_CAP.ANALOG_IN) !== 0).length === 0) {
       log('warning: firmware declared 0 ANALOG_IN pins. Toggle Permissive if your board has ADC.', 'err')
+    }
+    // Drop any restored widgets that bind to a pin this board doesn't have
+    // (e.g. switching from ESP32 with pin 32 back to an Uno R3 with pins 0–19).
+    const validPins = new Set(c.pins.map(p => p.pin))
+    const stale = widgets.value.filter(w => !validPins.has(w.pin))
+    if (stale.length) {
+      for (const w of stale) {
+        log(`removed widget bound to nonexistent pin ${w.pin} (${w.title})`, 'err')
+        removeWidget(w.id)
+      }
     }
     // Restart polling for any input widgets
     for (const w of widgets.value) {
@@ -430,14 +442,17 @@ async function momentaryDown(w: Widget) {
   } catch (e: any) { log(`button pin ${w.pin}: ${e.message ?? e}`, 'err') }
 }
 async function momentaryUp(w: Widget) {
-  if (!device || w.value === 0) return
+  if (w.value === 0) return
+  // Reset visual state regardless of device availability so the card
+  // doesn't stay stuck "pressed" if the user disconnects mid-press.
   w.value = 0; w.firing = false
+  if (!device) return
   try { await device.pin(w.pin).write(0) }
   catch (e: any) { log(`button pin ${w.pin}: ${e.message ?? e}`, 'err') }
 }
 
-let sliderPending = new Map<number, number>()
-let sliderInflight = new Set<number>()
+const sliderPending = new Map<number, number>()
+const sliderInflight = new Set<number>()
 async function flushSlider(w: Widget) {
   if (!device || sliderInflight.has(w.id)) return
   const v = sliderPending.get(w.id)
@@ -468,7 +483,9 @@ function startPoll(w: Widget) {
   const spec = specOf(w.type)
   if (spec.kind !== 'input' || spec.pollMs <= 0 || !device) return
   stopPoll(w.id)
-  const loop = { stop: false, errored: false }
+  const loop: { stop: boolean; errored: boolean; timerId: ReturnType<typeof setTimeout> | null } = {
+    stop: false, errored: false, timerId: null,
+  }
   polls.set(w.id, loop)
   const tick = async () => {
     if (loop.stop || !device) return
@@ -479,13 +496,17 @@ function startPoll(w: Widget) {
       if (!loop.errored) { log(`read pin ${w.pin}: ${e.message ?? e}`, 'err'); loop.errored = true }
       w.firing = false
     }
-    if (!loop.stop) setTimeout(tick, spec.pollMs)
+    if (!loop.stop) loop.timerId = setTimeout(tick, spec.pollMs)
   }
   tick()
 }
 function stopPoll(id: number) {
   const loop = polls.get(id)
-  if (loop) { loop.stop = true; polls.delete(id) }
+  if (loop) {
+    loop.stop = true
+    if (loop.timerId) clearTimeout(loop.timerId)
+    polls.delete(id)
+  }
 }
 
 function applyInput(w: Widget, v: number) {

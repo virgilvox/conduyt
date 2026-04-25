@@ -14,11 +14,11 @@ The ESP32 is the most fully-featured CONDUYT target. It supports every transport
 | MCU | Xtensa LX6, dual-core, 240 MHz |
 | Flash | 4 MB |
 | RAM | 520 KB SRAM |
-| GPIO | 34 pins |
-| ADC | 18 channels (12-bit) |
-| PWM | 16 channels |
-| I2C | 2 buses |
-| SPI | 3 buses |
+| GPIO | 40 silicon GPIOs (typically 28 broken out; GPIO 6–11/24/28–31 reserved for flash or unbonded) |
+| ADC | 8 ADC1 channels (GPIO 32–39) advertised as `analog_in`. ADC2 (GPIO 0,2,4,12–15,25–27) physically present but conflicts with active WiFi — not advertised. |
+| PWM | LEDC routable to every output-capable GPIO |
+| I2C | 2 buses (Wire + Wire1) |
+| SPI | 2 user-accessible buses (HSPI, VSPI). FSPI (SPI0/1) is reserved for flash. |
 | UART | 3 ports |
 | WiFi | 802.11 b/g/n (2.4 GHz only) |
 | BLE | 4.2 |

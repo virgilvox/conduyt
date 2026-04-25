@@ -44,7 +44,7 @@ The [Playground](/playground) lets you flash firmware, write code, and control h
 
 **Transports** - Serial, BLE, MQTT, WebSocket, TCP. Same protocol, same packets. Swap the wire, keep the code.
 
-**Capabilities** - On connect, the device describes itself: pin count, pin modes, loaded modules, declared datastreams, firmware version. The SDK validates operations before sending.
+**Capabilities** - On connect, the device describes itself: pin count, pin modes, loaded modules, declared datastreams, firmware version, factory MCU ID. The SDK validates module/datastream/I2C-bus operations on the host; pin-level mode checks are backstopped by the firmware with a `PIN_MODE_UNSUPPORTED` NAK.
 
 **Modules** - Opt-in firmware plugins for servos, NeoPixels, DHT sensors, and more. Enable with a compile flag, register in your sketch, and the host discovers them automatically.
 

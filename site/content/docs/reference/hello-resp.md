@@ -15,7 +15,7 @@ The HELLO_RESP payload (type `0x81`) is the device's self-description. The host 
 | 16 | version_major | 1 | Firmware major version |
 | 17 | version_minor | 1 | Firmware minor version |
 | 18 | version_patch | 1 | Firmware patch version |
-| 19 | mcu_id | 8 | Unique MCU identifier (or zeros) |
+| 19 | mcu_id | 8 | Factory-immutable MCU identifier. RA4M1 uses `R_BSP_UniqueIdGet`, RP2040 uses the flash JEDEC RUID, ESP32 uses the eFuse MAC, nRF52 uses `FICR.DEVICEID`, Teensy uses Kinetis `SIM_UID` / iMX RT `OCOTP_CFG`. Zero-padded to 8 bytes; zero on classic AVR without provisioning. |
 | 27 | ota_capable | 1 | 0x01 if OTA supported |
 | 28 | pin_count | 1 | Number of GPIO pins (N) |
 | 29 | pins[] | Nx1 | Per-pin capability bitmask |
@@ -112,7 +112,7 @@ Parsing walkthrough:
 
 1. Read 16 bytes at offset 0x00: firmware name is "MyBoard" (remaining bytes are `0x00` padding).
 2. Read 3 bytes at 0x10-0x12: firmware version 1.0.0.
-3. Read 8 bytes at 0x13-0x1A: MCU ID is all zeros (no unique ID set).
+3. Read 8 bytes at 0x13-0x1A: MCU ID. The walkthrough is contrived (all zeros); real firmware fills this from the silicon's factory unique-ID register — see the field reference above for the per-MCU source.
 4. Read 1 byte at 0x1B: OTA not supported.
 5. Read 1 byte at 0x1C: 3 pins declared. Read the next 3 bytes as pin capability bitmasks. Pin 0 has `0x0F` (digital in, digital out, PWM, analog in). Pins 1 and 13 each have `0x03` (digital in, digital out).
 6. Read bus counts at 0x20-0x22: 0 I2C, 0 SPI, 0 UART.
