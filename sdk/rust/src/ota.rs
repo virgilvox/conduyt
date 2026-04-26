@@ -9,6 +9,7 @@ use crate::transports::Transport;
 use sha2::{Digest, Sha256};
 
 /// Tunables for an OTA flash run.
+#[derive(Default)]
 pub struct FlashOptions<'a> {
     /// Bytes per OTA_CHUNK packet. `None` = auto-size from device max_payload
     /// (or 240 if not advertised).
@@ -18,12 +19,6 @@ pub struct FlashOptions<'a> {
     /// Optional progress callback invoked after every ACKed chunk:
     /// `on_progress(sent, total)`.
     pub on_progress: Option<&'a mut dyn FnMut(usize, usize)>,
-}
-
-impl<'a> Default for FlashOptions<'a> {
-    fn default() -> Self {
-        FlashOptions { chunk_size: None, sha256: None, on_progress: None }
-    }
 }
 
 /// Flash a firmware image to a connected device. Resolves once OTA_FINALIZE
