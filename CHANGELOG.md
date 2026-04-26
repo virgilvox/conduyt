@@ -1,5 +1,111 @@
 # Changelog
 
+## Unreleased — SDK breadth: module clients + OTA + docs everywhere
+
+The 0.3.3 release shipped a tight protocol spec; this batch fills in
+everything that lived around it. Nothing here changes wire bytes — but
+nearly every consumer-facing surface gets first-class support.
+
+### Module clients across all SDKs
+
+JS and Python had typed wrappers for all 7 firmware modules
+(Servo / NeoPixel / OLED / DHT / Encoder / Stepper / PID). Go, Rust, and
+Swift each had at most Servo. A user building a Rust desktop app or a
+Swift iOS controller hit a wall the moment they wanted to drive a
+NeoPixel strip. Closing that gap:
+
+- **Go SDK**: 1/7 → **7/7** modules. Each as a sub-package
+  (`sdk/go/modules/{neopixel,oled,dht,encoder,stepper,pid}`). 23 wire-
+  byte conformance tests.
+- **Rust SDK**: 1/7 → **7/7** modules under `conduyt::modules`. Each
+  takes `&mut Device<T>` + `module_id`. 26 tests.
+- **Swift SDK**: 0/7 → **7/7** modules under `Sources/ConduytKit/Modules`,
+  with a shared `DataLE.swift` extension for LE u16/i32/u32/f32 helpers.
+  22 tests, plus a new `MockTransport` shared with future test files.
+
+API alignment along the way:
+
+- `sdk/go/device.go::ModCmd` now returns `([]byte, error)` to match
+  what the Go SDK README has always claimed. Encoder.Read / DHT.Read
+  need the response bytes; the previous `error`-only signature made
+  those module wrappers unimplementable.
+- `sdk/rust/src/device.rs` now exposes `pub fn transport()` so module
+  tests can inspect `MockTransport.sent_packets` without an unsafe
+  layout cast.
+
+### Client-side OTA helpers
+
+The firmware has supported OTA since v0.3 (compile with
+`-DCONDUYT_OTA`), but no SDK exposed a chunked-flash flow. Anyone
+wanting to push a new firmware blob through CONDUYT had to hand-pack
+wire bytes and walk the offset sequence themselves. Fixed by shipping
+parallel `ConduytOTA` orchestrators in every SDK:
+
+- **JS**: `import { ConduytOTA } from 'conduyt-js'`. Web Crypto for
+  SHA-256 (works in Node 20+ and browsers). 10 tests.
+- **Python**: `from conduyt import ConduytOTA`. `hashlib.sha256` for
+  the digest. 8 tests.
+- **Go**: `import "github.com/virgilvox/conduyt/sdk/go/ota"`,
+  `ota.Flash(ctx, device, firmware, ota.Options{...})`. `crypto/sha256`.
+  7 tests.
+- **Rust**: `conduyt::ota::flash(...)` behind a new `ota` feature flag
+  (keeps the no_std core zero-dep). Uses the `sha2` crate. 7 tests.
+  CI now runs `cargo test --features ota` + `clippy --all-features`.
+- **Swift**: `ConduytOTA(device:).flash(_:options:)`. CryptoKit's
+  `SHA256` (no third-party dep — built into iOS 13+ / macOS 10.15+).
+  7 tests.
+
+All five orchestrators produce byte-identical OTA wire bytes for the
+same firmware blob. The 39 OTA tests + 71 module-client tests across
+SDKs are an implicit cross-SDK conformance net for module dispatch:
+identical asserts on the host side, identical decode on the firmware
+side via `firmware/test/test_native_modules`.
+
+### Firmware: native tests for library-bound modules
+
+`firmware/test/test_native_modules` now covers all 8 module classes,
+not just the 4 that didn't pull in vendor headers. Added minimal stub
+headers (`Servo.h`, `Adafruit_NeoPixel.h`, `Adafruit_GFX.h`,
+`Adafruit_SSD1306.h`, `DHT.h`) under `test/test_native_modules/stubs/`.
+Native test count: 86 → **114** (+28).
+
+Caught and fixed a real bug along the way: `ConduytModuleEncoder::pins()`
+returned an uninitialized `_pins[2] = {0, 0}` instead of populating it
+from `_pinA`/`_pinB`. The pin-claim conflict detection on the device
+was getting `{0, 0}` after every `attach`. Stepper had the right
+pattern; Encoder didn't. `test_encoder_attach_claims_two_pins`
+verifies the fix.
+
+### Documentation: 24 new pages
+
+The docs directory had 4 board pages for 18 supported boards, 3 module
+pages for 8 modules, and 1 SDK page for 6 SDKs. Now:
+
+- **All 18 board pages** present — every board CONDUYT firmware
+  compiles for has a docs page with specs, wiring notes, flashing
+  flow, and the `platformio.ini` env block.
+- **All 8 module pages** — added Encoder, OLED, PID, Stepper, and the
+  I2C-passthrough capability marker. Each documents firmware setup,
+  wiring, JS + Python host snippets, command + event tables.
+- **All 6 SDK pages** — added JS, Python, Go, Rust, Swift getting-
+  started pages alongside the existing WASM page.
+- **OTA how-to** at `docs/how-to/flash-ota.md` walks through the flow
+  in all five host languages.
+
+### Other 0.3.3 follow-ups bundled in
+
+- **Conformance + WASM CI**: two leftover `assert encoded[2] == 0x01`
+  checks in `sdk/python/tests/test_conformance.py` and
+  `sdk/wasm/tests/node.test.mjs` updated for the v2 protocol bump.
+  The Python test imports `PROTOCOL_VERSION` so future bumps don't
+  require a test edit.
+- **Manifest auto-sync**: `site/scripts/fetch-latest-firmware.mjs`
+  rewrites every `manifest*.json`'s `version` field to the GitHub
+  release tag it just downloaded. The playground's "version" badge
+  can no longer drift from what's actually served.
+- **CI step rename**: `firmware-ci.yml` no longer hardcodes a test
+  count in the step label (was "60 cases", now generic).
+
 ## 0.3.3 — Codegen owns SDK constants + WebSerial write race + CI gap
 
 Three audit-pass fixes bundled to keep the protocol/SDK/firmware story
