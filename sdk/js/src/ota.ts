@@ -64,6 +64,11 @@ async function sha256(data: Uint8Array): Promise<Uint8Array> {
   if (!subtle) {
     throw new Error('OTA: globalThis.crypto.subtle is unavailable. Use Node 20+ or a browser.')
   }
-  const buf = await subtle.digest('SHA-256', data)
+  // crypto.subtle.digest rejects Uint8Array typed as ArrayBufferLike
+  // (which now includes SharedArrayBuffer) under strict TS. Materialize
+  // into a fresh ArrayBuffer-backed view so the type is unambiguous.
+  const view = new Uint8Array(data.byteLength)
+  view.set(data)
+  const buf = await subtle.digest('SHA-256', view.buffer)
   return new Uint8Array(buf)
 }
