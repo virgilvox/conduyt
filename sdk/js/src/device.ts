@@ -251,6 +251,32 @@ export class ConduytDevice {
     this._on(eventType, handler)
   }
 
+  // ── OTA Primitives ─────────────────────────────────────
+  // High-level orchestration lives in ./ota.ts. These three are the raw
+  // wire commands; consumers normally use ConduytOTA.flash() instead.
+
+  /** Begin an OTA update. payload = total_bytes (u32 LE) + sha256 (32 bytes). */
+  async otaBegin(totalBytes: number, sha256: Uint8Array): Promise<void> {
+    if (sha256.length !== 32) throw new Error('OTA: sha256 must be 32 bytes')
+    const buf = new Uint8Array(36)
+    new DataView(buf.buffer).setUint32(0, totalBytes, true)
+    buf.set(sha256, 4)
+    await this._sendCommand(CMD.OTA_BEGIN, buf)
+  }
+
+  /** Send one OTA chunk. payload = offset (u32 LE) + data (N bytes). Offsets must be sequential. */
+  async otaChunk(offset: number, data: Uint8Array): Promise<void> {
+    const buf = new Uint8Array(4 + data.length)
+    new DataView(buf.buffer).setUint32(0, offset, true)
+    buf.set(data, 4)
+    await this._sendCommand(CMD.OTA_CHUNK, buf)
+  }
+
+  /** Finalize the OTA update. Firmware verifies SHA256 + reboots into the new image. */
+  async otaFinalize(): Promise<void> {
+    await this._sendCommand(CMD.OTA_FINALIZE)
+  }
+
   // ── Internal ───────────────────────────────────────────
 
   private _on(eventType: number, handler: EventHandler): void {

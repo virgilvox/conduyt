@@ -49,6 +49,22 @@ class ConduytDevice:
     async def reset(self) -> None:
         await self._send_command(CMD.RESET)
 
+    # OTA primitives. High-level orchestration lives in conduyt.ota.ConduytOTA.
+    async def ota_begin(self, total_bytes: int, sha256: bytes) -> None:
+        """Start an OTA update. sha256 must be exactly 32 bytes."""
+        if len(sha256) != 32:
+            raise ValueError("ota_begin: sha256 must be 32 bytes")
+        payload = total_bytes.to_bytes(4, "little") + sha256
+        await self._send_command(CMD.OTA_BEGIN, payload)
+
+    async def ota_chunk(self, offset: int, data: bytes) -> None:
+        """Send one OTA chunk. Offsets must be sequential (firmware NAKs out-of-order)."""
+        await self._send_command(CMD.OTA_CHUNK, offset.to_bytes(4, "little") + data)
+
+    async def ota_finalize(self) -> None:
+        """Finalize the update. Firmware verifies SHA256 + reboots into the new image."""
+        await self._send_command(CMD.OTA_FINALIZE)
+
     def pin(self, num: "int | str") -> _PinProxy:
         return _PinProxy(self, num)
 

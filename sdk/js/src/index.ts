@@ -20,6 +20,10 @@ export { ConduytNAKError, ConduytTimeoutError, ConduytDisconnectedError, Conduyt
 // Device
 export { ConduytDevice } from './device.js'
 
+// OTA orchestrator
+export { ConduytOTA } from './ota.js'
+export type { OTAFlashOptions } from './ota.js'
+
 // HELLO parser
 export { parseHelloResp } from './hello.js'
 
