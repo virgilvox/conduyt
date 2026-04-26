@@ -1,6 +1,6 @@
 [package]
 name = "conduyt"
-version = "0.3.3"
+version = "1.0.0"
 edition = "2021"
 description = "CONDUYT protocol SDK for Rust — host-side hardware control"
 license = "MIT"

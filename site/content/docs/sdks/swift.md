@@ -13,7 +13,7 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/virgilvox/conduyt.git", from: "0.3.0"),
+    .package(url: "https://github.com/virgilvox/conduyt.git", from: "1.0.0"),
 ],
 targets: [
     .target(
@@ -94,4 +94,4 @@ Every async device call throws `ConduytDeviceError`:
 
 ## Versioning
 
-The package follows the protocol version. `0.3.x` requires firmware running protocol version 2 — exposed as `ConduytProtocol.version`.
+The package follows the protocol version. `1.x` requires firmware running protocol version 2 — exposed as `ConduytProtocol.version`.

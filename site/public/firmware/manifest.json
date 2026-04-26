@@ -1,6 +1,6 @@
 {
   "name": "CONDUYT Firmware",
-  "version": "0.3.3",
+  "version": "1.0.0",
   "new_install_prompt_erase": true,
   "_comment": "Part paths are relative to this manifest. site/scripts/fetch-latest-firmware.mjs runs at build time and downloads the latest GitHub release artifacts into this directory so esp-web-tools can fetch them same-origin.",
   "builds": [

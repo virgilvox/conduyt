@@ -12,11 +12,11 @@ The Rust SDK is the source of truth for the protocol. The `conduyt` crate has a 
 ```toml
 # Cargo.toml — host client (default)
 [dependencies]
-conduyt = { version = "0.3", features = ["std"] }
+conduyt = { version = "1", features = ["std"] }
 
 # Cargo.toml — no_std embedded
 [dependencies]
-conduyt = { version = "0.3", default-features = false }
+conduyt = { version = "1", default-features = false }
 ```
 
 ## Quick start (host)
@@ -96,4 +96,4 @@ Every device method returns `Result<T, DeviceError<T::Error>>`. `DeviceError` di
 
 ## Versioning
 
-The crate uses semver. `0.3.x` requires firmware running protocol version 2 — exposed as `conduyt::PROTOCOL_VERSION`.
+The crate uses semver. `1.x` requires firmware running protocol version 2 — exposed as `conduyt::PROTOCOL_VERSION`.

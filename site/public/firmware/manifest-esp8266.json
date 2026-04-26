@@ -1,6 +1,6 @@
 {
   "name": "CONDUYT Firmware (ESP8266)",
-  "version": "0.3.3",
+  "version": "1.0.0",
   "new_install_prompt_erase": true,
   "builds": [
     {

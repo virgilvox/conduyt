@@ -93,4 +93,4 @@ The SDK ships `py.typed`. Install `mypy` and you'll get full inference on every 
 
 ## Versioning
 
-The SDK follows the protocol version. `conduyt-py 0.3.x` requires firmware running protocol version 2. The version byte is `conduyt.core.constants.PROTOCOL_VERSION`.
+The SDK follows the protocol version. `conduyt-py 1.x` requires firmware running protocol version 2. The version byte is `conduyt.core.constants.PROTOCOL_VERSION`.

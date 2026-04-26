@@ -88,4 +88,4 @@ Look up the module ID from `device.Capabilities().Modules` to avoid hard-coding 
 
 ## Versioning
 
-`conduyt-go` is versioned by git tag (`v0.3.3`, etc.). It requires firmware running protocol version 2. The version byte is exported as `conduyt.ProtocolVersion`.
+`conduyt-go` is versioned by git tag (`v1.0.0`, etc.). It requires firmware running protocol version 2. The version byte is exported as `conduyt.ProtocolVersion`.

@@ -91,4 +91,4 @@ Full types ship in the package. `device.module('servo')` returns a typed proxy s
 
 ## Versioning
 
-The SDK follows the protocol version. `0.3.x` SDKs only talk to firmware running protocol version 2 (the current spec). The protocol version byte is exported as `PROTOCOL_VERSION` for runtime checks.
+The SDK follows the protocol version. `1.x` SDKs only talk to firmware running protocol version 2 (the current spec). The protocol version byte is exported as `PROTOCOL_VERSION` for runtime checks.

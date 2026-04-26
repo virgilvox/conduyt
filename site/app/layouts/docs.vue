@@ -15,7 +15,7 @@
           </svg>
           <span>CONDUYT</span>
         </NuxtLink>
-        <div class="sidebar-version">v0.2</div>
+        <div class="sidebar-version">v1.0</div>
       </div>
 
       <nav class="sidebar-nav">
@@ -65,10 +65,24 @@ const navGroups = [
   {
     title: 'Boards',
     items: [
-      { path: '/docs/boards/esp32', title: 'ESP32' },
-      { path: '/docs/boards/arduino-uno-r4', title: 'Arduino Uno R4' },
       { path: '/docs/boards/arduino-uno-r3', title: 'Arduino Uno R3' },
+      { path: '/docs/boards/arduino-uno-r4', title: 'Arduino Uno R4 Minima' },
+      { path: '/docs/boards/arduino-uno-r4-wifi', title: 'Arduino Uno R4 WiFi' },
+      { path: '/docs/boards/arduino-mega-2560', title: 'Arduino Mega 2560' },
+      { path: '/docs/boards/arduino-nano', title: 'Arduino Nano' },
+      { path: '/docs/boards/arduino-nano-every', title: 'Arduino Nano Every' },
+      { path: '/docs/boards/arduino-nano-esp32', title: 'Arduino Nano ESP32' },
+      { path: '/docs/boards/arduino-leonardo', title: 'Arduino Leonardo' },
+      { path: '/docs/boards/esp32', title: 'ESP32' },
+      { path: '/docs/boards/esp32-s2', title: 'ESP32-S2' },
+      { path: '/docs/boards/esp32-s3', title: 'ESP32-S3' },
+      { path: '/docs/boards/esp32-c3', title: 'ESP32-C3' },
+      { path: '/docs/boards/nodemcu-v2', title: 'NodeMCU v2 (ESP8266)' },
       { path: '/docs/boards/rp2040-pico', title: 'Raspberry Pi Pico' },
+      { path: '/docs/boards/nrf52840-dk', title: 'nRF52840 DK' },
+      { path: '/docs/boards/teensy-3-6', title: 'Teensy 3.6' },
+      { path: '/docs/boards/teensy-4-0', title: 'Teensy 4.0' },
+      { path: '/docs/boards/teensy-4-1', title: 'Teensy 4.1' },
     ],
   },
   {
@@ -76,7 +90,12 @@ const navGroups = [
     items: [
       { path: '/docs/modules/servo', title: 'Servo' },
       { path: '/docs/modules/neopixel', title: 'NeoPixel' },
+      { path: '/docs/modules/oled', title: 'OLED (SSD1306)' },
       { path: '/docs/modules/dht', title: 'DHT (Temperature)' },
+      { path: '/docs/modules/encoder', title: 'Encoder' },
+      { path: '/docs/modules/stepper', title: 'Stepper' },
+      { path: '/docs/modules/pid', title: 'PID Controller' },
+      { path: '/docs/modules/i2c-passthrough', title: 'I2C Passthrough' },
     ],
   },
   {
@@ -86,18 +105,29 @@ const navGroups = [
       { path: '/docs/how-to/connect-mqtt', title: 'Connect over MQTT' },
       { path: '/docs/how-to/connect-ble', title: 'Connect over BLE' },
       { path: '/docs/how-to/use-datastreams', title: 'Use Datastreams' },
+      { path: '/docs/how-to/flash-ota', title: 'Flash OTA' },
       { path: '/docs/how-to/add-module', title: 'Write a Module' },
       { path: '/docs/how-to/broker-setup', title: 'Set Up MQTT Broker' },
       { path: '/docs/how-to/troubleshooting', title: 'Troubleshooting' },
     ],
   },
   {
-    title: 'SDKs & APIs',
+    title: 'SDKs',
     items: [
-      { path: '/docs/reference/js-api', title: 'JavaScript' },
-      { path: '/docs/reference/python-api', title: 'Python' },
-      { path: '/docs/reference/firmware-api', title: 'Firmware (C++)' },
+      { path: '/docs/sdks/javascript', title: 'JavaScript' },
+      { path: '/docs/sdks/python', title: 'Python' },
+      { path: '/docs/sdks/go', title: 'Go' },
+      { path: '/docs/sdks/rust', title: 'Rust' },
+      { path: '/docs/sdks/swift', title: 'Swift' },
       { path: '/docs/sdks/wasm', title: 'WASM (Browser)' },
+    ],
+  },
+  {
+    title: 'API Reference',
+    items: [
+      { path: '/docs/reference/js-api', title: 'JavaScript API' },
+      { path: '/docs/reference/python-api', title: 'Python API' },
+      { path: '/docs/reference/firmware-api', title: 'Firmware (C++)' },
     ],
   },
   {
