@@ -41,6 +41,10 @@ impl<T: Transport> Device<T> {
         Self { transport, seq: 0 }
     }
 
+    /// Borrow the underlying transport. Useful for tests that need to inspect
+    /// the wire bytes a `MockTransport` captured.
+    pub fn transport(&self) -> &T { &self.transport }
+
     /// Connect and perform HELLO handshake.
     pub fn connect(&mut self) -> Result<Vec<u8>, DeviceError<T::Error>> {
         self.transport.connect().map_err(DeviceError::Transport)?;

@@ -105,10 +105,19 @@ func (d *Device) Capabilities() *HelloResp {
 	return d.hello
 }
 
-// ModCmd sends a MOD_CMD and waits for ACK/response.
-func (d *Device) ModCmd(ctx context.Context, payload []byte) error {
-	_, err := d.sendCommand(ctx, CmdModCmd, payload)
-	return err
+// ModCmd sends a MOD_CMD and waits for ACK/MOD_RESP. Returns the response
+// payload (empty for ACK, populated for MOD_RESP). Module commands that
+// only ACK can ignore the byte slice; commands like Encoder.Read or
+// DHT.Read need the bytes.
+func (d *Device) ModCmd(ctx context.Context, payload []byte) ([]byte, error) {
+	resp, err := d.sendCommand(ctx, CmdModCmd, payload)
+	if err != nil {
+		return nil, err
+	}
+	if resp == nil {
+		return nil, nil
+	}
+	return resp.Payload, nil
 }
 
 // sendCommand sends a command and waits for the response.
