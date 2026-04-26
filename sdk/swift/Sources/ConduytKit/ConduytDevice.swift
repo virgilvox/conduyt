@@ -89,6 +89,41 @@ public class ConduytDevice {
         return resp.payload
     }
 
+    // MARK: - OTA Primitives
+    // High-level orchestration lives in ConduytOTA.swift. These three are
+    // the raw wire commands; consumers normally use ConduytOTA.flash() instead.
+
+    /// Begin an OTA update. `sha256` must be exactly 32 bytes.
+    public func otaBegin(totalBytes: UInt32, sha256: Data) async throws {
+        guard sha256.count == 32 else {
+            throw ConduytDeviceError.nak(code: 0xFE, name: "OTA_BAD_SHA_LENGTH")
+        }
+        var p = Data(count: 4)
+        p[0] = UInt8(totalBytes & 0xFF)
+        p[1] = UInt8((totalBytes >> 8) & 0xFF)
+        p[2] = UInt8((totalBytes >> 16) & 0xFF)
+        p[3] = UInt8((totalBytes >> 24) & 0xFF)
+        p.append(sha256)
+        _ = try await sendCommand(type: ConduytCmd.otaBegin, payload: p)
+    }
+
+    /// Send one OTA chunk. Offsets must be sequential — out-of-order chunks
+    /// NAK with OTA_INVALID.
+    public func otaChunk(offset: UInt32, data: Data) async throws {
+        var p = Data(count: 4)
+        p[0] = UInt8(offset & 0xFF)
+        p[1] = UInt8((offset >> 8) & 0xFF)
+        p[2] = UInt8((offset >> 16) & 0xFF)
+        p[3] = UInt8((offset >> 24) & 0xFF)
+        p.append(data)
+        _ = try await sendCommand(type: ConduytCmd.otaChunk, payload: p)
+    }
+
+    /// Finalize the OTA update. Firmware verifies SHA256 + reboots.
+    public func otaFinalize() async throws {
+        _ = try await sendCommand(type: ConduytCmd.otaFinalize)
+    }
+
     // MARK: - Internal
 
     private func sendCommand(type: UInt8, payload: Data = Data()) async throws -> ConduytPacket {

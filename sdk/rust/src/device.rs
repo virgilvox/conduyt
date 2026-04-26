@@ -115,6 +115,35 @@ impl<T: Transport> Device<T> {
     }
 
     /// Send a module command.
+    /// Begin an OTA update. `sha256` must be exactly 32 bytes.
+    pub fn ota_begin(&mut self, total_bytes: u32, sha256: &[u8]) -> Result<(), DeviceError<T::Error>> {
+        if sha256.len() != 32 {
+            // Reuse WireError as a generic argument-shape error.
+            return Err(DeviceError::WireError(crate::wire::WireError::IncompletePkt));
+        }
+        let mut payload = [0u8; 36];
+        payload[0..4].copy_from_slice(&total_bytes.to_le_bytes());
+        payload[4..36].copy_from_slice(sha256);
+        self.send_command(CMD_OTA_BEGIN, &payload)?;
+        Ok(())
+    }
+
+    /// Send one OTA chunk. Offsets must be sequential — the firmware NAKs
+    /// out-of-order chunks with OTA_INVALID.
+    pub fn ota_chunk(&mut self, offset: u32, data: &[u8]) -> Result<(), DeviceError<T::Error>> {
+        let mut payload = Vec::with_capacity(4 + data.len());
+        payload.extend_from_slice(&offset.to_le_bytes());
+        payload.extend_from_slice(data);
+        self.send_command(CMD_OTA_CHUNK, &payload)?;
+        Ok(())
+    }
+
+    /// Finalize the OTA update. Firmware verifies the SHA256 + reboots.
+    pub fn ota_finalize(&mut self) -> Result<(), DeviceError<T::Error>> {
+        self.send_command(CMD_OTA_FINALIZE, &[])?;
+        Ok(())
+    }
+
     pub fn mod_cmd(&mut self, payload: &[u8]) -> Result<Vec<u8>, DeviceError<T::Error>> {
         let resp = self.send_command(CMD_MOD_CMD, payload)?;
         Ok(resp.payload)

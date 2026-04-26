@@ -2,6 +2,7 @@ package conduyt
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"strconv"
 	"strings"
@@ -118,6 +119,36 @@ func (d *Device) ModCmd(ctx context.Context, payload []byte) ([]byte, error) {
 		return nil, nil
 	}
 	return resp.Payload, nil
+}
+
+// OTABegin starts an OTA update. sha256 must be exactly 32 bytes. The
+// firmware allocates space + verifies the digest at finalize time.
+func (d *Device) OTABegin(ctx context.Context, totalBytes uint32, sha256 []byte) error {
+	if len(sha256) != 32 {
+		return fmt.Errorf("OTABegin: sha256 must be 32 bytes, got %d", len(sha256))
+	}
+	payload := make([]byte, 36)
+	binary.LittleEndian.PutUint32(payload[0:4], totalBytes)
+	copy(payload[4:36], sha256)
+	_, err := d.sendCommand(ctx, CmdOTABegin, payload)
+	return err
+}
+
+// OTAChunk sends one OTA chunk. Offsets must be sequential — the firmware
+// NAKs out-of-order chunks with OTA_INVALID.
+func (d *Device) OTAChunk(ctx context.Context, offset uint32, data []byte) error {
+	payload := make([]byte, 4+len(data))
+	binary.LittleEndian.PutUint32(payload[0:4], offset)
+	copy(payload[4:], data)
+	_, err := d.sendCommand(ctx, CmdOTAChunk, payload)
+	return err
+}
+
+// OTAFinalize finalizes the update. Firmware verifies the SHA256 and reboots
+// into the new image. The next round-trip will fail until you reconnect.
+func (d *Device) OTAFinalize(ctx context.Context) error {
+	_, err := d.sendCommand(ctx, CmdOTAFinalize, nil)
+	return err
 }
 
 // sendCommand sends a command and waits for the response.

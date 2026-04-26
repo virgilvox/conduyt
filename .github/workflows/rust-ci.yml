@@ -18,12 +18,15 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           components: clippy
-      - name: Test
+      - name: Test (default)
         working-directory: sdk/rust
         run: cargo test
+      - name: Test (ota feature)
+        working-directory: sdk/rust
+        run: cargo test --features ota
       - name: Test no_std
         working-directory: sdk/rust
         run: cargo test --no-default-features
       - name: Clippy
         working-directory: sdk/rust
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --all-features -- -D warnings

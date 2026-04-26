@@ -16,6 +16,8 @@ pub mod transports;
 pub mod device;
 #[cfg(feature = "std")]
 pub mod modules;
+#[cfg(feature = "ota")]
+pub mod ota;
 
 pub use crc8::crc8;
 pub use wire::{Packet, wire_encode, wire_decode, make_packet, wire_find_packet};
