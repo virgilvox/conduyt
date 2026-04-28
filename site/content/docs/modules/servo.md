@@ -62,15 +62,15 @@ npm install conduyt-js
 // servo.mjs
 import { ConduytDevice } from 'conduyt-js'
 import { SerialTransport } from 'conduyt-js/transports/serial'
-import { Servo } from 'conduyt-js/modules/servo'
+import { ConduytServo } from 'conduyt-js/modules/servo'
 
 const device = await ConduytDevice.connect(
   new SerialTransport({ path: '<YOUR_PORT>' })
 )
 
-const servo = new Servo(device, 0)   // 0 = first registered module
+const servo = new ConduytServo(device)   // resolves the "servo" module from HELLO_RESP
 
-// Attach to pin 9 with default pulse range (544–2400 microseconds)
+// Attach to pin 9 with default pulse range (544 to 2400 microseconds)
 await servo.attach(9, 544, 2400)
 
 // Sweep from 0 to 180 degrees

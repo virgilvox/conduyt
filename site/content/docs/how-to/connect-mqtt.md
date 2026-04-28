@@ -186,7 +186,9 @@ All topics are prefixed with `conduyt/{deviceId}/`:
 
 ## QoS strategy
 
-| Packet Type | QoS | Why |
+The current SDKs publish every CONDUYT packet at a single QoS level. Default is QoS 1 (at-least-once); both the JS and Python `MQTTTransport` accept a `qos: 0 | 1 | 2` option to override that uniformly. Per-packet-type QoS routing is not implemented today; the table below is the *recommended* future strategy if you fork the transport for stricter guarantees.
+
+| Packet Type | Recommended QoS | Why |
 |-------------|-----|-----|
 | PIN_WRITE, PIN_MODE | 1 | Must arrive; writes are idempotent so redelivery is safe |
 | PIN_EVENT, STREAM_DATA | 0 | High frequency; stale data is worthless |
@@ -201,7 +203,7 @@ When the device connects to the broker, it registers an LWT:
 - On connect: publishes `"online"` to `conduyt/{deviceId}/status` with `retain=true`
 - On unexpected disconnect: the broker publishes `"offline"` to the same topic
 
-Host SDKs subscribe to the `status` topic and fire disconnect events automatically.
+The JS host SDK subscribes to the `status` topic on connect; the Python SDK currently subscribes only to `evt/#`. Neither host SDK fires a "disconnect" event from the status message today. If you need that, listen for the topic via your own MQTT client and react to `"offline"` payloads, or wrap the transport in `ReconnectTransport` (JS only) to auto-reconnect on link drops.
 
 ## Framing
 

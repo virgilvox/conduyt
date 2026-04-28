@@ -68,13 +68,13 @@ Breakout boards have the pull-up resistor built in. Just connect VCC, DATA, GND 
 // dht.mjs
 import { ConduytDevice } from 'conduyt-js'
 import { SerialTransport } from 'conduyt-js/transports/serial'
-import { DHT } from 'conduyt-js/modules/dht'
+import { ConduytDHT } from 'conduyt-js/modules/dht'
 
 const device = await ConduytDevice.connect(
   new SerialTransport({ path: '<YOUR_PORT>' })
 )
 
-const dht = new DHT(device, 0)
+const dht = new ConduytDHT(device)
 
 // Initialize: pin 4, sensor type 22 (use 11 for DHT11)
 await dht.begin(4, 22)

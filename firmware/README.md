@@ -44,8 +44,10 @@ ConduytSerial  transport(Serial, 115200);
 ConduytDevice  device("ModuleDemo", "1.0.0", transport);
 
 void setup() {
+  // Modules use a default constructor; the host calls each module's
+  // begin() command over the wire to configure pins/counts/etc.
   device.addModule(new ConduytModuleServo());
-  device.addModule(new ConduytModuleNeoPixel(6, 30)); // pin 6, 30 LEDs
+  device.addModule(new ConduytModuleNeoPixel());
   device.begin();
 }
 

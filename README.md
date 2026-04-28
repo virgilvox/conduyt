@@ -39,7 +39,11 @@ const device = await ConduytDevice.connect(
 )
 await device.pin(13).mode('output')
 await device.pin(13).write(1)
-const value = await device.pin(A0).read('analog')
+
+// 'A0' as a pin name puts the proxy in analog mode automatically.
+const value = await device.pin('A0').read()
+// Or be explicit: await device.pin(0).analogRead()
+
 await device.disconnect()
 ```
 
@@ -53,7 +57,11 @@ device = ConduytDevice(SerialTransport("/dev/ttyUSB0"))
 await device.connect()
 await device.pin(13).mode("output")
 await device.pin(13).write(1)
-value = await device.pin(0).read("analog")
+
+# 'A0' as a pin name puts the proxy in analog mode automatically.
+value = await device.pin("A0").read()
+# Or be explicit: await device.pin(0).analog_read()
+
 await device.disconnect()
 ```
 

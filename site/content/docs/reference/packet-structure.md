@@ -107,7 +107,7 @@ TCP, WebSocket, and MQTT transports skip COBS. TCP uses length-prefixed reads, a
 |---|---|
 | Serial (UART/USB) | Yes |
 | USB CDC | Yes |
-| BLE (NUS) | Yes |
+| BLE | Yes |
 | CLASP | Yes |
 | TCP | No |
 | WebSocket | No |

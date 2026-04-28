@@ -88,7 +88,7 @@ Datastreams are named, typed data channels for application-level data. A tempera
 
 ```cpp
 // Firmware: declare and push
-device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
+device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);
 device.writeDatastream("temperature", 22.5f);
 ```
 

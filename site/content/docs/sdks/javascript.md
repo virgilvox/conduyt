@@ -26,10 +26,10 @@ import { SerialTransport } from 'conduyt-js/transports/serial'
 const transport = new SerialTransport({ path: '/dev/cu.usbmodem14101', baudRate: 115200 })
 const device = await ConduytDevice.connect(transport)
 
-console.log('connected to', device.firmwareName)
+console.log('connected to', device.capabilities.firmwareName)
 
-await device.pinMode(13, 'output')
-await device.pinWrite(13, 1)
+await device.pin(13).mode('output')
+await device.pin(13).write(1)
 
 await device.disconnect()
 ```
@@ -40,12 +40,16 @@ await device.disconnect()
 import { ConduytDevice } from 'conduyt-js'
 import { WebSerialTransport } from 'conduyt-js/transports/web-serial'
 
+// Inside a click / keydown handler (WebSerial requires a user gesture).
+// Don't call port.open() yourself — the transport opens the port internally
+// using the baudRate option. Pre-opening throws "port is already open".
 const port = await navigator.serial.requestPort()
-const transport = new WebSerialTransport({ port, baudRate: 115200 })
-const device = await ConduytDevice.connect(transport)
+const device = await ConduytDevice.connect(
+  new WebSerialTransport({ port, baudRate: 115200 })
+)
 
-await device.pinMode(13, 'output')
-await device.pinWrite(13, 1)
+await device.pin(13).mode('output')
+await device.pin(13).write(1)
 ```
 
 ## Modules
@@ -62,28 +66,38 @@ import { ConduytStepper }  from 'conduyt-js/modules/stepper'
 import { ConduytPID }      from 'conduyt-js/modules/pid'
 ```
 
-Each constructor takes a connected `ConduytDevice` and resolves the module ID by name from the `HELLO_RESP`. See the per-module pages under [Modules](/docs/modules) for command reference and examples.
+Each constructor takes a connected `ConduytDevice` and resolves the module ID by name from the `HELLO_RESP`. See the per-module pages under [Modules](/docs/modules/servo) for command reference and examples.
 
 ## Datastreams
 
-Datastreams are firmware-side named values (sensor readings, knobs, status) that auto-stream to the host. They appear in `HELLO_RESP.datastreams` and you subscribe by name:
+Datastreams are firmware-side named values (sensor readings, knobs, status) that auto-stream to the host. They appear in `HELLO_RESP.datastreams`. Subscribe via the proxy returned by `device.datastream(name)`:
 
 ```javascript
-device.onDatastream('temperature', (value) => {
+// Read once
+const raw = await device.datastream('temperature').read()
+
+// Write a value (writable datastreams only)
+await device.datastream('setpoint').write(22.5)
+
+// Subscribe (async iterable)
+for await (const value of device.datastream('temperature').subscribe()) {
   console.log('temp:', value)
-})
-await device.streamStart()
+}
 ```
 
 ## Transports
 
 | Transport | Module | Where it works |
 |---|---|---|
-| Node.js Serial | `conduyt-js/transports/serial` | Node, Bun, Electron — uses `serialport` |
+| Node.js Serial | `conduyt-js/transports/serial` | Node, Bun, Electron (uses the `serialport` package) |
 | WebSerial | `conduyt-js/transports/web-serial` | Chrome / Edge / Opera browsers |
-| Mock | `conduyt-js/transports/mock` | Tests — captures sent bytes, lets you inject responses |
+| BLE | `conduyt-js/transports/ble` | Browsers with WebBluetooth (Chrome / Edge desktop) |
+| MQTT | `conduyt-js/transports/mqtt` | Node and browsers (uses the `mqtt` package) |
+| WebSocket | `conduyt-js/transports/websocket` | Node and browsers |
+| CLASP | `conduyt-js/transports/clasp` | Browser CLASP tunnel |
+| Mock | `conduyt-js/transports/mock` | Tests. Captures sent bytes, lets you inject responses |
 
-WebBluetooth and WebUSB transports are planned. For embedded targets that need a tiny binary instead of full TypeScript, use the [WASM SDK](/docs/sdks/wasm) directly.
+For embedded targets that need a tiny binary instead of full TypeScript, use the [WASM SDK](/docs/sdks/wasm) directly.
 
 ## TypeScript
 

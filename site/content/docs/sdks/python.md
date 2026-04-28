@@ -63,7 +63,7 @@ await servo.attach(pin=9)
 await servo.write(angle=90)
 ```
 
-Pass the module ID returned by `HELLO_RESP.modules` (often `0` if you only registered one module). See the per-module pages under [Modules](/docs/modules) for full command references.
+Pass the module ID returned by `HELLO_RESP.modules` (often `0` if you only registered one module). See the per-module pages under [Modules](/docs/modules/servo) for full command references.
 
 ## Datastreams
 

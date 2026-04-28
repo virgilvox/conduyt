@@ -180,5 +180,9 @@ Subscribing with a very short interval (e.g., 10ms) floods the serial buffer.
 **Fix:** Use a reasonable interval (100ms+) and set a change threshold so the device only sends updates when the value changes:
 
 ```javascript
-await device.pin(0).subscribe({ interval: 100, threshold: 5 })
+// `intervalMs` (not `interval`) is the option name; `threshold` only emits
+// when the value moves by more than this delta from the last report.
+for await (const v of device.pin('A0').subscribe({ intervalMs: 100, threshold: 5 })) {
+  console.log(v)
+}
 ```

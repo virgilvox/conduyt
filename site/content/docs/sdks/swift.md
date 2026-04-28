@@ -33,15 +33,17 @@ Minimum platforms: iOS 15, macOS 12 (`async`/`await` requires it).
 
 ```swift
 import ConduytKit
-import CoreBluetooth
 
-let transport = BLETransport(serviceUUID: CBUUID(string: "..."))
+// BLETransport(name: String? = nil, uuid: UUID? = nil). Pass `name:` to filter
+// the picker by advertised name, `uuid:` to target a specific device, or
+// neither to take the first CONDUYT-service advertiser.
+let transport = BLETransport()
 let device = ConduytDevice(transport: transport)
 
 Task {
     do {
         let hello = try await device.connect()
-        print("connected — \(hello.count) bytes of HELLO_RESP")
+        print("connected, \(hello.count) bytes of HELLO_RESP")
 
         try await device.pinMode(13, mode: ConduytPinMode.output)
         try await device.pinWrite(13, value: 1)
@@ -70,7 +72,7 @@ try await neo.fill(r: 0, g: 255, b: 0)
 try await neo.show()
 ```
 
-Available wrappers: `ConduytServo`, `ConduytNeoPixel`, `ConduytOLED`, `ConduytDHT`, `ConduytEncoder`, `ConduytStepper`, `ConduytPID`. See per-module pages under [Modules](/docs/modules).
+Available wrappers: `ConduytServo`, `ConduytNeoPixel`, `ConduytOLED`, `ConduytDHT`, `ConduytEncoder`, `ConduytStepper`, `ConduytPID`. See per-module pages under [Modules](/docs/modules/servo).
 
 ## Errors
 

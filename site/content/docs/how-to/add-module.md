@@ -177,7 +177,7 @@ The Python SDK doesn't have a `.module()` proxy. For custom modules, write a thi
 
 ```python
 # relay.py
-from conduyt.protocol import CMD_MOD_CMD
+from conduyt.core.constants import CMD
 
 
 class RelayModule:
@@ -190,13 +190,14 @@ class RelayModule:
     async def set_state(self, on: bool):
         """Send command 0x01: set relay state."""
         payload = bytes([self._id, 0x01, int(on)])
-        await self._device._send_command(CMD_MOD_CMD, payload)
+        await self._device._send_command(CMD.MOD_CMD, payload)
 
     async def get_state(self) -> int:
         """Send command 0x02: read relay state."""
         payload = bytes([self._id, 0x02])
-        resp = await self._device._send_command(CMD_MOD_CMD, payload)
-        return resp[0]
+        resp = await self._device._send_command(CMD.MOD_CMD, payload)
+        # MOD_RESP payload is `module_id(1) + data(N)`; skip the id byte.
+        return resp[1] if len(resp) > 1 else 0
 ```
 
 Usage:

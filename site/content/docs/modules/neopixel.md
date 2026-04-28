@@ -55,13 +55,13 @@ GND            ────► GND (connect Arduino GND + supply GND + strip GND
 // neopixel.mjs
 import { ConduytDevice } from 'conduyt-js'
 import { SerialTransport } from 'conduyt-js/transports/serial'
-import { NeoPixel } from 'conduyt-js/modules/neopixel'
+import { ConduytNeoPixel } from 'conduyt-js/modules/neopixel'
 
 const device = await ConduytDevice.connect(
   new SerialTransport({ path: '<YOUR_PORT>' })
 )
 
-const strip = new NeoPixel(device, 0)
+const strip = new ConduytNeoPixel(device)
 
 // Initialize: pin 6, 30 LEDs
 await strip.begin(6, 30)
@@ -117,15 +117,16 @@ asyncio.run(main())
 
 | Command | ID | Payload | Description |
 |---------|-----|---------|-------------|
-| Begin | `0x01` | `pin(1) + count(2)` | Initialize strip on pin with pixel count |
-| SetPixel | `0x02` | `index(2) + r(1) + g(1) + b(1)` | Set one pixel's RGB color |
-| SetPixelW | `0x03` | `index(2) + r(1) + g(1) + b(1) + w(1)` | Set one pixel's RGBW color (SK6812) |
-| Fill | `0x04` | `r(1) + g(1) + b(1)` | Set all pixels to one color |
+| Begin | `0x01` | `pin(1) + count(2) + type(1)` | Initialize strip on pin with pixel count and strip type (0 = NEO_GRB+800kHz default) |
+| SetPixel | `0x02` | `index(2) + r(1) + g(1) + b(1)` or `+ w(1)` | Set one pixel. RGBW (SK6812) when payload is 6 bytes; RGB when 5 |
+| SetRange | `0x03` | `start(2) + count(2) + r(1) + g(1) + b(1)` | Set a contiguous range of pixels to one color |
+| Fill | `0x04` | `r(1) + g(1) + b(1)` or `+ w(1)` | Fill all pixels. RGBW when payload is 4 bytes; RGB when 3 |
 | Show | `0x05` | (none) | Push the buffer to the physical strip |
-| Brightness | `0x06` | `level(1)` | Set global brightness, 0–255 |
+| Brightness | `0x06` | `level(1)` | Set global brightness, 0 to 255 |
 
 ## Notes
 
 - **Always call `show()` after changing pixels.** Changes are buffered in RAM until `show()` pushes them to the strip.
 - **RAM cost:** Each pixel uses ~3 bytes on the MCU. A 300-pixel strip = ~900 bytes. On the Uno R3 (2 KB RAM total), keep strips under ~50 pixels. ESP32 and Pico can handle hundreds.
-- **RGBW strips** (SK6812) use `setPixelW()` with a 4th white channel value.
+- **RGBW strips** (SK6812): pass a 5th `w` argument to `setPixel(index, r, g, b, w)` or 4th to `fill(r, g, b, w)`. The wrapper extends the payload by one byte; the firmware dispatches by payload size.
+- **`setRange(start, count, r, g, b)`**: paint a contiguous run of pixels in one packet. Cheaper than calling `setPixel` count times when the run is solid color.

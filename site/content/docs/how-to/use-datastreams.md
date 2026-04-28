@@ -22,10 +22,10 @@ void setup() {
 
   // Read-only: device pushes values, host reads/subscribes
   // Args: name, type, unit, writable
-  device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);
 
   // Writable: host writes values, device receives them
-  device.addDatastream("setpoint", CONDUYT_TYPE_FLOAT32, "celsius", true);
+  device.addDatastream("setpoint", CONDUYT_FLOAT32, "celsius", true);
 
   device.begin();
 }
@@ -77,15 +77,17 @@ If you don't call `ctx.ack()`, the device auto-acks. Call `ctx.nak(errorCode)` t
 
 | Code | Constant | Size | Range |
 |------|----------|------|-------|
-| `0x01` | `CONDUYT_TYPE_BOOL` | 1 byte | 0 or 1 |
-| `0x02` | `CONDUYT_TYPE_INT8` | 1 byte | -128 to 127 |
-| `0x03` | `CONDUYT_TYPE_UINT8` | 1 byte | 0 to 255 |
-| `0x04` | `CONDUYT_TYPE_INT16` | 2 bytes | -32768 to 32767 |
-| `0x05` | `CONDUYT_TYPE_UINT16` | 2 bytes | 0 to 65535 |
-| `0x06` | `CONDUYT_TYPE_INT32` | 4 bytes | -2^31 to 2^31-1 |
-| `0x07` | `CONDUYT_TYPE_FLOAT32` | 4 bytes | IEEE 754 float |
-| `0x08` | `CONDUYT_TYPE_STRING` | variable | UTF-8, null-terminated |
-| `0x09` | `CONDUYT_TYPE_BYTES` | variable | Raw binary |
+| `0x01` | `CONDUYT_BOOL` | 1 byte | 0 or 1 |
+| `0x02` | `CONDUYT_INT8` | 1 byte | -128 to 127 |
+| `0x03` | `CONDUYT_UINT8` | 1 byte | 0 to 255 |
+| `0x04` | `CONDUYT_INT16` | 2 bytes | -32768 to 32767 |
+| `0x05` | `CONDUYT_UINT16` | 2 bytes | 0 to 65535 |
+| `0x06` | `CONDUYT_INT32` | 4 bytes | -2^31 to 2^31-1 |
+| `0x07` | `CONDUYT_FLOAT32` | 4 bytes | IEEE 754 float |
+| `0x08` | `CONDUYT_STRING` | variable | UTF-8, null-terminated |
+| `0x09` | `CONDUYT_BYTES` | variable | Raw binary |
+
+The verbose `CONDUYT_TYPE_<NAME>` forms in `Conduyt.h` are aliases of these short forms; either works in `addDatastream()`.
 
 ## Host: JavaScript
 
@@ -146,29 +148,37 @@ node datastreams.mjs
 ```python
 # datastreams.py
 import asyncio
+import struct
+
 from conduyt import ConduytDevice
 from conduyt.transports.serial import SerialTransport
-from conduyt.protocol import CMD_DS_READ, CMD_DS_WRITE, CMD_DS_SUBSCRIBE
-import struct
+from conduyt.core.constants import CMD
+
+
+def ds_index(device, name: str) -> int:
+    """Look up a datastream's wire index from HELLO_RESP."""
+    for ds in device.capabilities.datastreams:
+        if ds.name == name:
+            return ds.index
+    raise KeyError(f"datastream {name!r} not found")
 
 
 async def main():
     device = ConduytDevice(SerialTransport('<YOUR_PORT>'))
     await device.connect()
 
-    # Read current temperature
-    # Send DS_READ command with the datastream name
-    resp = await device._send_command(
-        CMD_DS_READ,
-        b'temperature\x00'  # null-terminated datastream name
-    )
-    temp = struct.unpack('<f', resp[:4])[0]
+    temp_idx  = ds_index(device, 'temperature')
+    set_idx   = ds_index(device, 'setpoint')
+
+    # DS_READ payload is `ds_index(u8)`. Response (DS_READ_RESP, 0xD2) is
+    # `ds_index(u8) + value(N)`; skip the leading id byte.
+    resp = await device._send_command(CMD.DS_READ, bytes([temp_idx]))
+    temp = struct.unpack('<f', resp[1:5])[0]
     print(f"Current temp: {temp:.1f}")
 
-    # Write setpoint
-    # Send DS_WRITE with name + float32 value
-    payload = b'setpoint\x00' + struct.pack('<f', 22.0)
-    await device._send_command(CMD_DS_WRITE, payload)
+    # DS_WRITE payload is `ds_index(u8) + value(N)`.
+    payload = bytes([set_idx]) + struct.pack('<f', 22.0)
+    await device._send_command(CMD.DS_WRITE, payload)
     print("Setpoint set to 22.0")
 
     await device.disconnect()
@@ -177,7 +187,7 @@ async def main():
 asyncio.run(main())
 ```
 
-**Note:** The Python SDK doesn't have a `.datastream()` proxy like JavaScript. You send raw DS_READ/DS_WRITE/DS_SUBSCRIBE commands using `_send_command()`. The built-in module wrappers in `conduyt.modules` use the same pattern internally.
+**Note:** The Python SDK doesn't have a `.datastream()` proxy like JavaScript. Send raw DS_READ / DS_WRITE / DS_SUBSCRIBE commands via `_send_command()`. The built-in module wrappers in `conduyt.modules` use the same pattern internally. Constants are class attributes on `CMD` (e.g. `CMD.DS_READ`), exported from `conduyt.core.constants`.
 
 ## Full firmware example
 
@@ -192,8 +202,8 @@ float currentSetpoint = 20.0f;
 void setup() {
   Serial.begin(115200);
 
-  device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);
-  device.addDatastream("setpoint", CONDUYT_TYPE_FLOAT32, "celsius", true);
+  device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);
+  device.addDatastream("setpoint", CONDUYT_FLOAT32, "celsius", true);
 
   device.onDatastreamWrite("setpoint", [](ConduytPayloadReader &payload, ConduytContext &ctx) {
     currentSetpoint = payload.readFloat32();

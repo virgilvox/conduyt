@@ -82,24 +82,52 @@ const hello: HelloResp = await device.connect()
 
 ## PinProxy
 
-Returned by `device.pin(num)`.
+Returned by `device.pin(id)`. `id` is either a numeric pin (0, 13) or an analog name like `'A0'` (which puts the proxy in analog mode automatically).
 
 | Method | Return | Description |
 |---|---|---|
-| `async mode(mode)` | `Promise<void>` | Set pin mode: "input", "output", "pwm", "analog", "input_pullup" |
-| `async write(value)` | `Promise<void>` | Write digital or PWM value (0-255) |
-| `async read()` | `Promise<number>` | Read pin value (0-1023 for analog, 0-1 for digital) |
-| `subscribe(opts?)` | `AsyncIterable<number>` | Subscribe to pin changes. Options: `intervalMs`, `threshold` |
+| `async mode(mode)` | `Promise<void>` | Set pin mode: `"input"`, `"output"`, `"pwm"`, `"analog"`, `"input_pullup"` |
+| `async write(value)` | `Promise<void>` | Write digital (0/1) or PWM (0-255) value |
+| `async read()` | `Promise<number>` | Read using the pin's stored mode (or analog if the proxy was made with `'A0'`) |
+| `async analogRead()` | `Promise<number>` | Explicit analog read (0-1023 on most boards) |
+| `async digitalRead()` | `Promise<number>` | Explicit digital read (0 or 1) |
+| `subscribe(opts?)` | `AsyncIterable<number>` | Subscribe to pin events. Options: `mode`, `intervalMs`, `threshold` |
+
+`subscribe(opts)` options:
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `mode` | number (`SUB_MODE.*`) | `ANALOG_POLL` (0x04) | `CHANGE` (0x01), `RISING` (0x02), `FALLING` (0x03), `ANALOG_POLL` (0x04) |
+| `intervalMs` | number | 100 | Poll interval for analog mode |
+| `threshold` | number | 0 | Only emit when value moves by more than threshold |
+
+```ts
+import { ConduytDevice, SUB_MODE } from 'conduyt-js'
+
+// Analog poll: yields the latest reading every interval
+for await (const v of device.pin('A0').subscribe({ intervalMs: 50 })) { ... }
+
+// Falling edge: yields once per detected edge
+for await (const _ of device.pin(2).subscribe({ mode: SUB_MODE.FALLING })) { ... }
+```
 
 ## DatastreamProxy
 
-Returned by `device.datastream(name)`.
+Returned by `device.datastream(name)`. The proxy looks up the datastream's descriptor in `device.capabilities.datastreams` and uses it to encode writes and decode reads.
 
-| Method | Return | Description |
+| Method / Getter | Return | Description |
 |---|---|---|
-| `async read()` | `Promise<any>` | Read current value |
-| `async write(value)` | `Promise<void>` | Write a value (writable datastreams only) |
-| `subscribe(opts?)` | `AsyncIterable<any>` | Subscribe to value updates. Options: `intervalMs` |
+| `descriptor` | `DatastreamDescriptor \| null` | The descriptor from `HELLO_RESP`, or null if the name is unknown |
+| `async read()` | `Promise<Uint8Array>` | Read the current raw payload |
+| `async write(value)` | `Promise<void>` | Write a value. Accepts `boolean`, `number`, `string`, or `Uint8Array`; the SDK encodes per the declared type. Throws `ConduytCapabilityError` if the stream is read-only or unknown |
+| `subscribe(opts?)` | `AsyncIterable<DatastreamValue>` | Subscribe to pushed values. Option: `threshold` (numeric streams only) |
+
+```ts
+// Subscribe yields each value the device pushes:
+for await (const t of device.datastream('temperature').subscribe()) {
+  console.log(t)
+}
+```
 
 ## ModuleProxy
 
@@ -136,12 +164,33 @@ All transports implement the `ConduytTransport` interface:
 
 ```typescript
 interface ConduytTransport {
-  open(): Promise<void>
-  close(): Promise<void>
+  connect(): Promise<void>
+  disconnect(): Promise<void>
   send(packet: Uint8Array): Promise<void>
-  onPacket(handler: (packet: Uint8Array) => void): void
+  onReceive(handler: (packet: Uint8Array) => void): void
+  readonly connected: boolean
   readonly needsCOBS: boolean
 }
+```
+
+Direct transports that operate on byte streams (Serial, WebSerial, BLE) set `needsCOBS = true` so `ConduytDevice` applies COBS framing. Message-oriented transports (MQTT, WebSocket, Mock) set it to `false`.
+
+### ReconnectTransport
+
+Wrap any transport to add exponential-backoff reconnection.
+
+```ts
+import { ConduytDevice, ReconnectTransport } from 'conduyt-js'
+import { SerialTransport } from 'conduyt-js/transports/serial'
+
+const transport = new ReconnectTransport(
+  new SerialTransport({ path: '/dev/ttyACM0' }),
+  { initialDelay: 1000, maxDelay: 30000, multiplier: 2, maxAttempts: 0 }
+)
+transport.onReconnect = () => {
+  console.log('reconnected')
+}
+const device = await ConduytDevice.connect(transport)
 ```
 
 ## Error Classes

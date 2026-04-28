@@ -20,13 +20,16 @@ const device = await ConduytDevice.connect(
   new SerialTransport({ path: '/dev/ttyUSB0' })
 )
 
-// Pin control
+// Pin control. Pass 'A0' (string) for analog channels, or numeric pin IDs.
 await device.pin(13).mode('output')
 await device.pin(13).write(1)
-const value = await device.pin(A0).read('analog')
+const value = await device.pin('A0').read()
+// Or be explicit: await device.pin(0).analogRead()
 
-// Pin subscription (async iterable)
-for await (const reading of device.pin(A0).subscribe({ mode: 'analog', intervalMs: 100 })) {
+// Pin subscription (async iterable). 'A0' as pin name defaults the
+// subscribe mode to ANALOG_POLL. For digital edges, pass a numeric
+// SUB_MODE (e.g. SUB_MODE.FALLING).
+for await (const reading of device.pin('A0').subscribe({ intervalMs: 100 })) {
   console.log(reading)
 }
 

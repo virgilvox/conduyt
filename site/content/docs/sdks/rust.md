@@ -59,7 +59,7 @@ servo.attach(9, 1000, 2000)?;
 servo.write(90)?;
 ```
 
-Each wrapper takes the device and a `module_id` byte. Get the ID from the parsed `HELLO_RESP` (or hard-code if you control the firmware). See the per-module pages under [Modules](/docs/modules) for command references.
+Each wrapper takes the device and a `module_id` byte. Get the ID from the parsed `HELLO_RESP` (or hard-code if you control the firmware). See the per-module pages under [Modules](/docs/modules/servo) for command references.
 
 ## no_std core
 

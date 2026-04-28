@@ -53,15 +53,17 @@ After flashing, the device starts advertising immediately. You should see "MyDev
 
 ## BLE transport details
 
-CONDUYT uses the **Nordic UART Service (NUS)** for data transfer:
+CONDUYT defines its own GATT service with three characteristics. The UUIDs are the firmware-side defaults; both the firmware (`firmware/src/conduyt/transport/ConduytBLE.h`) and the JS SDK (`sdk/js/src/transports/ble.ts`) use these by default.
 
 | Characteristic | UUID | Direction |
 |----------------|------|-----------|
-| Service | `6E400001-B5A3-F393-E0A9-E50E24DCCA9E` | - |
-| TX (notifications) | `6E400003-B5A3-F393-E0A9-E50E24DCCA9E` | Device → Host |
-| RX (write) | `6E400002-B5A3-F393-E0A9-E50E24DCCA9E` | Host → Device |
+| Service | `0000cd01-0000-1000-8000-00805f9b34fb` | - |
+| TX (notifications) | `0000cd02-0000-1000-8000-00805f9b34fb` | Device to Host |
+| RX (write) | `0000cd03-0000-1000-8000-00805f9b34fb` | Host to Device |
 
-BLE is a byte stream, so CONDUYT applies **COBS framing** to delimit packets - same as serial. The transport handles this automatically.
+If you build a custom BLE central (raw CoreBluetooth, native Android, MicroPython BLE), scan and subscribe against these exact UUIDs. The JS `BLETransport` constructor accepts `{ serviceUUID, txCharUUID, rxCharUUID }` overrides if you ever need to point at a different service.
+
+BLE is a byte stream, so CONDUYT applies **COBS framing** to delimit packets, same as serial. The transport handles this automatically.
 
 **MTU:** The default BLE MTU is 20 bytes. CONDUYT packets larger than 20 bytes are automatically split across multiple BLE writes by the transport layer. For better throughput, the SDK negotiates a larger MTU (up to 512 bytes) when both sides support it.
 
@@ -91,7 +93,7 @@ WebBluetooth only works in **Chrome** or **Edge** on desktop. It requires a **us
     document.getElementById('connect').addEventListener('click', async () => {
       try {
         // This opens the browser's Bluetooth device picker
-        // The picker is filtered to devices advertising the NUS service
+        // The picker is filtered to devices advertising the CONDUYT service
         const transport = new BLETransport()
         device = await ConduytDevice.connect(transport)
 
@@ -102,13 +104,19 @@ WebBluetooth only works in **Chrome** or **Edge** on desktop. It requires a **us
         document.getElementById('toggle').disabled = false
         document.getElementById('connect').disabled = true
 
-        device.on('disconnect', () => {
-          print('Disconnected')
-          document.getElementById('toggle').disabled = true
-          document.getElementById('connect').disabled = false
-          device = null
-          ledOn = false
-        })
+        // Poll device.connected to detect link drops. The SDK does not expose a
+        // public 'disconnect' event today; check `device.connected` periodically
+        // (or wrap the transport in ReconnectTransport for auto-reconnect).
+        const checkLink = setInterval(() => {
+          if (!device.connected) {
+            clearInterval(checkLink)
+            print('Disconnected')
+            document.getElementById('toggle').disabled = true
+            document.getElementById('connect').disabled = false
+            device = null
+            ledOn = false
+          }
+        }, 1000)
       } catch (err) {
         print('Failed: ' + err.message)
       }
@@ -134,25 +142,29 @@ npx serve .
 
 ## Swift (iOS / macOS)
 
-ConduytKit wraps CoreBluetooth and handles NUS discovery, COBS framing, and the CONDUYT protocol:
+ConduytKit wraps CoreBluetooth and handles CONDUYT service discovery, COBS framing, and the protocol:
 
 ```swift
 import ConduytKit
 
-let device = ConduytBLEDevice()
+// BLETransport scans for the CONDUYT GATT service. Pass `name:` or `uuid:` to
+// filter the picker; otherwise it connects to the first device that advertises
+// the service.
+let transport = BLETransport()
+let device = ConduytDevice(transport: transport)
 
-// Scans for CONDUYT devices and connects to the first one found
-// On iOS, this triggers the system Bluetooth permission prompt on first use
-let capabilities = try await device.connect()
-print("Connected: \(capabilities.firmwareName)")
-print("Pins: \(capabilities.pins.count)")
+// connect() returns the raw HELLO_RESP Data; on iOS this also triggers the
+// system Bluetooth permission prompt on first use.
+let helloData = try await device.connect()
+print("Connected, HELLO_RESP \(helloData.count) bytes")
 
-// Control pins
-try await device.pin(13).mode(.output)
-try await device.pin(13).write(1)
+// Pin control. ConduytKit uses flat methods on the device (no pin proxy);
+// constants live on `ConduytPinMode` and `ConduytSubMode`.
+try await device.pinMode(13, mode: ConduytPinMode.output)
+try await device.pinWrite(13, value: 1)
 print("LED on")
 
-let value = try await device.pin(0).read()
+let value = try await device.pinRead(0)
 print("A0 = \(value)")
 
 try await device.disconnect()
@@ -160,7 +172,7 @@ try await device.disconnect()
 
 ### Using CoreBluetooth directly
 
-If you're not using ConduytKit, scan for the NUS service UUID (`6E400001-...`), subscribe to notifications on the TX characteristic (`6E400003-...`), and write to the RX characteristic (`6E400002-...`). All data must pass through COBS encode/decode since BLE is a byte stream.
+If you're not using ConduytKit, scan for the CONDUYT service UUID (`0000cd01-0000-1000-8000-00805f9b34fb`), subscribe to notifications on the TX characteristic (`0000cd02-...`), and write to the RX characteristic (`0000cd03-...`). All data must pass through COBS encode/decode since BLE is a byte stream.
 
 ## Troubleshooting
 

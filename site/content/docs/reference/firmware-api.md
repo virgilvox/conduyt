@@ -90,7 +90,7 @@ ConduytDevice(const char *name, const char *version, ConduytTransport &transport
 void callback(ConduytPayloadReader &payload, ConduytContext &ctx)
 ```
 
-Read values from `payload` using `readFloat32()`, `readInt32()`, `readUint8()`, etc. Call `ctx.ack()` or `ctx.nak(errorCode)` to respond.
+Read values from `payload` using `readFloat32()`, `readInt32()`, `readUInt8()`, etc. Call `ctx.ack()` or `ctx.nak(errorCode)` to respond.
 
 ## ConduytModuleBase
 
@@ -114,9 +114,11 @@ Base class for all modules. Subclass this to create custom modules.
 | `ConduytSerial` | UART/USB | Yes | All boards |
 | `ConduytUSBSerial` | USB CDC | Yes | RP2040, SAMD, nRF52 |
 | `ConduytMQTT` | MQTT | No | ESP32, ESP8266 |
-| `ConduytBLE` | BLE (NUS) | Yes | ESP32, nRF52 |
-| `ConduytTCP` | TCP Server | No | ESP32, ESP8266 |
-| `ConduytCLASP` | CLASP | Yes | ESP32 |
+| `ConduytBLE` | BLE | Yes | ESP32, nRF52 |
+| `ConduytTCP` | TCP Client | No | ESP32, ESP8266 |
+| `ConduytCLASP` | CLASP relay | Yes | ESP32 |
+
+CONDUYT BLE uses its own GATT service UUIDs (`0000cd0[123]-0000-1000-8000-00805f9b34fb`), not Nordic UART Service.
 
 ### Construction Examples
 
@@ -124,21 +126,24 @@ Base class for all modules. Subclass this to create custom modules.
 // Serial (all boards)
 ConduytSerial transport(Serial, 115200);
 
-// USB CDC (RP2040, SAMD, nRF52)
-ConduytUSBSerial transport(SerialUSB, 115200);
+// USB CDC (RP2040, SAMD, nRF52). Constructor takes baud + optional
+// connect-wait timeout; the host Serial object is referenced internally.
+ConduytUSBSerial transport(115200);
 
-// MQTT (ESP32/ESP8266)
+// MQTT (ESP32/ESP8266). Pass a Client (WiFiClient or similar), broker host,
+// port, and a unique device id used as the MQTT topic prefix.
 WiFiClient wifi;
 ConduytMQTT transport(wifi, "broker.local", 1883, "device-001");
 
-// BLE (ESP32, nRF52)
+// BLE (ESP32, nRF52). Optional advertised-name argument; defaults to "CONDUYT".
 ConduytBLE transport("CONDUYT-Device");
 
-// TCP (ESP32/ESP8266)
-ConduytTCP transport(3000);  // listen port
+// TCP client (ESP32/ESP8266). Connects out to a TCP server at host:port.
+WiFiClient tcpClient;
+ConduytTCP transport(tcpClient, "10.0.0.5", 3000);
 
-// CLASP (ESP32)
-ConduytCLASP transport;
+// CLASP (ESP32). Connects to a relay over WebSockets on a named channel.
+ConduytCLASP transport("wss://relay.example.com", "my-device-channel");
 ```
 
 Non-default transports require a compile define before `#include <Conduyt.h>`:

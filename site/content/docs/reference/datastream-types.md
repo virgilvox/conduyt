@@ -85,6 +85,8 @@ Declared in the [HELLO_RESP](/docs/reference/hello-resp) payload. Each descripto
 ## Firmware Declaration
 
 ```cpp
-device.addDatastream("temperature", CONDUYT_TYPE_FLOAT32, "celsius", false);  // read-only
-device.addDatastream("setpoint",    CONDUYT_TYPE_FLOAT32, "celsius", true);   // writable
+device.addDatastream("temperature", CONDUYT_FLOAT32, "celsius", false);  // read-only
+device.addDatastream("setpoint",    CONDUYT_FLOAT32, "celsius", true);   // writable
 ```
+
+`CONDUYT_FLOAT32` and the other `CONDUYT_<TYPE>` short forms are aliases for `CONDUYT_TYPE_<TYPE>` defined in `Conduyt.h`. Either form works; the firmware examples use the short form.

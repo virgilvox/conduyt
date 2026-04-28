@@ -169,7 +169,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 import ConduytKit
 import Foundation
 
-let transport = BLETransport(serviceUUID: ...)
+// BLETransport's init takes optional `name:` or `uuid:` filters; bare-init
+// connects to the first CONDUYT-service advertiser.
+let transport = BLETransport()
 let device = ConduytDevice(transport: transport)
 _ = try await device.connect()
 
@@ -194,7 +196,7 @@ After `OTA_FINALIZE` ACKs, the firmware reboots immediately. Any packet sent on 
 
 ## Notes
 
-- **Chunk size**: each SDK auto-sizes chunks based on `HELLO_RESP.maxPayload`. The device reserves 4 bytes of every payload for the offset header, so chunks are `(maxPayload - 4)` bytes by default. ESP32 advertises 1024, so chunks are 1020 bytes — about 2 chunks per kilobyte of firmware.
+- **Chunk size**: each SDK auto-sizes chunks based on `HELLO_RESP.maxPayload`. The device reserves 4 bytes of every payload for the offset header, so chunks are `(maxPayload - 4)` bytes by default. ESP32, RP2040, nRF52, STM32, and Teensy advertise 512 bytes (so chunks are 508), SAMD advertises 256, ATmega328 advertises 128. Override at firmware build time with `#define CONDUYT_PACKET_BUF_SIZE 1024` before `#include <Conduyt.h>` if you want larger chunks on capable boards.
 - **Sequential offsets**: chunks must be sent in ascending offset order. The firmware NAKs any out-of-order chunk to keep `Update.write` happy. None of the SDK orchestrators reorder, so this is automatic if you use them.
 - **Hashing on the host**: the SHA-256 is computed on the host and verified by the firmware at finalize time. A mid-flight transport corruption that slips past CRC8 will still get caught here.
 - **Rollback**: there's no rollback in the OTA spec itself — if the new firmware bricks itself, you fall back to USB / DFU. Keep a known-good build handy.

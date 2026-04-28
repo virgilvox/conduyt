@@ -36,7 +36,7 @@ void loop() {
 
 ## Host usage
 
-The marker module itself has no commands — every `MOD_CMD` to it returns `NAK 0x09`. Drive I2C through `device.i2cWrite` and `device.i2cRead` directly.
+The marker module itself has no commands. Every `MOD_CMD` to it returns `NAK 0x09`. Drive I2C through the proxy returned by `device.i2c()` directly. The proxy exposes `write`, `read`, and `readReg` methods.
 
 ### JavaScript
 
@@ -45,26 +45,34 @@ import { ConduytDevice } from 'conduyt-js'
 import { SerialTransport } from 'conduyt-js/transports/serial'
 
 const device = await ConduytDevice.connect(new SerialTransport({ path: '<YOUR_PORT>' }))
+const i2c = device.i2c()
 
-// Read 2 bytes from register 0x00 of an MPU-6050 (addr 0x68)
-await device.i2cWrite(0x68, new Uint8Array([0x00]))   // point to register 0x00
-const data = await device.i2cRead(0x68, 2)
-console.log('WHO_AM_I + 1:', data)
+// Read 1 byte from register 0x75 (WHO_AM_I) of an MPU-6050 (addr 0x68)
+const data = await i2c.readReg(0x68, 0x75, 1)
+console.log('WHO_AM_I:', data[0].toString(16))
+
+// Or write then read in two steps:
+await i2c.write(0x68, new Uint8Array([0x75]))   // point to register 0x75
+const echoed = await i2c.read(0x68, 1)
+console.log('WHO_AM_I (manual):', echoed[0].toString(16))
 ```
 
 ### Python
 
+The Python SDK doesn't have a public I2C proxy (the JS SDK's `device.i2c()` has no Python equivalent today). Send raw protocol commands via `_send_command`. Wire format: `I2C_WRITE` payload is `bus(1) + addr(1) + data(N)`; `I2C_READ` is `bus(1) + addr(1) + count(1)`.
+
 ```python
 from conduyt import ConduytDevice
 from conduyt.transports.serial import SerialTransport
+from conduyt.core.constants import CMD
 
 device = ConduytDevice(SerialTransport('<YOUR_PORT>'))
 await device.connect()
 
-# Read 2 bytes from register 0x00 of an MPU-6050 (addr 0x68)
-await device.i2c_write(0x68, b"\x00")
-data = await device.i2c_read(0x68, 2)
-print(data.hex())
+# Read 1 byte from register 0x75 (WHO_AM_I) of an MPU-6050 (addr 0x68) on bus 0
+await device._send_command(CMD.I2C_WRITE, bytes([0, 0x68, 0x75]))
+data = await device._send_command(CMD.I2C_READ, bytes([0, 0x68, 1]))
+print('WHO_AM_I:', data.hex())
 ```
 
 ## Why this exists as a module
@@ -74,7 +82,7 @@ print(data.hex())
 1. Discover that the firmware has I2C wired up (`Wire.begin()` was called) by checking `HELLO_RESP.modules` for the `i2c_pass` entry.
 2. Show "I2C available" in playgrounds and dashboards instead of probing blindly.
 
-If you only need raw I2C access and don't care about advertising it, you can leave this module disabled and still call `device.i2cWrite` / `device.i2cRead`.
+If you only need raw I2C access and don't care about advertising it, you can leave this module disabled and still call `device.i2c().write()` / `device.i2c().read()` / `device.i2c().readReg()`.
 
 ## Notes
 

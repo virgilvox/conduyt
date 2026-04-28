@@ -73,7 +73,7 @@ if err := s.Attach(ctx, 9, 1000, 2000); err != nil { log.Fatal(err) }
 if err := s.Write(ctx, 90); err != nil { log.Fatal(err) }
 ```
 
-Look up the module ID from `device.Capabilities().Modules` to avoid hard-coding it. See the per-module pages under [Modules](/docs/modules) for command reference.
+Look up the module ID from `device.Capabilities().Modules` to avoid hard-coding it. See the per-module pages under [Modules](/docs/modules/servo) for command reference.
 
 ## Transports
 
